@@ -1,0 +1,49 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+    annotations:
+        nais.io/read-only-file-system: "false"
+        nais.io/run-as-user: "1001"
+    name: helseid-nav-test
+    namespace: helseopplysninger
+    labels:
+        team: helseopplysninger
+spec:
+    accessPolicy:
+        outbound:
+            external:
+                -   host:  {{host}}
+                -   host: www.vg.no
+    observability:
+        tracing:
+            enabled: true
+    port: 8080
+    image: {{image}}
+    liveness:
+        path: /actuator/health/liveness
+        initialDelay: 60
+    readiness:
+        path: /actuator/health/readiness
+        initialDelay: 60
+    prometheus:
+        enabled: true
+        path: /actuator/prometheus
+    replicas:
+        min: 1
+        max: 1
+        cpuThresholdPercentage: 50
+    ingresses:
+        - {{ingress}}
+    resources:
+        limits:
+            memory: 8192Mi
+        requests:
+            cpu: 250m
+            memory: 4096Mi
+    env:
+        -   name: HOST
+            value: {{host}}
+        -   name: ENV
+            value: {{env}}
+    envFrom:
+        -   secret: helseid

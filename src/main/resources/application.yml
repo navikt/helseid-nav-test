@@ -1,0 +1,43 @@
+management:
+    endpoint:
+        env:
+            show-values: always
+        configprops:
+            show-values: always
+    endpoints:
+        web:
+            exposure:
+                include: '*'
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          helse-id:
+             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+             client-authentication-method: "private_key_jwt"
+             authorization-grant-type: "authorization_code"
+             client-id: "d33dd479-12d2-493f-a8a2-f440ee9e5219"
+             client-name: "helseopplysninger-web"
+             scope:
+                - "profile"
+                - "openid"
+                - "hdir:felleskodeverk.api/kodeverk"
+                - "hdir:felleskodeverk.api/kodeverdier"
+                - "helseid://scopes/identity/assurance_level"
+                - "helseid://scopes/identity/pid"
+                - "helseid://scopes/identity/pid_pseudonym"
+                - "helseid://scopes/identity/security_level"
+                - "helseid://scopes/identity/network"
+                - "helseid://scopes/hpr/hpr_number"
+        provider:
+          helse-id:
+            issuer-uri:  ${helse-id.issuer}
+logging:
+  level:
+    org.springframework.web: TRACE
+    org.springframework.security.oauth2: TRACE
+    no.nav.helse: INFO
+
+authserver.url: https://helseid-sts.test.nhn.no
