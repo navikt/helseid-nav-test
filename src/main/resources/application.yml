@@ -12,6 +12,9 @@ management:
 spring:
   security:
     oauth2:
+      resourceserver:
+            jwt:
+              issuer-uri:  ${helse-id.issuer}
       client:
         registration:
           helse-id:
@@ -23,20 +26,16 @@ spring:
              scope:
                 - "profile"
                 - "openid"
-                - "hdir:felleskodeverk.api/kodeverk"
-                - "hdir:felleskodeverk.api/kodeverdier"
                 - "helseid://scopes/identity/assurance_level"
                 - "helseid://scopes/identity/pid"
-                - "helseid://scopes/identity/pid_pseudonym"
                 - "helseid://scopes/identity/security_level"
-                - "helseid://scopes/identity/network"
                 - "helseid://scopes/hpr/hpr_number"
         provider:
           helse-id:
             issuer-uri:  ${helse-id.issuer}
 logging:
   level:
-    org.springframework.web: TRACE
+    org.springframework: TRACE
     org.springframework.security.oauth2: TRACE
     no.nav.helse: INFO
 
