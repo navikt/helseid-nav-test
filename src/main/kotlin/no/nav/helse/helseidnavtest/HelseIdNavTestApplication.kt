@@ -30,6 +30,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.ModelAndView
 import no.nav.boot.conditionals.Cluster.Companion.profiler
 
 @SpringBootApplication
@@ -51,8 +52,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
     @Bean
-     fun userAuthoritiesMapper() : GrantedAuthoritiesMapper {
-        return GrantedAuthoritiesMapper { authorities : Collection<GrantedAuthority> ->
+     fun userAuthoritiesMapper() =
+         GrantedAuthoritiesMapper { authorities : Collection<GrantedAuthority> ->
             val mappedAuthorities  = mutableSetOf<GrantedAuthority>()
             authorities.forEach { authority ->
                 log.warn("Authority {}", authority.authority)
@@ -71,7 +72,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
             }
             mappedAuthorities
         }
-    }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
@@ -142,7 +142,7 @@ class HelseController {
     private val log = LoggerFactory.getLogger(HelseController::class.java)
 
     @GetMapping("/")
-    fun root() = "root"
+    fun rickroll()  =  ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
     @GetMapping("/error")
     fun error() = "Uh-oh"

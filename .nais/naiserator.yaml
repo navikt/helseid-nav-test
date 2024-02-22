@@ -13,7 +13,7 @@ spec:
         outbound:
             external:
                 -   host:  {{host}}
-                -   host: www.vg.no
+                -   host: youtube.com
     observability:
         tracing:
             enabled: true
