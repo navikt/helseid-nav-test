@@ -142,11 +142,12 @@ class HelseController {
     private val log = LoggerFactory.getLogger(HelseController::class.java)
 
     @GetMapping("/")
-    fun rickroll()  =  ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
+    fun root()  =  roll()
     @GetMapping("/error")
-    fun error()   = rickroll()
+    fun error()   = roll()
 
+    private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication): String {
         val oidcUser = authentication.principal as OidcUser
