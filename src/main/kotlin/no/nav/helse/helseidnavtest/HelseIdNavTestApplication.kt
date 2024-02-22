@@ -1,7 +1,6 @@
 package no.nav.helse.helseidnavtest
 
 import com.nimbusds.jose.jwk.JWK
-import kotlin.math.log
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -25,7 +24,6 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -51,23 +49,25 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     private val jwk = JWK.parse(assertion)
 
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
+
     @Bean
      fun userAuthoritiesMapper() =
-         GrantedAuthoritiesMapper { authorities : Collection<GrantedAuthority> ->
+         GrantedAuthoritiesMapper { authorities ->
             val mappedAuthorities  = mutableSetOf<GrantedAuthority>()
-            authorities.forEach { authority ->
-                log.warn("Authority {}", authority.authority)
-                mappedAuthorities.add(authority)
-                if (OidcUserAuthority::class.java.isInstance(authority)) {
-                    val oidcUserAuthority = authority as OidcUserAuthority
-                    val idToken = oidcUserAuthority.idToken
-                    if (authority.authority == "OIDC_USER") {
-                        val level = idToken.getClaim<String>("helseid://claims/identity/security_level")
-                        val hpr = idToken.getClaim<String>("helseid://claims/hpr/hpr_number")
-                        if ("4" == level && hpr != null) {
-                            mappedAuthorities.add(GrantedAuthority { "LEGE_4" })
+            authorities.forEach {
+                mappedAuthorities.add(it)
+                when(it) {
+                    is OidcUserAuthority -> {
+                        val idToken = it.idToken
+                        if (it.authority == "OIDC_USER") {
+                            val level = idToken.getClaim<String>("helseid://claims/identity/security_level")
+                            val hpr = idToken.getClaim<String>("helseid://claims/hpr/hpr_number")
+                            if ("4" == level && hpr != null) {
+                                mappedAuthorities.add(GrantedAuthority { "LEGE_4" })
+                            }
                         }
                     }
+                    else -> log.warn("Authority: {}", it)
                 }
             }
             mappedAuthorities
@@ -75,7 +75,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
-            setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helseid" )
+            setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id" )
         }
 
     @Bean
@@ -136,7 +136,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 }
 
 @RestController
-@EnableMethodSecurity(prePostEnabled = true)
 class HelseController {
 
     private val log = LoggerFactory.getLogger(HelseController::class.java)
@@ -147,7 +146,7 @@ class HelseController {
     fun error()   = roll()
 
     private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-    
+
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication): String {
         val oidcUser = authentication.principal as OidcUser
@@ -176,6 +175,7 @@ class HelseController {
     fun hello(authentication: Authentication): String {
         val oidcUser = authentication.principal as OidcUser
         val attributes = oidcUser.claims
+        oidcUser.userInfo.claims.forEach { log.warn("{}", it) }
         val idToken = oidcUser.idToken
         val auths = oidcUser.authorities.joinToString { it.authority }
         println("AAA")

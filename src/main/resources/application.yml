@@ -35,8 +35,8 @@ spring:
             issuer-uri:  ${helse-id.issuer}
 logging:
   level:
-    org.springframework: TRACE
-    org.springframework.security.oauth2: TRACE
+    org.springframework.web: TRACE
+    org.springframework.security: TRACE
     no.nav.helse: INFO
 
 authserver.url: https://helseid-sts.test.nhn.no
