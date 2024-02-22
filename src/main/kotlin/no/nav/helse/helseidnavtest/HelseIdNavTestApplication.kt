@@ -46,6 +46,10 @@ fun main(args: Array<String>) {
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
 class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
+
+    private val authorizationEndpoint: String = "/oauth2/authorization"
+
+
     private val jwk = JWK.parse(assertion)
 
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
@@ -80,10 +84,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
-            when (it.registrationId) {
+        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter { clientRegistration ->
+            when (clientRegistration.registrationId) {
                 "helse-id" -> jwk
-                else -> throw IllegalArgumentException("Unknown client: ${it.registrationId}")
+                else -> throw IllegalArgumentException("Unknown client: ${clientRegistration.registrationId}")
             }
         })
     }
@@ -96,7 +100,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun pkceResolver(repo: ClientRegistrationRepository) =
-        DefaultOAuth2AuthorizationRequestResolver(repo, "/protected").apply {
+        DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
         }
 
@@ -109,7 +113,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         http {
             oauth2Login {
                 authorizationEndpoint {
-                    baseUri = "/protected"
+                    baseUri = authorizationEndpoint
                     authorizationRequestResolver = resolver
                 }
             }
@@ -142,6 +146,7 @@ class HelseController {
 
     @GetMapping("/")
     fun root()  =  roll()
+
     @GetMapping("/error")
     fun error()   = roll()
 
