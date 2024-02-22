@@ -35,7 +35,8 @@ spring:
             issuer-uri:  ${helse-id.issuer}
 logging:
   level:
-    org.springframework.web: TRACE
+    org.springframework.web: INFO
+    # org.springframework.security.oauth2: TRACE
     org.springframework.security: TRACE
     no.nav.helse: INFO
 
