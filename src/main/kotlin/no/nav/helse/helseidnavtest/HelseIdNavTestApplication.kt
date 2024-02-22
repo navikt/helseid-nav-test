@@ -145,7 +145,7 @@ class HelseController {
     fun rickroll()  =  ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
     @GetMapping("/error")
-    fun error() = "Uh-oh"
+    fun error()   = rickroll()
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication): String {
