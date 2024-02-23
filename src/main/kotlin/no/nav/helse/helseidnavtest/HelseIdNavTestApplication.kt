@@ -1,6 +1,7 @@
 package no.nav.helse.helseidnavtest
 
 import com.nimbusds.jose.jwk.JWK
+import no.nav.boot.conditionals.Cluster.Companion.profiler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -29,7 +30,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.ModelAndView
-import no.nav.boot.conditionals.Cluster.Companion.profiler
 
 @SpringBootApplication
 @EnableWebSecurity
@@ -55,12 +55,12 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
 
     @Bean
-     fun userAuthoritiesMapper() =
-         GrantedAuthoritiesMapper { authorities ->
-            val mappedAuthorities  = mutableSetOf<GrantedAuthority>()
+    fun userAuthoritiesMapper() =
+        GrantedAuthoritiesMapper { authorities ->
+            val mappedAuthorities = mutableSetOf<GrantedAuthority>()
             authorities.forEach {
                 mappedAuthorities.add(it)
-                when(it) {
+                when (it) {
                     is OidcUserAuthority -> {
                         val idToken = it.idToken
                         if (it.authority == "OIDC_USER") {
@@ -71,15 +71,17 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                             }
                         }
                     }
+
                     else -> log.warn("Authority: {}", it)
                 }
             }
             mappedAuthorities
         }
+
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
-            setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id" )
+            setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
     @Bean
@@ -135,8 +137,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         }
         return http.build()
     }
-
-
+    
 }
 
 @RestController
@@ -144,56 +145,65 @@ class HelseController {
 
     private val log = LoggerFactory.getLogger(HelseController::class.java)
 
+    private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
     @GetMapping("/")
-    fun root()  =  roll()
+    fun root() = roll()
 
     @GetMapping("/error")
-    fun error()   = roll()
-
-    private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    fun error() = roll()
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication): String {
         val oidcUser = authentication.principal as OidcUser
-        val attributes = oidcUser.attributes
+
+        val attributes = oidcUser.claims
         val idToken = oidcUser.idToken
-        log.info(oidcUser.userInfo.claims.toString())
-        log.warn("Logget inn bruker (pseudo) personnummer: {}", attributes["helseid://claims/identity/pid_pseudonym"])
-        log.warn("{}", idToken.tokenValue)
-        idToken.claims.forEach { log.warn("{}", it) }
-        val auths = oidcUser.authorities.joinToString { it.authority }
+        val auths = oidcUser.authorities.joinToString("", "<li>", "</li>")
+
+        log.debug("JWT token: {}", idToken.tokenValue)
+
+        oidcUser.userInfo.claims.forEach { log.debug("OIDC_USER CLAIM: {}", it) }
+        idToken.claims.forEach { log.debug("TOKEN CLAIM: {}", it) }
 
         return """
+            <h1>/hello1</h1>
             <p>Hello from <b>${attributes["name"]}</b></p>
             <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
             <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
             <p>Verifisert med: <b>${attributes["idp"]}</b></p>
-            <p>Authorities <b>$auths}</b></p>
-
+            <p>Authorities</p>
+            <ul>$auths</ul>
+            </br >
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
     }
+
     @GetMapping("/public/utlogget")
     fun public() = "Du er nå logget ut. <a href='/hello'>Logg inn igjen</a>"
 
     @GetMapping("/hello")
     fun hello(authentication: Authentication): String {
         val oidcUser = authentication.principal as OidcUser
+
         val attributes = oidcUser.claims
-        oidcUser.userInfo.claims.forEach { log.warn("{}", it) }
         val idToken = oidcUser.idToken
-        val auths = oidcUser.authorities.joinToString { it.authority }
-        println("AAA")
-        log.warn("Logget inn bruker (pseudo) personnummer: {}", attributes["helseid://claims/identity/pid_pseudonym"])
-        log.warn("{}", idToken.tokenValue)
-        idToken.claims.forEach { log.warn("{}", it) }
+        val auths = oidcUser.authorities.joinToString("", "<li>", "</li>")
+
+        log.debug("JWT token: {}", idToken.tokenValue)
+
+        oidcUser.userInfo.claims.forEach { log.debug("OIDC_USER CLAIM: {}", it) }
+        idToken.claims.forEach { log.debug("TOKEN CLAIM: {}", it) }
 
         return """
+            <h1>/hello</h1>
             <p>Hello from <b>${attributes["name"]}</b></p>
             <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
             <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
             <p>Verifisert med: <b>${attributes["idp"]}</b></p>
-            <p>Authorities <b>$auths}</b></p>
+            <p>Authorities</p>
+            <ul>$auths</ul>
+            </br >
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
     }
