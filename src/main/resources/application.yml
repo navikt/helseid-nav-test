@@ -22,7 +22,7 @@ spring:
              client-authentication-method: "private_key_jwt"
              authorization-grant-type: "authorization_code"
              client-id: "d33dd479-12d2-493f-a8a2-f440ee9e5219"
-             client-name: "helseopplysninger-web"
+             client-name: "NAV Helseopplysninger"
              scope:
                 - "profile"
                 - "openid"
@@ -33,11 +33,5 @@ spring:
         provider:
           helse-id:
             issuer-uri:  ${helse-id.issuer}
-logging:
-  level:
-    org.springframework.web: INFO
-    # org.springframework.security.oauth2: TRACE
-    org.springframework.security: TRACE
-    no.nav.helse: INFO
 
 authserver.url: https://helseid-sts.test.nhn.no
