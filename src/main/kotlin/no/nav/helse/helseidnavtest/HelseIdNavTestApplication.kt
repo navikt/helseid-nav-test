@@ -2,6 +2,7 @@ package no.nav.helse.helseidnavtest
 
 import com.nimbusds.jose.jwk.JWK
 import no.nav.boot.conditionals.Cluster.Companion.profiler
+import no.nav.helse.helseidnavtest.SecurityConfig.HPRDetailsExtractor.HPRDetails.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -32,10 +33,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.ModelAndView
-import no.nav.helse.helseidnavtest.SecurityConfig.HPRDetailsExtractor.HPRDetails.HPRAuthorization
-import no.nav.helse.helseidnavtest.SecurityConfig.HPRDetailsExtractor.HPRDetails.HPRData
-import no.nav.helse.helseidnavtest.SecurityConfig.HPRDetailsExtractor.HPRDetails.HPRRekvisision
-import no.nav.helse.helseidnavtest.SecurityConfig.HPRDetailsExtractor.HPRDetails.HPRSpesialitet
 
 @SpringBootApplication
 @EnableWebSecurity
@@ -82,9 +79,9 @@ fun main(args: Array<String>) {
 @EnableWebSecurity(debug = true)
 class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
-    internal class HPRDetailsExtractor  {
+    internal class HPRDetailsExtractor {
 
-        fun extract(respons: Any?) : List<HPRDetails> {
+        fun extract(respons: Any?): List<HPRDetails> {
             val details = (respons as Map<*, *>)
             println(details)
             return (details["approvals"] as List<*>).map { app ->
@@ -101,9 +98,14 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 }
             }
         }
-        private fun ex(m: Map<String, String>)= m.map {
-            (k, v) ->HPRData(k, v)}
-        data class HPRDetails(val profession: String, val auth: HPRAuthorization, val rek: HPRRekvisision, val spec: HPRSpesialitet) {
+
+        private fun ex(m: Map<String, String>) = m.map { (k, v) -> HPRData(k, v) }
+        data class HPRDetails(
+            val profession: String,
+            val auth: HPRAuthorization,
+            val rek: HPRRekvisision,
+            val spec: HPRSpesialitet
+        ) {
             data class HPRAuthorization(val data: HPRData)
             data class HPRRekvisision(val data: List<HPRData>)
             data class HPRSpesialitet(val data: List<HPRData>)
@@ -122,7 +124,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         with(OidcUserService().loadUser(req)) {
             val details = HPRDetailsExtractor().extract(claims["helseid://claims/hpr/hpr_details"])
             val level = claims["helseid://claims/identity/security_level"]
-                                                                                  val profession = claims["helseid://claims/hpr/hpr_details"]?.let { it as Map<*, *> }?.let {
+            val profession = claims["helseid://claims/hpr/hpr_details"]?.let { it as Map<*, *> }?.let {
                 ((it["approvals"] as List<*>?)?.getOrNull(0) as? Map<*, *>?)?.get("profession")
             }
             log.info("Level: $level, profession: $profession")
@@ -134,10 +136,11 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 mutableListOf()
             }
             DefaultOidcUser(
-                authorities + extra /*+ SimpleGrantedAuthority("LEGE_4")*/, req.idToken, userInfo).also {
+                authorities + extra /*+ SimpleGrantedAuthority("LEGE_4")*/, req.idToken, userInfo
+            ).also {
                 log.info("User: $this Authorities: $authorities")
                 log.info("User: $it Authorities: ${it.authorities}")
-                }
+            }
         }
     }
 
@@ -203,13 +206,11 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         }
         return http.build()
     }
-    
+
 }
 
 @RestController
 class HelseController {
-
-    private val log = LoggerFactory.getLogger(HelseController::class.java)
 
     private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
@@ -224,13 +225,13 @@ class HelseController {
         val oidcUser = authentication.principal as OidcUser
 
         val attributes = oidcUser.claims
-        val idToken = oidcUser.idToken
-        val auths = oidcUser.authorities.joinToString(",", "<li>", "</li>")
+        val scopes = oidcUser.authorities.joinToString("") {
+            "<li>${it.authority.replace("SCOPE_", "")}</li>"
+        }
 
-        log.debug("JWT token: {}", idToken.tokenValue)
-
-        oidcUser.userInfo.claims.forEach { log.debug("OIDC_USER CLAIM: {}", it) }
-        idToken.claims.forEach { log.debug("TOKEN CLAIM: {}", it) }
+        val claims = oidcUser.claims.map {
+            "<li>${it.key}: ${it.value}</li>"
+        }.joinToString("")
 
         return """
             <h1>/hello1</h1>
@@ -238,9 +239,13 @@ class HelseController {
             <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
             <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
             <p>Verifisert med: <b>${attributes["idp"]}</b></p>
-            <p>Authorities</p>
-            <ul>$auths</ul>
-            </br >
+            <br>
+            <p>Requested authorities</p>
+            <ul>$scopes</ul>
+            <br>
+            <p>Token claims</p>
+            <ul>$claims</ul>
+            <br>
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
     }
@@ -253,13 +258,13 @@ class HelseController {
         val oidcUser = authentication.principal as OidcUser
 
         val attributes = oidcUser.claims
-        val idToken = oidcUser.idToken
-        val auths = oidcUser.authorities.joinToString("", "<li>", "</li>")
+        val scopes = oidcUser.authorities.joinToString("") {
+            "<li>${it.authority.replace("SCOPE_", "")}</li>"
+        }
 
-        log.debug("JWT token: {}", idToken.tokenValue)
-
-        oidcUser.userInfo.claims.forEach { log.debug("OIDC_USER CLAIM: {}", it) }
-        idToken.claims.forEach { log.debug("TOKEN CLAIM: {}", it) }
+        val claims = oidcUser.claims.map {
+            "<li>${it.key}: ${it.value}</li>"
+        }.joinToString("")
 
         return """
             <h1>/hello</h1>
@@ -267,9 +272,13 @@ class HelseController {
             <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
             <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
             <p>Verifisert med: <b>${attributes["idp"]}</b></p>
-            <p>Authorities</p>
-            <ul>$auths</ul>
-            </br >
+            <br>
+            <p>Requested authorities</p>
+            <ul>$scopes</ul>
+            <br>
+            <p>Token claims</p>
+            <ul>$claims</ul>
+            <br>
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
     }
