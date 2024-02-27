@@ -27,33 +27,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 
-//{approvals=[
-// {profession=LE,
-//     authorization={value=1, description=Autorisasjon},
-//     requisition_rights=[
-//        {value=1, description=Full rekvisisjonsrett}
-//     ],
-//     specialities=[
-//         {value=40, description=Psykiatri}
-//  ]
-//  },
-//  {profession=FT,
-//     authorization={value=1, description=Autorisasjon},
-//     requisition_rights=[],
-//     specialities=[]
-//  },
-//  {profession=SP,
-//     authorization={value=1, description=Autorisasjon},
-//     requisition_rights=[], specialities=[]
-//  }
-// ],
-// hpr_number=6081940}
-
-
-//HPRDetails(profession=LE,
-//   auth=HPRAuthorization(data=HPRData(value=1, description=Autorisasjon)),
-//   rek=HPRRekvisision(data=[HPRData(value=value, description=1), HPRData(value=description, description=Full rekvisisjonsrett)]),
-//   spec=HPRSpesialitet(data=[HPRData(value=value, description=40), HPRData(value=description, description=Psykiatri)]))
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -62,32 +35,19 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
-
     private val jwk = JWK.parse(assertion)
 
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
 
     private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
         with(OidcUserService().loadUser(req)) {
-            val details = HPRDetailsExtractor().extract(claims["helseid://claims/hpr/hpr_details"])
             val level = claims["helseid://claims/identity/security_level"]
-            val profession = claims["helseid://claims/hpr/hpr_details"]?.let { it as Map<*, *> }?.let {
-                ((it["approvals"] as List<*>?)?.getOrNull(0) as? Map<*, *>?)?.get("profession")
+            val roles = HPRDetailsExtractor().extract(claims["helseid://claims/hpr/hpr_details"] as Map<*, *>).map {
+                SimpleGrantedAuthority("${it.profession}_${level}")
+            }.also {
+                log.info("La til roller: $it")
             }
-            log.info("Level: $level, profession: $profession")
-            val extra = if (level != null && profession != null) {
-                mutableListOf(SimpleGrantedAuthority("${profession}_$level")).also {
-                    log.info("La til rolle $it")
-                }
-            } else {
-                mutableListOf()
-            }
-            DefaultOidcUser(
-                authorities + extra /*+ SimpleGrantedAuthority("LEGE_4")*/, req.idToken, userInfo
-            ).also {
-                log.info("User: $this Authorities: $authorities")
-                log.info("User: $it Authorities: ${it.authorities}")
-            }
+            DefaultOidcUser(authorities + roles, req.idToken, userInfo)
         }
     }
 
@@ -147,7 +107,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 authorize("/hello1", authenticated)
                 authorize("/public/**", permitAll)
                 authorize("/actuator/**", permitAll)
-                authorize("/hello", hasAuthority("SP_4 or LE_4"))
+                authorize("/hello", hasAuthority("LE_4"))
                 authorize(anyRequest, authenticated)
             }
         }
