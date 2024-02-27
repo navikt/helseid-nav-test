@@ -1,2 +1,2 @@
 helse-id:
-    issuer: https://${host}
+  issuer: https://${host}

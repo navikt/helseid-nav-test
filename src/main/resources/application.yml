@@ -1,37 +1,40 @@
 management:
-    endpoint:
-        env:
-            show-values: always
-        configprops:
-            show-values: always
-    endpoints:
-        web:
-            exposure:
-                include: '*'
+  endpoint:
+    env:
+      show-values: always
+    configprops:
+      show-values: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 spring:
   security:
     oauth2:
       resourceserver:
-            jwt:
-              issuer-uri:  ${helse-id.issuer}
+        jwt:
+          issuer-uri: ${helse-id.issuer}
       client:
         registration:
           helse-id:
-             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-             client-authentication-method: "private_key_jwt"
-             authorization-grant-type: "authorization_code"
-             client-id: "d33dd479-12d2-493f-a8a2-f440ee9e5219"
-             client-name: "NAV Helseopplysninger"
-             scope:
-                - "profile"
-                - "openid"
-                - "helseid://scopes/identity/assurance_level"
-                - "helseid://scopes/identity/pid"
-                - "helseid://scopes/identity/security_level"
-                - "helseid://scopes/hpr/hpr_number"
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+            client-authentication-method: "private_key_jwt"
+            authorization-grant-type: "authorization_code"
+            client-id: "d33dd479-12d2-493f-a8a2-f440ee9e5219"
+            client-name: "NAV Helseopplysninger"
+            scope:
+              - "profile"
+              - "openid"
+              - "helseid://scopes/identity/assurance_level"
+              - "helseid://scopes/identity/pid"
+              - "helseid://scopes/identity/security_level"
+              - "helseid://scopes/hpr/hpr_number"
+              - "nhn:flr-public/read"
+              - "hdir:felleskodeverk.api/kodeverk"
+              - "hdir:felleskodeverk.api/kodeverdier"
         provider:
           helse-id:
-            issuer-uri:  ${helse-id.issuer}
+            issuer-uri: ${helse-id.issuer}
 
 authserver.url: https://helseid-sts.test.nhn.no
