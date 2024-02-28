@@ -2,9 +2,11 @@ package no.nav.helse.helseidnavtest.helseopplysninger
 
 import no.nav.helse.helseidnavtest.helseopplysninger.HPRDetail.*
 
-class HPRDetailsExtractor {
+class HPRDetailsExtractor(private val claims : MutableMap<String, Any>) {
 
-    fun extract(respons: Map<*,*>)  =
+    fun extract() = extract(claims["helseid://claims/hpr/hpr_details"] as Map<*, *>)
+
+    private fun extract(respons: Map<*,*>)  =
         HPRDetails(with((respons)) {
             (this["approvals"] as List<*>).map {
                 it as Map<*, *>
