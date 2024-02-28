@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter
@@ -33,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -126,8 +128,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 }
 class CustomAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(request : HttpServletRequest, response : HttpServletResponse, e : AccessDeniedException) {
-        SecurityContextHolder.getContext().authentication?.let {
-            val professions = ClaimsExtractor((it.principal as OidcUser).claims).professions
+        getContext().authentication?.let {
+            val professions = ClaimsExtractor((it.oidcUser()    ).claims).professions
             response.status = SC_FORBIDDEN;
             response.contentType = APPLICATION_JSON_VALUE;
             response.writer.write("""error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions""")

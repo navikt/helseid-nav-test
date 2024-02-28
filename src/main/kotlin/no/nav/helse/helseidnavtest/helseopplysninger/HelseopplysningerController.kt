@@ -22,7 +22,7 @@ class HelseopplysningerController {
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication) = dump(authentication)
-    
+
     @GetMapping("/hello")
     fun hello(authentication: Authentication) = dump(authentication)
 
