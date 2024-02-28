@@ -11,12 +11,9 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.H
 class ClaimsExtractor(private val claims : Map<String, Any>) {
 
     val professions = hprDetails(claims[HPR_DETAILS] as Map<*, *>).professions
-
     val hprNumber = stringClaim(HPR_NUMBER)
     val securityLevel = stringClaim(SECURITY_LEVEL)
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
-
-
     fun stringClaim(claim: String) = claims[claim] as String
 
     private fun hprDetails(respons : Map<*, *>) =
