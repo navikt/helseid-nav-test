@@ -23,11 +23,10 @@ class ClaimsExtractor(private val claims : Map<String, Any>) {
         HPRDetails(with((respons)) {
             (this[APPROVALS] as List<*>).map {
                 it as Map<*, *>
-                HPRDetail(
-                    it[PROFESSION] as String,
+                HPRDetail(it[PROFESSION] as String,
                     HPRAuthorization(ex(it[AUTHORIZATION] as Map<String, String>)),
-                    HPRRekvisision((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map { ex(it) }),
-                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { ex(it) }))
+                    HPRRekvisision((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map {r -> ex(r) }),
+                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s -> ex(s) }))
             }
         })
 
