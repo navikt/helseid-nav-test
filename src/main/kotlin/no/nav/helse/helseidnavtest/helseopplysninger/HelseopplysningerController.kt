@@ -21,15 +21,10 @@ class HelseopplysningerController {
     fun error() = roll()
 
     @GetMapping("/hello1")
-    fun hello1(authentication: Authentication): String {
-        return dump(authentication)
-    }
-
-
+    fun hello1(authentication: Authentication) = dump(authentication)
+    
     @GetMapping("/hello")
-    fun hello(authentication: Authentication): String {
-        return dump(authentication)
-    }
+    fun hello(authentication: Authentication) = dump(authentication)
 
     private fun dump(authentication : Authentication) : String {
     val oidcUser = authentication.oidcUser()
