@@ -52,7 +52,9 @@ class ClaimsExtractor(private val claims : Map<String, Any>) {
         private const val REQUISITION_RIGHTS = "requisition_rights"
         private const val SPECIALITIES = "specialities"
         private const val HPR_DETAILS = "helseid://claims/hpr/details"
+        private const val VALUE = "value"
+        private const val DESCRIPTION = "description"
 
-        private fun ex(m : Map<String, String>) = HPRData(m.get("value") as String, m.get("description") as String)
+        private fun ex(m : Map<String, String>) = HPRData(m[VALUE] as String, m[DESCRIPTION] as String)
     }
 }
