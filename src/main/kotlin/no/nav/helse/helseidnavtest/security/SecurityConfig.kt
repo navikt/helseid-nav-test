@@ -32,12 +32,13 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import no.nav.helse.helseidnavtest.helseopplysninger.HPRDetailsExtractor
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
 class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
+
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
@@ -47,9 +48,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
         with(OidcUserService().loadUser(req)) {
-            val level = claims["helseid://claims/identity/security_level"]
-            val roles = HPRDetailsExtractor(claims).extract().professions.map {
-                SimpleGrantedAuthority("${it}_${level}").also {
+            val extractor = ClaimsExtractor(claims)
+            val roles = ClaimsExtractor(claims).professions.map {
+                SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
                     log.info("La til roller: $it")
                 }
             }
@@ -124,13 +125,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     }
 }
 class CustomAccessDeniedHandler : AccessDeniedHandler {
-    companion object {
-        val LOG = LoggerFactory.getLogger(CustomAccessDeniedHandler::class.java)
-    }
     override fun handle(request : HttpServletRequest, response : HttpServletResponse, e : AccessDeniedException) {
         SecurityContextHolder.getContext().authentication?.let {
-            val user = it.principal as OidcUser
-            val professions = HPRDetailsExtractor(user.claims).extract().professions
+            val professions = ClaimsExtractor((it.principal as OidcUser).claims).professions
             response.status = SC_FORBIDDEN;
             response.contentType = APPLICATION_JSON_VALUE;
             response.writer.write("""error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions""")

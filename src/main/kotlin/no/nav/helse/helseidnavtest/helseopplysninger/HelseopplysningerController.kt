@@ -1,15 +1,18 @@
 package no.nav.helse.helseidnavtest.helseopplysninger
 
 import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.ModelAndView
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
 
 @RestController
 class HelseopplysningerController {
 
     private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+    @GetMapping("/public/utlogget")
+    fun public() = "Du er nå logget ut. <a href='/hello'>Logg inn igjen</a>"
 
     @GetMapping("/")
     fun root() = roll()
@@ -19,58 +22,31 @@ class HelseopplysningerController {
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication): String {
-        val oidcUser = authentication.principal as OidcUser
-
-        val attributes = oidcUser.claims
-        val scopes = oidcUser.authorities.joinToString("") {
-            "<li>${it.authority.replace("SCOPE_", "")}</li>"
-        }
-
-        val claims = oidcUser.claims.map {
-            "<li>${it.key}: ${it.value}</li>"
-        }.joinToString("")
-
-        return """
-            <h1>/hello1</h1>
-            <p>Hello from <b>${attributes["name"]}</b></p>
-            <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
-            <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
-            <p>Verifisert med: <b>${attributes["idp"]}</b></p>
-            <br>
-            <p>Requested authorities</p>
-            <ul>$scopes</ul>
-            <br>
-            <p>Token claims</p>
-            <ul>$claims</ul>
-            <br>
-            <a href="/logout"><button>Logg ut</button></a>
-        """.trimIndent()
+        return dump(authentication)
     }
 
-    @GetMapping("/public/utlogget")
-    fun public() = "Du er nå logget ut. <a href='/hello'>Logg inn igjen</a>"
 
     @GetMapping("/hello")
     fun hello(authentication: Authentication): String {
-        val oidcUser = authentication.principal as OidcUser
+        return dump(authentication)
+    }
 
-        val attributes = oidcUser.claims
+    private fun dump(authentication : Authentication) : String {
+    val oidcUser = authentication.oidcUser()
+    val extractor = ClaimsExtractor(oidcUser.claims)
+    val scopes = oidcUser.authorities.joinToString("") {
+        "<li>${it.authority.replace("SCOPE_", "")}</li>"
+    }
+    val claims = oidcUser.claims.map {
+        "<li>${it.key}: ${it.value}</li>"
+    }.joinToString("")
 
-        oidcUser.idToken.tokenValue
-        val scopes = oidcUser.authorities.joinToString("") {
-            "<li>${it.authority.replace("SCOPE_", "")}</li>"
-        }
-
-        val claims = oidcUser.claims.map {
-            "<li>${it.key}: ${it.value}</li>"
-        }.joinToString("")
-
-        return """
-            <h1>/hello</h1>
-            <p>Hello from <b>${attributes["name"]}</b></p>
-            <p>HPR-nummer: <b>${attributes["helseid://claims/hpr/hpr_number"]}</b></p>
-            <p>Nivå: <b>${attributes["helseid://claims/identity/assurance_level"]}</b> - <b>${attributes["helseid://claims/identity/security_level"]}</b></p>
-            <p>Verifisert med: <b>${attributes["idp"]}</b></p>
+    return """
+            <h1>/hello1</h1>
+            <p>Hello from <b>${extractor.stringClaim("name")}</b></p>
+            <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>
+            <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}}</b></p>
+            <p>Verifisert med: <b>${extractor.stringClaim("idp")}</b></p>
             <br>
             <p>Requested authorities</p>
             <ul>$scopes</ul>
@@ -81,5 +57,4 @@ class HelseopplysningerController {
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
     }
-
 }
