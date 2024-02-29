@@ -7,14 +7,13 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.H
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRRekvisision
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRSpesialitet
 
+class ClaimsExtractor(private val claims : Map<String, Any>?) {
 
-class ClaimsExtractor(private val claims : Map<String, Any>) {
-
-    val professions = hprDetails(claims[HPR_DETAILS] as Map<*, *>).professions
+    val professions = hprDetails(claims?.get(HPR_DETAILS) as Map<*, *>).professions
     val hprNumber = stringClaim(HPR_NUMBER)
     val securityLevel = stringClaim(SECURITY_LEVEL)
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
-    fun stringClaim(claim: String) = claims[claim] as String
+    fun stringClaim(claim: String) = claims?.get(claim) as String
 
     private fun hprDetails(respons : Map<*, *>) =
         HPRDetails(with((respons)) {
@@ -23,7 +22,7 @@ class ClaimsExtractor(private val claims : Map<String, Any>) {
                 HPRDetail(it[PROFESSION] as String,
                     HPRAuthorization(ex(it[AUTHORIZATION] as Map<String, String>)),
                     HPRRekvisision((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map {r -> ex(r) }),
-                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s -> ex(s) }))
+                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s  -> ex(s) }))
             }
         })
 
@@ -46,7 +45,7 @@ class ClaimsExtractor(private val claims : Map<String, Any>) {
         private const val ASSURANCE_LEVEL = "helseid://claims/identity/assurance_level"
         private const val SECURITY_LEVEL = "helseid://claims/identity/security_level"
         private const val HPR_NUMBER = "helseid://claims/hpr/hpr_number"
-        private const val HPR_DETAILS = "helseid://claims/hpr/details"
+        private const val HPR_DETAILS = "helseid://claims/hpr/hpr_details"
         private const val APPROVALS = "approvals"
         private const val PROFESSION = "profession"
         private const val AUTHORIZATION = "authorization"

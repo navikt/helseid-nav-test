@@ -51,7 +51,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
         with(OidcUserService().loadUser(req)) {
             val extractor = ClaimsExtractor(claims)
-            val roles = ClaimsExtractor(claims).professions.map {
+            val roles = extractor.professions.map {
                 SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
                     log.info("La til roller: $it")
                 }
