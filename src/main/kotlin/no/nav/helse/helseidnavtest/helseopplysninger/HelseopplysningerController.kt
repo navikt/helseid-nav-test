@@ -40,7 +40,7 @@ class HelseopplysningerController {
             <h1>/hello1</h1>
             <p>Hello from <b>${extractor.stringClaim("name")}</b></p>
             <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>
-            <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}}</b></p>
+            <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}</b></p>
             <p>Verifisert med: <b>${extractor.stringClaim("idp")}</b></p>
             <br>
             <p>Requested authorities</p>
