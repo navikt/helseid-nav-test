@@ -2,11 +2,12 @@ package no.nav.helse.helseidnavtest.helseopplysninger
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRAuthorization
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRData
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRRekvisision
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRDetail.HPRSpesialitet
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRAuthorization
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRData
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRRekvisision
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
+@Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims : Map<String, Any>?) {
 
     val professions = hprDetails(claims?.get(HPR_DETAILS) as Map<*, *>).professions
@@ -19,19 +20,19 @@ class ClaimsExtractor(private val claims : Map<String, Any>?) {
         HPRDetails(with((respons)) {
             (this[APPROVALS] as List<*>).map {
                 it as Map<*, *>
-                HPRDetail(it[PROFESSION] as String,
+                HPRApproval(it[PROFESSION] as String,
                     HPRAuthorization(ex(it[AUTHORIZATION] as Map<String, String>)),
                     HPRRekvisision((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map {r -> ex(r) }),
                     HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s  -> ex(s) }))
             }
         })
 
-    data class HPRDetails(val detail : List<HPRDetail>) {
+    data class HPRDetails(val detail : List<HPRApproval>) {
 
         val professions = detail.map { it.profession }
     }
 
-    data class HPRDetail(val profession : String, val auth : HPRAuthorization, val rek : HPRRekvisision, val spec : HPRSpesialitet) {
+    data class HPRApproval(val profession : String, val auth : HPRAuthorization, val rek : HPRRekvisision, val spec : HPRSpesialitet) {
         data class HPRAuthorization(val data : HPRData)
         data class HPRRekvisision(val data : List<HPRData>)
         data class HPRSpesialitet(val data : List<HPRData>)
