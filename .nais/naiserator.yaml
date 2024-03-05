@@ -48,3 +48,4 @@ spec:
             value: {{env}}
     envFrom:
         -   secret: helseid
+        -   secret: fastlege
