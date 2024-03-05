@@ -14,7 +14,7 @@
     <name>helseid-nav-test</name>
     <description>helseid-nav-test</description>
     <properties>
-        <cxf.version>4.0.1</cxf.version>
+        <cxf.version>4.0.2</cxf.version>
         <conditionals.version>5.0.8</conditionals.version>
         <java.version>21</java.version>
         <kotlin.version>1.9.22</kotlin.version>
@@ -111,7 +111,8 @@
             <plugin>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.2</version>
+                <extensions></extensions>
                 <executions>
                     <execution>
                         <id>flr</id>
@@ -119,11 +120,11 @@
                             <goal>wsimport</goal>
                         </goals>
                         <configuration>
+                            <extension>true</extension>
                             <verbose>true</verbose>
                             <bindingFiles>
                                 ${project.basedir}/src/main/resources/bindings.xml
                             </bindingFiles>
-
                             <wsdlFiles>
                                 ${project.basedir}/src/main/resources/fastlegeinformasjon.wsdl
                             </wsdlFiles>

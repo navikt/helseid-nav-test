@@ -1089,7 +1089,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientsGPDetails">
@@ -1101,7 +1101,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientsGPDetailsAtTime">
@@ -1113,7 +1113,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientGPHistory">
@@ -1125,7 +1125,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContract">
@@ -1137,7 +1137,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractsOnOffice">
@@ -1149,7 +1149,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPPatientList">
@@ -1161,7 +1161,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPWithAssociatedGPContracts">
@@ -1173,7 +1173,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="ConfirmGP">
@@ -1185,7 +1185,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractForNav">
@@ -1197,7 +1197,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="NavGetEncryptedPatientList">
@@ -1209,7 +1209,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="NavGetEncryptedPatientListAlternate">
@@ -1221,7 +1221,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractIdsOperatingInPostalCode">
@@ -1233,7 +1233,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="SearchForGP">
@@ -1245,7 +1245,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="QueryGPContracts">
@@ -1257,7 +1257,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetNavPatientLists">
@@ -1269,7 +1269,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPrimaryHealthCareTeam">
@@ -1281,7 +1281,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -1297,7 +1297,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientsGPDetails">
@@ -1309,7 +1309,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientsGPDetailsAtTime">
@@ -1321,7 +1321,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPatientGPHistory">
@@ -1333,7 +1333,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContract">
@@ -1345,7 +1345,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractsOnOffice">
@@ -1357,7 +1357,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPPatientList">
@@ -1369,7 +1369,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPWithAssociatedGPContracts">
@@ -1381,7 +1381,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="ConfirmGP">
@@ -1393,7 +1393,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractForNav">
@@ -1405,7 +1405,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="NavGetEncryptedPatientList">
@@ -1417,7 +1417,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="NavGetEncryptedPatientListAlternate">
@@ -1429,7 +1429,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetGPContractIdsOperatingInPostalCode">
@@ -1441,7 +1441,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="SearchForGP">
@@ -1453,7 +1453,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="QueryGPContracts">
@@ -1465,7 +1465,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetNavPatientLists">
@@ -1477,7 +1477,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="GetPrimaryHealthCareTeam">
@@ -1489,7 +1489,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="GenericFaultFault">
-                <soap12:fault use="literal" name="GenericFaultFault" namespace=""/>
+                <soap12:fault use="literal" name="GenericFaultFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
