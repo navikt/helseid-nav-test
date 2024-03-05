@@ -50,7 +50,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
         with(OidcUserService().loadUser(req)) {
-            val extractor = ClaimsExtractor(claims)
+            val extractor = ClaimsExtractor(this)
             val roles = extractor.professions.map {
                 SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
                     log.info("La til roller: $it")
@@ -129,7 +129,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 class CustomAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(request : HttpServletRequest, response : HttpServletResponse, e : AccessDeniedException) {
         getContext().authentication?.let {
-            val professions = ClaimsExtractor((it.oidcUser()).claims).professions
+            val professions = ClaimsExtractor((it.oidcUser())).professions
             response.status = SC_FORBIDDEN;
             response.contentType = APPLICATION_JSON_VALUE;
             response.writer.write("""error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions""")

@@ -8,13 +8,13 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
 @Suppress("UNCHECKED_CAST")
-class ClaimsExtractor(private val claims : Map<String, Any>?) {
+class ClaimsExtractor(private val user : OidcUser) {
 
-    val professions = claims?.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
+    val professions = user.claims?.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val hprNumber = stringClaim(HPR_NUMBER)
     val securityLevel = stringClaim(SECURITY_LEVEL)
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
-    fun stringClaim(claim: String) = claims?.get(claim) as? String
+    fun stringClaim(claim: String) = user.claims?.get(claim) as? String
 
     private fun hprDetails(respons : Map<*, *>) =
         HPRDetails(with((respons)) {

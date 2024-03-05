@@ -28,7 +28,7 @@ class HelseopplysningerController {
 
     private fun dump(authentication : Authentication) : String {
     val oidcUser = authentication.oidcUser()
-    val extractor = ClaimsExtractor(oidcUser.claims)
+    val extractor = ClaimsExtractor(oidcUser)
     val scopes = oidcUser.authorities.joinToString("") {
         "<li>${it.authority.replace("SCOPE_", "")}</li>"
     }
