@@ -14,11 +14,32 @@
     <name>helseid-nav-test</name>
     <description>helseid-nav-test</description>
     <properties>
+        <cxf.version>4.0.1</cxf.version>
         <conditionals.version>5.0.8</conditionals.version>
         <java.version>21</java.version>
         <kotlin.version>1.9.22</kotlin.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-autoconfigure</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-features-logging</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -88,6 +109,33 @@
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>4.0.1</version>
+                <executions>
+                    <execution>
+                        <id>flr</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>true</verbose>
+                            <bindingFiles>
+                                ${project.basedir}/src/main/resources/bindings.xml
+                            </bindingFiles>
+
+                            <wsdlFiles>
+                                ${project.basedir}/src/main/resources/fastlegeinformasjon.wsdl
+                            </wsdlFiles>
+                            <packageName>no.nav.helse.helseidnavtest.ws</packageName>
+                            <sourceDestDir>${sourcesDir}</sourceDestDir>
+                            <destDir>${classesDir}</destDir>
+                            <extension>true</extension>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
@@ -112,6 +160,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
                 <configuration>
                     <args>
                         <arg>-Xjsr305=strict</arg>
