@@ -14,7 +14,12 @@ class FastlegeWSAdapter(cfg: FastlegeConfig) {
 
     private val client : IFlrReadOperations = createPort(cfg)
 
+
+
     fun fastlege(hpr: Int, fnr: String) = client.confirmGP(fnr, hpr, now())
+
+    fun fastlegeForPasient(fnr: String) = client.getPatientGPDetails(fnr)
+
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
         time = Date()
