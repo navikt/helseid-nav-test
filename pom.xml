@@ -120,18 +120,33 @@
                             <goal>wsimport</goal>
                         </goals>
                         <configuration>
-                            <extension>true</extension>
                             <verbose>true</verbose>
                             <bindingFiles>
-                                ${project.basedir}/src/main/resources/bindings.xml
+                                ${project.basedir}/src/main/resources/flrbindings.xml
                             </bindingFiles>
                             <wsdlFiles>
-                                ${project.basedir}/src/main/resources/fastlegeinformasjon.wsdl
+                                ${project.basedir}/src/main/resources/flr.wsdl
                             </wsdlFiles>
-                            <packageName>no.nav.helse.helseidnavtest.ws</packageName>
+                            <packageName>no.nav.helse.helseidnavtest.ws.flr</packageName>
                             <sourceDestDir>${sourcesDir}</sourceDestDir>
                             <destDir>${classesDir}</destDir>
                             <extension>true</extension>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ar</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <extension>true</extension>
+                            <verbose>true</verbose>
+                            <wsdlFiles>
+                                ${project.basedir}/src/main/resources/ar.wsdl
+                            </wsdlFiles>
+                            <packageName>no.nav.helse.helseidnavtest.ws.ar</packageName>
+                            <sourceDestDir>${sourcesDir}</sourceDestDir>
+                            <destDir>${classesDir}</destDir>
                         </configuration>
                     </execution>
                 </executions>
