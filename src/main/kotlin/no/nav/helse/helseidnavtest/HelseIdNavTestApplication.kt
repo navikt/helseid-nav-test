@@ -24,7 +24,9 @@ class HelseIdNavTestApplication : CommandLineRunner {
     lateinit var applicationContext : ApplicationContext
     override fun run(vararg args : String) {
         try {
-            applicationContext.getBean(FastlegeWSAdapter::class.java).fastlege(123, "12345678901")
+            applicationContext.getBean(FastlegeWSAdapter::class.java).fastlege(7125186  , "19087999648").also {
+                log.info("Fastlege: $it")
+            }
         } catch (e: Exception) {
             log.warn("Feil ved sjekk av fastlege",e)
         }

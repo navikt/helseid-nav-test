@@ -1,4 +1,4 @@
 helse-id:
   issuer: https://${host}
 fastlege:
-    url: https://ws.test.nhn.no/v2/flr/Basis
+    url: https://ws-at.test.nhn.no/v2/flr/Basic
