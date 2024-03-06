@@ -23,10 +23,10 @@ class HelseIdNavTestApplication : CommandLineRunner {
     @Autowired
     lateinit var applicationContext : ApplicationContext
     override fun run(vararg args : String) {
-        runCatching {
+        try {
             applicationContext.getBean(FastlegeWSAdapter::class.java).fastlege(123, "12345678901")
-        }.onFailure {
-            log.warn("Feil ved sjekk av fastlege",it)
+        } catch (e: Exception) {
+            log.warn("Feil ved sjekk av fastlege",e)
         }
     }
 }
