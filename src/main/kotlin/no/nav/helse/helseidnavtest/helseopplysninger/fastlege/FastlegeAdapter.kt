@@ -12,7 +12,7 @@ import no.nav.helse.helseidnavtest.ws.IFlrReadOperations
 @Component
 class FastlegeWSAdapter(cfg: FastlegeConfig) {
 
-    val client : IFlrReadOperations = createPort(cfg)
+    private val client : IFlrReadOperations = createPort(cfg)
 
     fun fastlege(hpr: Int, fnr: String) = client.confirmGP(fnr, hpr, now())
 
