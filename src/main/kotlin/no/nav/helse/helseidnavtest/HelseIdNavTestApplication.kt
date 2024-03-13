@@ -25,7 +25,7 @@ class HelseIdNavTestApplication : CommandLineRunner {
     lateinit var applicationContext : ApplicationContext
     override fun run(vararg args : String) {
         try {
-            
+
             applicationContext.getBean(AdresseWSAdapter::class.java).apply {
                 ping().also {
                     log.info("ping respons: $it")

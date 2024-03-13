@@ -12,7 +12,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                -   host: ws.test.nhn.no
+                -   host: ws-at.test.nhn.no
                 -   host: {{host}}
                 -   host: youtube.com
     observability:
