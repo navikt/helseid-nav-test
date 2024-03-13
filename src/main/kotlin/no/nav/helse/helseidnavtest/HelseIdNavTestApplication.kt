@@ -25,12 +25,12 @@ class HelseIdNavTestApplication : CommandLineRunner {
     lateinit var applicationContext : ApplicationContext
     override fun run(vararg args : String) {
         try {
-            /*
+            
             applicationContext.getBean(AdresseWSAdapter::class.java).apply {
                 ping().also {
                     log.info("ping respons: $it")
                 }
-            }*/
+            }
             applicationContext.getBean(FastlegeWSAdapter::class.java).apply {
                 fastlege(7125186  , "19087999648").also {
                     log.info("Fastlegestatus : $it")
