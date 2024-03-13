@@ -2,9 +2,9 @@ package no.nav.helse.helseidnavtest.helseopplysninger
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRAuthorization
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRAutorisasjon
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRData
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRRekvisision
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRRekvisisjon
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
 @Suppress("UNCHECKED_CAST")
@@ -21,8 +21,8 @@ class ClaimsExtractor(private val user : OidcUser) {
             (this[APPROVALS] as List<*>).map {
                 it as Map<*, *>
                 HPRApproval(it[PROFESSION] as String,
-                    HPRAuthorization(ex(it[AUTHORIZATION] as Map<String, String>)),
-                    HPRRekvisision((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map {r -> ex(r) }),
+                    HPRAutorisasjon(ex(it[AUTHORIZATION] as Map<String, String>)),
+                    HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map { r -> ex(r) }),
                     HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s  -> ex(s) }))
             }
         })
@@ -32,9 +32,9 @@ class ClaimsExtractor(private val user : OidcUser) {
         val professions = detail.map { it.profession }
     }
 
-    data class HPRApproval(val profession : String, val auth : HPRAuthorization, val rek : HPRRekvisision, val spec : HPRSpesialitet) {
-        data class HPRAuthorization(val data : HPRData)
-        data class HPRRekvisision(val data : List<HPRData>)
+    data class HPRApproval(val profession : String, val auth : HPRAutorisasjon, val rek : HPRRekvisisjon, val spec : HPRSpesialitet) {
+        data class HPRAutorisasjon(val data : HPRData)
+        data class HPRRekvisisjon(val data : List<HPRData>)
         data class HPRSpesialitet(val data : List<HPRData>)
         data class HPRData(val value : String, val description : String)
     }
