@@ -1,7 +1,7 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.fastlege
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import no.nav.helse.helseidnavtest.helseopplysninger.FastlegeConfig
+import no.nav.helse.helseidnavtest.helseopplysninger.WSConfig
 
 @ConfigurationProperties("fastlege")
-class FastlegeConfig(url: String, username: String, password: String) : FastlegeConfig(url,username,password)
+class FastlegeConfig(url: String, username: String, password: String) : WSConfig(url,username,password)
