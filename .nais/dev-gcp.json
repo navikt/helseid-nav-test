@@ -1,5 +1,6 @@
 {
   "ingress": "https://helseid-nav-test.ekstern.dev.nav.no",
   "env": "dev",
-  "host": "helseid-sts.test.nhn.no"
+  "host": "helseid-sts.test.nhn.no",
+  "wshost": "ws-at.test.nhn.no"
 }
