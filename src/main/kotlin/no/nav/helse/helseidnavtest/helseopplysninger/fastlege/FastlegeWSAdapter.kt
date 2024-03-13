@@ -3,9 +3,6 @@ package no.nav.helse.helseidnavtest.helseopplysninger.fastlege
 import java.util.Date
 import java.util.GregorianCalendar
 import javax.xml.datatype.DatatypeFactory.*
-import org.apache.cxf.frontend.ClientProxy
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
-import org.apache.cxf.transport.http.HTTPConduit
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.createPort
 import no.nav.helse.helseidnavtest.ws.flr.IFlrReadOperations
