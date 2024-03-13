@@ -4,3 +4,5 @@ fastlege:
     url: https://ws-at.test.nhn.no/v2/flr/Basic
 adresse:
   url: https://ws-at.test.nhn.no/v1/AR/Basic
+  username: ${fastlege.username}
+  password: ${fastlege.password}

@@ -4,7 +4,7 @@ import org.apache.cxf.frontend.ClientProxy
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.transport.http.HTTPConduit
 
- inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>(cfg.url) {
+ inline fun <reified T> createPort(cfg: FastlegeConfig) = createPort<T>(cfg.url) {
     proxy {}
     port {
         withBasicAuth(cfg.username, cfg.password)
@@ -44,4 +44,4 @@ class PortConfigurator<T> {
     }
 }
 
-abstract class WSConfig(val url: String, val username: String, val password: String)
+abstract class FastlegeConfig(val url: String, val username: String, val password: String)
