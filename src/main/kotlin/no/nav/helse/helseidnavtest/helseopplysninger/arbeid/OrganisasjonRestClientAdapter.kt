@@ -21,7 +21,7 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .uri { b -> cf.organisasjonURI(b, orgnr) }
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .onStatus({ it.isError }) { req, res ->
+                .onStatus({ !it.is2xxSuccessful }) { req, res ->
                     log.warn("Received ${res.statusCode} from ${req.uri}" )
                     throw when (res.statusCode) {
                         NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
