@@ -16,7 +16,6 @@ management:
      web:
        exposure:
         include: '*'
-       base-path: /management
 spring:
   security:
     oauth2:
