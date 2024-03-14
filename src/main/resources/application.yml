@@ -1,14 +1,22 @@
 management:
-  endpoint:
-    env:
-      show-values: always
-    configprops:
-      show-values: always
-  endpoints:
-    web:
-      exposure:
+   health:
+    ping:
+      enabled: false
+    diskspace:
+      enabled: false
+   endpoint:
+      health:
+        show-details: always
+        show-components: always
+      env:
+        show-values: always
+      configprops:
+        show-values: always
+   endpoints:
+     web:
+       exposure:
         include: '*'
-
+       base-path: /management
 spring:
   security:
     oauth2:
@@ -21,7 +29,7 @@ spring:
             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
             client-authentication-method: "private_key_jwt"
             authorization-grant-type: "authorization_code"
-            client-id: "d33dd479-12d2-493f-a8a2-f440ee9e5219"
+            client-id:  ${clientid}
             client-name: "NAV Helseopplysninger"
             scope:
               - "profile"
@@ -37,4 +45,7 @@ spring:
           helse-id:
             issuer-uri: ${helse-id.issuer}
 
-authserver.url: https://helseid-sts.test.nhn.no
+
+adresse:
+  username: ${fastlege.username}
+  password: ${fastlege.password}

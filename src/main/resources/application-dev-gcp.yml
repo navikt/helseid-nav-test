@@ -4,9 +4,11 @@ fastlege:
     url: https://ws-at.test.nhn.no/v2/flr/Basic
 adresse:
   url: https://ws-at.test.nhn.no/v1/AR/Basic
-  username: ${fastlege.username}
-  password: ${fastlege.password}
 arbeidsforhold:
-  base-uri: https://aareg-services-q1.dev-fss-pub.nais.io
+  base-uri: https://${aareg}
 organisasjon:
-  base-uri: https://ereg-services-q1.dev-fss-pub.nais.io
+  base-uri: https://${ereg}
+authserver:
+   url: https://helseid-sts.test.nhn.no
+
+

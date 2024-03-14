@@ -15,6 +15,8 @@ spec:
                 -   host: {{wshost}}
                 -   host: {{host}}
                 -   host: youtube.com
+                -   host: {{aareg}}
+                -   host: {{ereg}}
     observability:
         tracing:
             enabled: true
@@ -46,6 +48,12 @@ spec:
             value: {{host}}
         -   name: ENV
             value: {{env}}
+        -   name: CLIENTID
+            value: {{clientid}}
+        -   name: aareg
+            value: {{aareg}}
+        - name: ereg
+          value: {{ereg}}
     envFrom:
         -   secret: helseid
         -   secret: fastlege

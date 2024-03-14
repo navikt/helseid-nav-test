@@ -18,6 +18,6 @@ internal class OrganisasjonClientBeanConfig {
             .build()
 
     @Bean
-    @ConditionalOnProperty("$ORGANISASJON.enabled", havingValue = "true")
+    @ConditionalOnProperty("$ORGANISASJON.enabled", havingValue = "true", matchIfMissing = true)
     fun organisasjonHealthIndicator(a: OrganisasjonRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
 }
