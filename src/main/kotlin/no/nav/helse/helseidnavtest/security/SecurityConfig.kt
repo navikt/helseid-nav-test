@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
@@ -127,12 +126,12 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     }
 }
 class CustomAccessDeniedHandler : AccessDeniedHandler {
-    override fun handle(request : HttpServletRequest, response : HttpServletResponse, e : AccessDeniedException) {
+    override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
         getContext().authentication?.let {
             val professions = ClaimsExtractor((it.oidcUser())).professions
-            response.status = SC_FORBIDDEN;
-            response.contentType = APPLICATION_JSON_VALUE;
-            response.writer.write("""error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions""")
+            res.status = SC_FORBIDDEN;
+            res.contentType = APPLICATION_JSON_VALUE;
+            res.writer.write("Error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions")
         }
     }
 }

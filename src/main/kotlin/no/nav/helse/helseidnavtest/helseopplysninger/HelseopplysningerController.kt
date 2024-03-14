@@ -10,10 +10,7 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.o
 class HelseopplysningerController {
 
     private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
-    @GetMapping("/public/utlogget")
-    fun public() = "Du er nå logget ut. <a href='/hello'>Logg inn igjen</a>"
-
+    
     @GetMapping("/")
     fun root() = roll()
 

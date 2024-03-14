@@ -12,11 +12,9 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig,/* tokenX: TokenXFilterFunction, ctx: AuthContext*/) =
+    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig) =
         builder
             .baseUrl("${cfg.baseUri}")
-      //      .filter(generellFilterFunction(NAV_PERSON_IDENT) { ctx.getSubject() ?: "NO SUBJECT" })
-      //      .filter(tokenX)
             .build()
 
     @Bean
