@@ -23,9 +23,13 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
                     log.warn("Received ${res.statusCode} from ${req.uri}" )
+                    throw when (res.statusCode) {
+                        NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
+                        else -> OrganisasjonException("Fikk response ${res.statusCode} fra ${req.uri}")
+                    }
                 }
                 .onStatus({ it.is2xxSuccessful }) { req, res ->
-                    log.trace("Received {} from {}", res.statusCode, req.uri)
+                    log.trace("Fikk {} fra {}", res.statusCode, req.uri)
                 }
                 .body<OrganisasjonDTO>()?.fulltNavn ?: orgnr.orgnr
                 .also { log.trace("Organisasjon oppslag response {}", it) }
@@ -33,6 +37,8 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
         else {
             orgnr.orgnr
         }
+
+    private class OrganisasjonException(orgnr: String) : Throwable("Fant ikke organisasjon med orgnr $orgnr")
 
 }
 

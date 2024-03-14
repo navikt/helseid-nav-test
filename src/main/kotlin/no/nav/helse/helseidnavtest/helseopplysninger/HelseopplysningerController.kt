@@ -10,7 +10,7 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.o
 class HelseopplysningerController {
 
     private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-    
+
     @GetMapping("/")
     fun root() = roll()
 
