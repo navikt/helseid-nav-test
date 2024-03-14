@@ -17,9 +17,20 @@
         <cxf.version>4.0.2</cxf.version>
         <conditionals.version>5.0.8</conditionals.version>
         <java.version>21</java.version>
-        <kotlin.version>1.9.22</kotlin.version>
+        <kotlin.version>1.9.23</kotlin.version>
+        <springdoc.version>2.4.0</springdoc.version>
     </properties>
     <dependencies>
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-common</artifactId>
+        <version>${springdoc.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>${springdoc.version}</version>
+    </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-autoconfigure</artifactId>
@@ -112,7 +123,6 @@
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
                 <version>4.0.2</version>
-                <extensions></extensions>
                 <executions>
                     <execution>
                         <id>flr</id>
