@@ -10,7 +10,7 @@ data class OrgNummer(@get:JsonValue val orgnr : String) {
     protected val log = getLogger(javaClass)
 
     init {
-        if (currentCluster() in listOf(PROD_GCP)) {
+        if (currentCluster() == PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), orgnr)
             require(orgnr.length == 9) { "Orgnr må ha lengde 9, $orgnr har lengde ${orgnr.length} " }
             require(orgnr.startsWith("8") || orgnr.startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
@@ -25,11 +25,10 @@ data class OrgNummer(@get:JsonValue val orgnr : String) {
 
         private val WEIGHTS = intArrayOf(3, 2, 7, 6, 5, 4, 3, 2)
 
-        private fun mod11(orgnr : String) =
-            with(11 - orgnr.indices.sumOf {
-                (orgnr[it].code - 48) * WEIGHTS[it]
-            } % 11) {
-                if (this == 11) 0 else this
-            }
+        private fun mod11(orgnr: String): Int {
+            val weightedSum = orgnr.indices.sumOf { (orgnr[it].code - 48) * WEIGHTS[it] }
+            val remainder = 11 - weightedSum % 11
+            return if (remainder == 11) 0 else remainder
+        }
     }
 }
