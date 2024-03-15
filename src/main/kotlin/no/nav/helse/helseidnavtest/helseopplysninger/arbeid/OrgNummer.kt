@@ -1,7 +1,7 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.boot.conditionals.Cluster
+import no.nav.boot.conditionals.Cluster.*
 import no.nav.boot.conditionals.Cluster.Companion.currentCluster
 import org.slf4j.LoggerFactory.getLogger
 
@@ -10,7 +10,7 @@ data class OrgNummer(@get:JsonValue val orgnr : String) {
     protected val log = getLogger(javaClass)
 
     init {
-        if (!currentCluster().equals(Cluster.DEV_GCP)) {
+        if (currentCluster() in listOf(PROD_GCP)) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), orgnr)
             require(orgnr.length == 9) { "Orgnr må ha lengde 9, $orgnr har lengde ${orgnr.length} " }
             require(orgnr.startsWith("8") || orgnr.startsWith("9")) { "Orgnr må begynne med 8 eller 9" }

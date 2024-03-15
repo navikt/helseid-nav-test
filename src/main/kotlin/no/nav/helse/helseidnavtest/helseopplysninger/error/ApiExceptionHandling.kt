@@ -1,6 +1,8 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.error
 
 import com.fasterxml.jackson.databind.DatabindException
+import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonRestClientAdapter
+import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonRestClientAdapter.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
@@ -22,8 +24,8 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    @ExceptionHandler(NotFound::class)
-    fun ikkeFunnet(e: NotFound, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    @ExceptionHandler(OrganisasjonException::class)
+    fun ikkeFunnet(e: OrganisasjonException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
 
     @ExceptionHandler(HttpMessageConversionException::class)
     fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)

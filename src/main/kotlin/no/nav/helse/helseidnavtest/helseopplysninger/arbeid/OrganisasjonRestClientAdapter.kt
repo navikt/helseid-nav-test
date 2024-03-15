@@ -41,10 +41,10 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
         throw when (res.statusCode) {
             NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
             else -> OrganisasjonException("Fikk response ${res.statusCode} fra ${req.uri}")
-        }.also { log.error(it.message, it) }
+        }
     }
 
-    private class OrganisasjonException(orgnr: String) : Throwable("Fant ikke organisasjon med orgnr $orgnr")
+    class OrganisasjonException(msg: String) : RuntimeException(msg)
 
 }
 
