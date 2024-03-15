@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory.getLogger
 @ControllerAdvice
 class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
-    
+
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
