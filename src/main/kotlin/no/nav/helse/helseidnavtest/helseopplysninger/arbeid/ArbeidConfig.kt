@@ -1,14 +1,20 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
 
+import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.convert.PeriodFormat
+import org.springframework.boot.convert.PeriodStyle.*
+import org.springframework.http.HttpRequest
+import org.springframework.http.client.ClientHttpRequestExecution
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
+import org.springframework.web.util.UriBuilder
+import java.io.IOException
 import java.net.URI
 import java.time.LocalDate.now
 import java.time.Period
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.convert.PeriodFormat
-import org.springframework.boot.convert.PeriodStyle.*
-import org.springframework.web.util.UriBuilder
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+
 
 @ConfigurationProperties(ARBEID)
 class ArbeidConfig(baseUri: URI, private val path: String = PATH,

@@ -8,9 +8,12 @@ import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.o
 import org.springframework.web.bind.annotation.RequestParam
 
 @RestController("arbeid")
-class ArbeidController(private val adapter: OrganisasjonRestClientAdapter) {
+class ArbeidController(private val adapter: OrganisasjonRestClientAdapter, private val arbeid: ArbeidClient) {
 
 
-    @GetMapping("/navn") fun test(@RequestParam orgnr: OrgNummer) = adapter.orgNavn(orgnr)
+    @GetMapping("/navn") fun navn(@RequestParam orgnr: OrgNummer) = adapter.orgNavn(orgnr)
+
+    @GetMapping("/areid") fun arbeid(@RequestParam fnr: Fødselsnummer) = arbeid.arbeidInfo(fnr)
+
 
 }

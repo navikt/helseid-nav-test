@@ -9,11 +9,12 @@ import org.springframework.web.client.body
 @Component
 class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, private val cf : ArbeidConfig) : AbstractRestClientAdapter(restClient, cf) {
 
-    fun arbeidInfo() =
+    fun arbeidInfo(fnr: Fødselsnummer) =
         if (cf.isEnabled) {
             restClient
                 .get()
                 .uri(cf::arbeidsforholdURI)
+                .header("Nav-Personident", fnr.fnr)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
