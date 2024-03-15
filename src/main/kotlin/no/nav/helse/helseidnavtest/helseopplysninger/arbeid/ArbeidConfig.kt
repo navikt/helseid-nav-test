@@ -11,11 +11,11 @@ import org.springframework.web.util.UriBuilder
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
 
 @ConfigurationProperties(ARBEID)
-class ArbeidConfig(baseUri: URI, private val path: String = PATH, enabled: Boolean = true,
+class ArbeidConfig(baseUri: URI, private val path: String = PATH,
+                   enabled: Boolean = true,
                    pingPath: String = PINGPATH,
                    @PeriodFormat(SIMPLE) private val tidTilbake: Period = Period.ofYears(5),
-                   val sporingsinformasjon: Boolean = false) :
-    AbstractRestConfig(baseUri, pingPath, ARBEID, enabled) {
+                   val sporingsinformasjon: Boolean = false) : AbstractRestConfig(baseUri, pingPath, ARBEID, enabled) {
 
     fun arbeidsforholdURI(b: UriBuilder) =
         b.path(path)

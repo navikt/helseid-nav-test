@@ -13,7 +13,7 @@ spec:
         outbound:
             external:
                 -   host: {{wshost}}
-                -   host: {{host}}
+                -   host: {{stshost}}
                 -   host: youtube.com
                 -   host: {{aareg}}
                 -   host: {{ereg}}
@@ -44,11 +44,11 @@ spec:
             cpu: 250m
             memory: 4096Mi
     env:
-        -   name: HOST
-            value: {{host}}
-        -   name: ENV
+        -   name: stshost
+            value: {{stshost}}
+        -   name: env
             value: {{env}}
-        -   name: CLIENTID
+        -   name: clientid
             value: {{clientid}}
         -   name: aareg
             value: {{aareg}}

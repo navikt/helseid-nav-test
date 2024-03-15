@@ -1,14 +1,8 @@
-helse-id:
-  issuer: https://${host}
 fastlege:
-    url: https://ws-at.test.nhn.no/v2/flr/Basic
+    url: https://${wshost}/v2/flr/Basic
 adresse:
-  url: https://ws-at.test.nhn.no/v1/AR/Basic
-arbeidsforhold:
-  base-uri: https://${aareg}
-organisasjon:
-  base-uri: https://${ereg}
+  url: https://${wshost}/v1/AR/Basic
 authserver:
-   url: https://helseid-sts.test.nhn.no
+   url: https://${stshost}
 
 

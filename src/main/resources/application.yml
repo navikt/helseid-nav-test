@@ -48,3 +48,12 @@ spring:
 adresse:
   username: ${fastlege.username}
   password: ${fastlege.password}
+
+arbeidsforhold:
+  base-uri: https://${aareg}
+
+organisasjon:
+  base-uri: https://${ereg}
+
+helse-id:
+  issuer: https://${stshost}

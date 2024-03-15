@@ -7,10 +7,7 @@ import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Compani
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 @Component
-class ArbeidRestClientAdapter(
-    @Qualifier(ARBEID) restClient : RestClient,
-    private val cf : ArbeidConfig
-) : AbstractRestClientAdapter(restClient, cf) {
+class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, private val cf : ArbeidConfig) : AbstractRestClientAdapter(restClient, cf) {
 
     fun arbeidInfo() =
         if (cf.isEnabled) {

@@ -55,11 +55,4 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
 
     private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) =
         log.warn("$req $problem ${status.reasonPhrase}: ${t.message}", t)
-
-
-
-    companion object {
-        private const val SUBSTATUS = "substatus"
-    }
-
 }
