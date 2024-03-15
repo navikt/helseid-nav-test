@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonConfig.Companion.ORGANISASJON
+import org.springframework.http.HttpRequest
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import org.springframework.web.servlet.resource.HttpResource
 
 @Component
 class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestClient,
@@ -22,11 +25,7 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ !it.is2xxSuccessful }) { req, res ->
-                    log.warn("Received ${res.statusCode} from ${req.uri}" )
-                    throw when (res.statusCode) {
-                        NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
-                        else -> OrganisasjonException("Fikk response ${res.statusCode} fra ${req.uri}")
-                    }
+                    handleErrors(req, res, orgnr)
                 }
                 .onStatus({ it.is2xxSuccessful }) { req, res ->
                     log.trace("Fikk {} fra {}", res.statusCode, req.uri)
@@ -37,6 +36,13 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
         else {
             orgnr.orgnr
         }
+    private fun handleErrors(req: HttpRequest, res: ClientHttpResponse, orgnr: OrgNummer) {
+        log.warn("Received ${res.statusCode} from ${req.uri}" )
+        throw when (res.statusCode) {
+            NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
+            else -> OrganisasjonException("Fikk response ${res.statusCode} fra ${req.uri}")
+        }.also { log.error(it.message, it) }
+    }
 
     private class OrganisasjonException(orgnr: String) : Throwable("Fant ikke organisasjon med orgnr $orgnr")
 
