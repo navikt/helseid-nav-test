@@ -4,18 +4,23 @@ import com.nimbusds.jose.jwk.JWK
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
-import org.springframework.security.access.AccessDeniedException
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
+import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder.*
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter
@@ -27,14 +32,14 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
+import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.stereotype.Service
+
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -60,8 +65,19 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         }
     }
 
-    @Bean
-    fun jalla(a: OAuth2AuthorizedClientManager)  = null
+    @Service
+    class SecurityHelper(private val authorizedClientManager: OAuth2AuthorizedClientManager) {
+        fun token(): OAuth2AccessToken? {
+                val clientRegistrationId = "arbeid"
+                val authorizeRequest =
+                    OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistrationId) // This principal value is unnecessary, but if you don't give it a value,
+                        // it throws an exception.
+                        .principal("dummy")
+                        .build()
+                val authorizedClient = authorizedClientManager.authorize(authorizeRequest)
+                return authorizedClient?.accessToken
+            }
+    }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
