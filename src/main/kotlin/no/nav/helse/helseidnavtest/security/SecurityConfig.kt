@@ -34,6 +34,7 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -59,6 +60,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         }
     }
 
+    @Bean
+    fun jalla(a: OAuth2AuthorizedClientManager)  = null
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {

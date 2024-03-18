@@ -24,6 +24,12 @@ spring:
           issuer-uri: ${helse-id.issuer}
       client:
         registration:
+          arbeid:
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            provider: aad
           helse-id:
             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
             client-authentication-method: "private_key_jwt"
@@ -41,9 +47,13 @@ spring:
               - "hdir:felleskodeverk.api/kodeverk"
               - "hdir:felleskodeverk.api/kodeverdier"
         provider:
+          aad:
+            issuer-uri: ${azure.openid.config.issuer}
           helse-id:
             issuer-uri: ${helse-id.issuer}
-
+  threads:
+    virtual:
+      enabled: true
 
 adresse:
   username: ${fastlege.username}
