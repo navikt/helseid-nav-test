@@ -10,7 +10,6 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import org.springframework.web.servlet.resource.HttpResource
 
 @Component
 class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestClient,
@@ -39,12 +38,12 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
     private fun handleErrors(req: HttpRequest, res: ClientHttpResponse, orgnr: OrgNummer) {
         log.warn("Received ${res.statusCode} from ${req.uri}" )
         throw when (res.statusCode) {
-            NOT_FOUND -> OrganisasjonException("Fant ikke ${orgnr.orgnr}")
+            NOT_FOUND -> OppslagNotFoundException("Fant ikke ${orgnr.orgnr}")
             else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
         }
     }
 
-    class OrganisasjonException(msg: String) : RuntimeException(msg)
+    class OppslagNotFoundException(msg: String) : RuntimeException(msg)
     class IntegrationException(msg: String) : RuntimeException(msg)
 
 

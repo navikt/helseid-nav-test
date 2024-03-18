@@ -1,7 +1,6 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.error
 
 import com.fasterxml.jackson.databind.DatabindException
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonRestClientAdapter
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonRestClientAdapter.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity.*
 import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.client.HttpClientErrorException.NotFound
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import org.slf4j.LoggerFactory.getLogger
@@ -24,8 +22,8 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    @ExceptionHandler(OrganisasjonException::class)
-    fun ikkeFunnet(e: OrganisasjonException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    @ExceptionHandler(OppslagNotFoundException::class)
+    fun ikkeFunnet(e: OppslagNotFoundException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
 
     @ExceptionHandler(HttpMessageConversionException::class)
     fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
