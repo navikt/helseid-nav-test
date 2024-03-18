@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.client.ClientHttpResponse
@@ -35,8 +37,8 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
     private fun handleErrors(req: HttpRequest, res: ClientHttpResponse, fnr: Fødselsnummer) {
         log.warn("Received ${res.statusCode} from ${req.uri}" )
         throw when (res.statusCode) {
-            HttpStatus.NOT_FOUND -> OrganisasjonRestClientAdapter.OppslagNotFoundException("Fant ikke arbeidsforhodl for ${fnr.fnr}")
-            else -> OrganisasjonRestClientAdapter.IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
+            HttpStatus.NOT_FOUND -> OppslagNotFoundException("Fant ikke arbeidsforhodl for ${fnr.fnr}")
+            else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
         }
     }
 

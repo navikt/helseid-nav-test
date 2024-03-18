@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonConfig.Companion.ORGANISASJON
+import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
@@ -42,9 +44,6 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
             else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
         }
     }
-
-    class OppslagNotFoundException(msg: String) : RuntimeException(msg)
-    class IntegrationException(msg: String) : RuntimeException(msg)
 
 
 }

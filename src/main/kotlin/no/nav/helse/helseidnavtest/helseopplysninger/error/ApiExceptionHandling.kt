@@ -1,7 +1,6 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.error
 
 import com.fasterxml.jackson.databind.DatabindException
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonRestClientAdapter.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*

@@ -26,7 +26,6 @@ class HelseIdNavTestApplication : CommandLineRunner {
     lateinit var ctx : ApplicationContext
     override fun run(vararg args : String) {
         try {
-
             ctx.getBean(AdresseWSAdapter::class.java).apply {
                 ping().also {
                     log.info("ping respons: $it")
@@ -41,7 +40,7 @@ class HelseIdNavTestApplication : CommandLineRunner {
                 }
             }
         } catch (e: Exception) {
-            log.warn("Feil ved sjekk av fastlege",e)
+            log.warn("Feil ved oppslag",e)
         }
     }
 }
