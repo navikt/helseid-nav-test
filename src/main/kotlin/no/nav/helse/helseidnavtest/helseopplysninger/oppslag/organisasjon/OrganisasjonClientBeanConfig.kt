@@ -1,10 +1,10 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonConfig.Companion.ORGANISASJON
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
 import no.nav.helse.helseidnavtest.helseopplysninger.health.AbstractPingableHealthIndicator
 import org.springframework.web.client.RestClient
 

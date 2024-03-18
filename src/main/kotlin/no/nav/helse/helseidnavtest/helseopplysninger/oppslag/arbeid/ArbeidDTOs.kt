@@ -1,7 +1,8 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.Arbeidsforhold.Arbeidsavtale
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.Arbeidsforhold.Arbeidsavtale
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrgNummer
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)

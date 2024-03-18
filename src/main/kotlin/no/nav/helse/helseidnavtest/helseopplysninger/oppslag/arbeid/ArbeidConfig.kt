@@ -1,15 +1,11 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid
 
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestConfig
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.PeriodFormat
 import org.springframework.boot.convert.PeriodStyle.*
-import org.springframework.http.HttpRequest
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.util.UriBuilder
-import java.io.IOException
 import java.net.URI
 import java.time.LocalDate.now
 import java.time.Period

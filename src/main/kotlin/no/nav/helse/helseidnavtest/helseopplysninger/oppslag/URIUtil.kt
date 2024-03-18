@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag
 
 import java.net.URI
 import org.springframework.http.HttpHeaders

@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.helseopplysninger
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag
 
 import org.apache.cxf.frontend.ClientProxy
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean

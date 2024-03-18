@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag
 
 import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
 import org.springframework.http.MediaType.APPLICATION_JSON

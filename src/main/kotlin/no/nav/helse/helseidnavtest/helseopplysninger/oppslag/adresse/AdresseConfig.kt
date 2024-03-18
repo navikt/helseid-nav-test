@@ -1,6 +1,6 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.adresse
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.adresse
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import no.nav.helse.helseidnavtest.helseopplysninger.WSConfig
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.WSConfig
 @ConfigurationProperties("adresse")
 class AdresseConfig(url: String, username: String, password: String) : WSConfig(url,username,password)

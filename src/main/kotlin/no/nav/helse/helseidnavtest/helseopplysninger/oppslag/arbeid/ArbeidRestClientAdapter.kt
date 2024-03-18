@@ -1,15 +1,11 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
-import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
-import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
-import org.springframework.http.HttpRequest
-import org.springframework.http.HttpStatus
-import org.springframework.http.client.ClientHttpResponse
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestClientAdapter
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 @Component

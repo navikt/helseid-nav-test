@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid
 
 import com.fasterxml.jackson.annotation.JsonValue
 

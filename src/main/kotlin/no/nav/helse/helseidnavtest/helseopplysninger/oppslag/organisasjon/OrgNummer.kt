@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.boot.conditionals.Cluster.*

@@ -1,10 +1,10 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.fastlege
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege
 
 import java.util.Date
 import java.util.GregorianCalendar
 import javax.xml.datatype.DatatypeFactory.*
 import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.createPort
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.createPort
 import no.nav.helse.helseidnavtest.ws.flr.IFlrReadOperations
 
 @Component

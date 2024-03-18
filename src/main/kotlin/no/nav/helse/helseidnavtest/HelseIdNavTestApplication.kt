@@ -10,8 +10,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import no.nav.boot.conditionals.Cluster.Companion.profiler
-import no.nav.helse.helseidnavtest.helseopplysninger.adresse.AdresseWSAdapter
-import no.nav.helse.helseidnavtest.helseopplysninger.fastlege.FastlegeWSAdapter
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.adresse.AdresseWSAdapter
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege.FastlegeWSAdapter
 import no.nav.helse.helseidnavtest.security.SecurityConfig
 
 @SpringBootApplication

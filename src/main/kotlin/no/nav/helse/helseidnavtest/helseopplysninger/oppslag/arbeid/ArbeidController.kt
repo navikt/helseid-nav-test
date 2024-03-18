@@ -1,5 +1,7 @@
-package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
+package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid
 
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrgNummer
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonRestClientAdapter
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestParam
