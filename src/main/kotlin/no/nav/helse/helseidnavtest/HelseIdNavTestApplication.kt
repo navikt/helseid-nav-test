@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import no.nav.boot.conditionals.Cluster.Companion.profiler
 import no.nav.helse.helseidnavtest.helseopplysninger.adresse.AdresseWSAdapter
 import no.nav.helse.helseidnavtest.helseopplysninger.fastlege.FastlegeWSAdapter
+import no.nav.helse.helseidnavtest.security.SecurityConfig
 
 @SpringBootApplication
 @EnableWebSecurity
@@ -22,16 +23,22 @@ class HelseIdNavTestApplication : CommandLineRunner {
     val log = LoggerFactory.getLogger(HelseIdNavTestApplication::class.java)
 
     @Autowired
-    lateinit var applicationContext : ApplicationContext
+    lateinit var ctx : ApplicationContext
     override fun run(vararg args : String) {
         try {
 
-            applicationContext.getBean(AdresseWSAdapter::class.java).apply {
+            ctx.getBean(SecurityConfig.SecurityHelper::class.java).apply {
+                token().also {
+                    log.info("Token: $it")
+                }
+            }
+
+            ctx.getBean(AdresseWSAdapter::class.java).apply {
                 ping().also {
                     log.info("ping respons: $it")
                 }
             }
-            applicationContext.getBean(FastlegeWSAdapter::class.java).apply {
+            ctx.getBean(FastlegeWSAdapter::class.java).apply {
                 fastlege(7125186  , "19087999648").also {
                     log.info("Fastlegestatus : $it")
                 }
