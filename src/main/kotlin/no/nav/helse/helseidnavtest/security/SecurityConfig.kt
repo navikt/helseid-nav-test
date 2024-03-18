@@ -23,16 +23,11 @@ import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
@@ -52,44 +47,22 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
 
-    private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
-        with(OidcUserService().loadUser(req)) {
-            val extractor = ClaimsExtractor(this.claims)
-            val roles = extractor.professions.map {
-                SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
-                  //  log.info("La til roller: $it")
-                }
-            }
-            DefaultOidcUser(authorities /* + roles,*/, req.idToken, userInfo)
-        }
-    }
-
-
     @Bean
-    fun userAuthoritiesMapper(): GrantedAuthoritiesMapper = GrantedAuthoritiesMapper { authorities: Collection<GrantedAuthority> ->
-        val mappedAuthorities = mutableSetOf<GrantedAuthority>()
-
-        authorities.forEach { authority ->
+    fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
+        (authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
             if (authority is OidcUserAuthority) {
-                log.trace("MAP OidcUserAuthority: {}", authority)
-                val extractor = ClaimsExtractor(authority.userInfo.claims)
-                mappedAuthorities.addAll(extractor.professions.map { it ->
-                    SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
-                        log.info("La til roller: $it")
+                val claimsExtractor = ClaimsExtractor(authority.userInfo.claims)
+                with(claimsExtractor) {
+                    professions.map { profession ->
+                        SimpleGrantedAuthority("${profession}_${securityLevel}").also {
+                            log.info("La til roller: $it")
+                        }
                     }
-                })
-                val userInfo = authority.userInfo
-                // Map the claims found in idToken and/or userInfo
-                // to one or more GrantedAuthority's and add it to mappedAuthorities
-            } else if (authority is OAuth2UserAuthority) {
-                log.trace("MAP OAuth2UserAuthority: {}", authority)
-                val userAttributes = authority.attributes
-                // Map the attributes found in userAttributes
-                // to one or more GrantedAuthority's and add it to mappedAuthorities
+                }
+            } else {
+                emptyList()
             }
-        }
-
-        (mappedAuthorities + authorities).also { log.info("Mapped authorities: $it") }
+        }).also { log.info("Authorities after mapping: $it") }
     }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
@@ -130,9 +103,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 accessDeniedHandler = CustomAccessDeniedHandler()
             }
             oauth2Login {
-                userInfoEndpoint {
-                    oidcUserService = oidcUserService()
-                }
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
                     authorizationRequestResolver = resolver
