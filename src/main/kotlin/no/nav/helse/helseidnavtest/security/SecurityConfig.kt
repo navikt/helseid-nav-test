@@ -127,10 +127,14 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 class CustomAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
         getContext().authentication?.let {
-            val professions = ClaimsExtractor((it.oidcUser().claims)).professions
-            res.status = SC_FORBIDDEN;
-            res.contentType = APPLICATION_JSON_VALUE;
-            res.writer.write("Error : To access this resource you need to be a GP registered in HPR, but token contained only the following profession(s): $professions")
+            res.apply {
+                status = SC_FORBIDDEN
+                contentType = APPLICATION_JSON_VALUE
+                writer.write(
+                    "Error : To access this resource you need to be a GP registered in HPR, but token contained only the following profession(s): ${
+                        ClaimsExtractor((it.oidcUser().claims)).professions
+                    }")
+            }
         }
     }
 }
