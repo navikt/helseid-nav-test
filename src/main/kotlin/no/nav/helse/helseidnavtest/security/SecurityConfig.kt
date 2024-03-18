@@ -67,13 +67,13 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun userAuthoritiesMapper(): GrantedAuthoritiesMapper = GrantedAuthoritiesMapper { authorities: Collection<GrantedAuthority> ->
-        val mappedAuthorities = emptySet<GrantedAuthority>()
+        val mappedAuthorities = mutableSetOf<GrantedAuthority>()
 
         authorities.forEach { authority ->
             if (authority is OidcUserAuthority) {
                 log.trace("MAP OidcUserAuthority: {}", authority)
                 val extractor = ClaimsExtractor(authority.userInfo.claims)
-                mappedAuthorities.plus(extractor.professions.map { it ->
+                mappedAuthorities.addAll(extractor.professions.map { it ->
                     SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
                         log.info("La til roller: $it")
                     }
