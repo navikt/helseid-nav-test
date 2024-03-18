@@ -28,7 +28,9 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
                 .onStatus({ it.is2xxSuccessful }) { req, res ->
                     log.trace("Received {} from {}", res.statusCode, req.uri)
                 }
-                .body<List<ArbeidsforholdDTO>>() ?: listOf()
+                .body<List<ArbeidsforholdDTO>>().also {
+                    log.trace("Arbeidsforhold response {}", it)
+                } ?: listOf()
         }
         else {
             listOf()

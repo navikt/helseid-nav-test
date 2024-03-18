@@ -49,6 +49,8 @@ spec:
     env:
         -   name: stshost
             value: {{stshost}}
+        -   name:   wshost
+            value: {{wshost}}
         -   name: env
             value: {{env}}
         -   name: clientid
