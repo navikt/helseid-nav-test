@@ -10,7 +10,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpRequest
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.client.ClientHttpRequestExecution
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -18,8 +22,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder.*
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
@@ -32,13 +36,12 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
-import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
 
 @Configuration
@@ -65,18 +68,22 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         }
     }
 
-    @Service
-    class SecurityHelper(private val authorizedClientManager: OAuth2AuthorizedClientManager) {
-        fun token(): OAuth2AccessToken? {
-                val clientRegistrationId = "arbeid"
-                val authorizeRequest =
-                    OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistrationId) // This principal value is unnecessary, but if you don't give it a value,
-                        // it throws an exception.
-                        .principal("dummy")
-                        .build()
-                val authorizedClient = authorizedClientManager.authorize(authorizeRequest)
-                return authorizedClient?.accessToken
+
+
+   @Component
+    class Jalla(private val clientCredentialsClientManager: OAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+        override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+            authorizeUsingClientCredentialsFlow().let { client ->
+                request.headers.setBearerAuth(client.accessToken.tokenValue)
             }
+            return execution.execute(request, body)
+        }
+        private fun authorizeUsingClientCredentialsFlow() : OAuth2AuthorizedClient =
+            clientCredentialsClientManager.authorize(
+                OAuth2AuthorizeRequest
+                    .withClientRegistrationId("arbeid")
+                    .principal("anonymous")
+                    .build())!!
     }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
