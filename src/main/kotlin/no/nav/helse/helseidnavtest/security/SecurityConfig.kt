@@ -89,7 +89,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
             }
         }
 
-        mappedAuthorities
+        mappedAuthorities + authorities
     }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
