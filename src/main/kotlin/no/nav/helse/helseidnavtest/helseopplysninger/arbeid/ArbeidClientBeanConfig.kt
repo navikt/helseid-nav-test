@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
-import no.nav.helse.helseidnavtest.security.SecurityConfig
+import no.nav.helse.helseidnavtest.security.ClientCredentialsTokenInterceptor
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class ArbeidClientBeanConfig(private val filter: SecurityConfig.Jalla) {
+class ArbeidClientBeanConfig(private val filter: ClientCredentialsTokenInterceptor) {
 
     @Bean
     @Qualifier(ARBEID)

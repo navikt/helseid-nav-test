@@ -6,25 +6,20 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
-import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpRequest
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder.*
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter
@@ -38,10 +33,11 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
+import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import org.springframework.stereotype.Component
 
 
 @Configuration
@@ -69,25 +65,27 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     }
 
 
+    @Bean
+    fun userAuthoritiesMapper(): GrantedAuthoritiesMapper = GrantedAuthoritiesMapper { authorities: Collection<GrantedAuthority> ->
+        val mappedAuthorities = emptySet<GrantedAuthority>()
 
-   @Component
-    class Jalla(private val clientCredentialsClientManager: OAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+        authorities.forEach { authority ->
+            if (authority is OidcUserAuthority) {
+                log.trace("MAP OidcUserAuthority: {}", authority)
+                val idToken = authority.idToken
+                val userInfo = authority.userInfo
+                // Map the claims found in idToken and/or userInfo
+                // to one or more GrantedAuthority's and add it to mappedAuthorities
+            } else if (authority is OAuth2UserAuthority) {
+                log.trace("MAP OAuth2UserAuthority: {}", authority)
+                val userAttributes = authority.attributes
+                // Map the attributes found in userAttributes
+                // to one or more GrantedAuthority's and add it to mappedAuthorities
+            }
+        }
 
-       private val log = LoggerFactory.getLogger(Jalla::class.java)
-
-       override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-           clientCredentialsClientManager.authorize(
-               OAuth2AuthorizeRequest
-                   .withClientRegistrationId(ARBEID)
-                   .principal("anonymous")
-                   .build()
-           )?.let {
-               log.info("Fikk token: ${it.accessToken.tokenValue}")
-               request.headers.setBearerAuth(it.accessToken.tokenValue)
-           }
-           return execution.execute(request, body)
-       }
-   }
+        authorities
+    }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
