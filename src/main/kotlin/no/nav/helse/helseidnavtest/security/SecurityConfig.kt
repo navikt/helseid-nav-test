@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder.*
@@ -29,7 +28,6 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
@@ -51,11 +49,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
         (authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
             if (authority is OidcUserAuthority) {
-                val claimsExtractor = ClaimsExtractor(authority.userInfo.claims)
-                with(claimsExtractor) {
+                with(ClaimsExtractor(authority.userInfo.claims)) {
                     professions.map { profession ->
                         SimpleGrantedAuthority("${profession}_${securityLevel}").also {
-                            log.info("La til roller: $it")
+                            log.info("La til rolle: $it")
                         }
                     }
                 }
