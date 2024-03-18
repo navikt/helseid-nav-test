@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
 import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
+import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -81,7 +82,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         private fun authorizeUsingClientCredentialsFlow() : OAuth2AuthorizedClient =
             clientCredentialsClientManager.authorize(
                 OAuth2AuthorizeRequest
-                    .withClientRegistrationId("arbeid")
+                    .withClientRegistrationId(ARBEID)
                     .principal("anonymous")
                     .build())!!
     }

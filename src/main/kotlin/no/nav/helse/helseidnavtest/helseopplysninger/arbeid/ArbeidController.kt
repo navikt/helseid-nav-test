@@ -13,7 +13,7 @@ class ArbeidController(private val adapter: OrganisasjonRestClientAdapter, priva
 
     @GetMapping("/navn") fun navn(@RequestParam orgnr: OrgNummer) = adapter.orgNavn(orgnr)
 
-    @GetMapping("/areid") fun arbeid(@RequestParam fnr: Fødselsnummer) = arbeid.arbeidInfo(fnr)
+    @GetMapping("/arbeid") fun arbeid(@RequestParam fnr: Fødselsnummer) = arbeid.arbeidInfo(fnr)
 
 
 }

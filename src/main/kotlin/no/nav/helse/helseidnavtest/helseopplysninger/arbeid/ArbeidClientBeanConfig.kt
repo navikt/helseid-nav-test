@@ -5,16 +5,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helse.helseidnavtest.security.SecurityConfig
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class ArbeidClientBeanConfig {
+class ArbeidClientBeanConfig(private val filter: SecurityConfig.Jalla) {
 
     @Bean
     @Qualifier(ARBEID)
     fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig) =
         builder
             .baseUrl("${cfg.baseUri}")
+            .requestInterceptor(filter)
             .build()
 
     @Bean

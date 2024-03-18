@@ -24,7 +24,7 @@ spring:
           issuer-uri: ${helse-id.issuer}
       client:
         registration:
-          arbeid:
+          arbeidsforhold:
             authorization-grant-type: client_credentials
             client-authentication-method: client_secret_basic
             client-id: ${azure.app.client.id}
