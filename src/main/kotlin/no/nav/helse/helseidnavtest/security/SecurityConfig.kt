@@ -54,13 +54,13 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private fun oidcUserService() = OAuth2UserService<OidcUserRequest, OidcUser> { req ->
         with(OidcUserService().loadUser(req)) {
-            val extractor = ClaimsExtractor(this)
+            val extractor = ClaimsExtractor(this.claims)
             val roles = extractor.professions.map {
                 SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
-                    log.info("La til roller: $it")
+                  //  log.info("La til roller: $it")
                 }
             }
-            DefaultOidcUser(authorities + roles, req.idToken, userInfo)
+            DefaultOidcUser(authorities /* roles,*/, req.idToken, userInfo)
         }
     }
 
@@ -72,7 +72,12 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         authorities.forEach { authority ->
             if (authority is OidcUserAuthority) {
                 log.trace("MAP OidcUserAuthority: {}", authority)
-                val idToken = authority.idToken
+                val extractor = ClaimsExtractor(authority.idToken.claims)
+                mappedAuthorities.plus(extractor.professions.map { it ->
+                    SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
+                        log.info("La til roller: $it")
+                    }
+                })
                 val userInfo = authority.userInfo
                 // Map the claims found in idToken and/or userInfo
                 // to one or more GrantedAuthority's and add it to mappedAuthorities
@@ -155,7 +160,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 class CustomAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
         getContext().authentication?.let {
-            val professions = ClaimsExtractor((it.oidcUser())).professions
+            val professions = ClaimsExtractor((it.oidcUser().claims)).professions
             res.status = SC_FORBIDDEN;
             res.contentType = APPLICATION_JSON_VALUE;
             res.writer.write("Error : To access this resource you need to be a GP registered in HPR, but only the following were found: $professions")
