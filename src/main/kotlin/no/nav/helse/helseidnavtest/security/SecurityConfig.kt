@@ -60,7 +60,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                   //  log.info("La til roller: $it")
                 }
             }
-            DefaultOidcUser(authorities /* roles,*/, req.idToken, userInfo)
+            DefaultOidcUser(authorities /* + roles,*/, req.idToken, userInfo)
         }
     }
 
@@ -72,7 +72,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         authorities.forEach { authority ->
             if (authority is OidcUserAuthority) {
                 log.trace("MAP OidcUserAuthority: {}", authority)
-                val extractor = ClaimsExtractor(authority.idToken.claims)
+                val extractor = ClaimsExtractor(authority.userInfo.claims)
                 mappedAuthorities.plus(extractor.professions.map { it ->
                     SimpleGrantedAuthority("${it}_${extractor.securityLevel}").also {
                         log.info("La til roller: $it")
