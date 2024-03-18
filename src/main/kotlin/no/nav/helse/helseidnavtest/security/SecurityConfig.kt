@@ -24,7 +24,6 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
@@ -73,19 +72,22 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
    @Component
     class Jalla(private val clientCredentialsClientManager: OAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
-        override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-            authorizeUsingClientCredentialsFlow().let { client ->
-                request.headers.setBearerAuth(client.accessToken.tokenValue)
-            }
-            return execution.execute(request, body)
-        }
-        private fun authorizeUsingClientCredentialsFlow() : OAuth2AuthorizedClient =
-            clientCredentialsClientManager.authorize(
-                OAuth2AuthorizeRequest
-                    .withClientRegistrationId(ARBEID)
-                    .principal("anonymous")
-                    .build())!!
-    }
+
+       private val log = LoggerFactory.getLogger(Jalla::class.java)
+
+       override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+           clientCredentialsClientManager.authorize(
+               OAuth2AuthorizeRequest
+                   .withClientRegistrationId(ARBEID)
+                   .principal("anonymous")
+                   .build()
+           )?.let {
+               log.info("Fikk token: ${it.accessToken.tokenValue}")
+               request.headers.setBearerAuth(it.accessToken.tokenValue)
+           }
+           return execution.execute(request, body)
+       }
+   }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
