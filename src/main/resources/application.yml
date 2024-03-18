@@ -30,6 +30,8 @@ spring:
             client-id: ${azure.app.client.id}
             client-secret: ${azure.app.client.secret}
             provider: aad
+            scope:
+              - "api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default"
           helse-id:
             redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
             client-authentication-method: "private_key_jwt"
