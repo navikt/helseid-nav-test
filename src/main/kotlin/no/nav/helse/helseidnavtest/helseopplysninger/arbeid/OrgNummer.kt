@@ -7,15 +7,16 @@ import org.slf4j.LoggerFactory.getLogger
 
 data class OrgNummer(@get:JsonValue val orgnr : String) {
 
-    protected val log = getLogger(javaClass)
+    private val log = getLogger(javaClass)
 
     init {
         if (currentCluster() == PROD_GCP) {
-            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), orgnr)
-            require(orgnr.length == 9) { "Orgnr må ha lengde 9, $orgnr har lengde ${orgnr.length} " }
-            require(orgnr.startsWith("8") || orgnr.startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
-            require(orgnr[8].code - 48 == mod11(orgnr.substring(0, 8))) { "${orgnr[8]} feilet mod11 validering" }
-        }
+            with(orgnr)  {
+                require(length == WEIGHTS.size + 1) { "Orgnr må ha lengde ${WEIGHTS.size + 1}, $orgnr har lengde ${orgnr.length} " }
+                require(startsWith("8") || startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
+                require(this[8].code - 48 == mod11(substring(0, 8))) { "${this[8]} feilet mod11 validering" }
+            }
+           }
         else {
             log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), orgnr)
         }

@@ -1,22 +1,20 @@
-package no.nav.helse.helseidnavtest.helseopplysninger
+package no.nav.helse.helseidnavtest.security
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRAutorisasjon
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRData
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRRekvisisjon
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.HPRApproval.HPRSpesialitet
+import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRAutorisasjon
+import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRData
+import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRRekvisisjon
+import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
 @Suppress("UNCHECKED_CAST")
-//class ClaimsExtractor(private val user : OidcUser) : this(user.claims) {
-
-class ClaimsExtractor(private val claims : Map<*,*>) {
+class ClaimsExtractor(private val claims : Map<String,Any>) {
 
     val professions = claims.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val hprNumber = stringClaim(HPR_NUMBER)
     val securityLevel = stringClaim(SECURITY_LEVEL)
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
-    fun stringClaim(claim: String) = claims?.get(claim) as? String
+    fun stringClaim(claim: String) = claims[claim] as? String
 
     private fun hprDetails(respons : Map<*, *>) =
         HPRDetails(with((respons)) {
@@ -24,8 +22,8 @@ class ClaimsExtractor(private val claims : Map<*,*>) {
                 it as Map<*, *>
                 HPRApproval(it[PROFESSION] as String,
                     HPRAutorisasjon(ex(it[AUTHORIZATION] as Map<String, String>)),
-                    HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map { r -> ex(r) }),
-                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map { s  -> ex(s) }))
+                    HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map(::ex)),
+                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map(::ex)))
             }
         })
 

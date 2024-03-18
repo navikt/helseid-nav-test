@@ -1,5 +1,6 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
 
+import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.slf4j.LoggerFactory.getLogger

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.OrganisasjonConfig.Companion.ORGANISASJON
 import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
 import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.web.client.RestClient
@@ -26,7 +27,7 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ !it.is2xxSuccessful }) { req, res ->
-                    handleErrors(req, res, orgnr)
+                    handleErrors(req, res, orgnr.orgnr)
                 }
                 .onStatus({ it.is2xxSuccessful }) { req, res ->
                     log.trace("Fikk {} fra {}", res.statusCode, req.uri)
@@ -37,15 +38,6 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
         else {
             orgnr.orgnr
         }
-    private fun handleErrors(req: HttpRequest, res: ClientHttpResponse, orgnr: OrgNummer) {
-        log.warn("Received ${res.statusCode} from ${req.uri}" )
-        throw when (res.statusCode) {
-            NOT_FOUND -> OppslagNotFoundException("Fant ikke ${orgnr.orgnr}")
-            else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
-        }
-    }
-
-
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

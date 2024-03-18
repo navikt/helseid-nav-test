@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helse.helseidnavtest.helseopplysninger.health.AbstractPingableHealthIndicator
 import no.nav.helse.helseidnavtest.security.ClientCredentialsTokenInterceptor
 import org.springframework.web.client.RestClient.Builder
 

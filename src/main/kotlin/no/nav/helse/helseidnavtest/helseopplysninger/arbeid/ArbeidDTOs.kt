@@ -2,6 +2,7 @@ package no.nav.helse.helseidnavtest.helseopplysninger.arbeid
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.Arbeidsforhold.Arbeidsavtale
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsforholdDTO(val ansettelsesperiode: AnsettelsesperiodeDTO,
@@ -33,3 +34,5 @@ data class ArbeidsforholdDTO(val ansettelsesperiode: AnsettelsesperiodeDTO,
 data class Arbeidsforhold(val navn: String, val avtaler: List<Arbeidsavtale>) {
     data class Arbeidsavtale(val stillingsprosent: Double, val antallTimerPrUke: Double, val periode: Periode)
 }
+
+data class Periode(val fom : LocalDate, val tom : LocalDate?)

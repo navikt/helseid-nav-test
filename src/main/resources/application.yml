@@ -31,23 +31,23 @@ spring:
             client-secret: ${azure.app.client.secret}
             provider: aad
             scope:
-              - "api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default"
+              - api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default
           helse-id:
-            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-            client-authentication-method: "private_key_jwt"
-            authorization-grant-type: "authorization_code"
+            redirect-uri: {baseUrl}/login/oauth2/code/{registrationId}
+            client-authentication-method: private_key_jwt
+            authorization-grant-type: authorization_code
             client-id:  ${clientid}
-            client-name: "NAV Helseopplysninger"
+            client-name: NAV Helseopplysninger
             scope:
-              - "profile"
-              - "openid"
-              - "helseid://scopes/identity/assurance_level"
-              - "helseid://scopes/identity/pid"
-              - "helseid://scopes/identity/security_level"
-              - "helseid://scopes/hpr/hpr_number"
-              - "nhn:flr-public/read"
-              - "hdir:felleskodeverk.api/kodeverk"
-              - "hdir:felleskodeverk.api/kodeverdier"
+              - profile
+              - openid
+              - helseid://scopes/identity/assurance_level
+              - helseid://scopes/identity/pid
+              - helseid://scopes/identity/security_level
+              - helseid://scopes/hpr/hpr_number
+              - nhn:flr-public/read
+              - hdir:felleskodeverk.api/kodeverk
+              - hdir:felleskodeverk.api/kodeverdier
         provider:
           aad:
             issuer-uri: ${azure.openid.config.issuer}

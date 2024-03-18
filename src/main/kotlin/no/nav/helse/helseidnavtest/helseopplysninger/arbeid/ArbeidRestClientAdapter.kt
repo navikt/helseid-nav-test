@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.arbeid.ArbeidConfig.Companion.ARBEID
 import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
 import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.client.ClientHttpResponse
@@ -23,7 +24,7 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
-                   handleErrors(req, res, fnr)
+                   handleErrors(req, res, fnr.fnr)
                 }
                 .onStatus({ it.is2xxSuccessful }) { req, res ->
                     log.trace("Received {} from {}", res.statusCode, req.uri)
@@ -35,14 +36,5 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
         else {
             listOf()
         }
-
-    private fun handleErrors(req: HttpRequest, res: ClientHttpResponse, fnr: Fødselsnummer) {
-        log.warn("Received ${res.statusCode} from ${req.uri}" )
-        throw when (res.statusCode) {
-            HttpStatus.NOT_FOUND -> OppslagNotFoundException("Fant ikke arbeidsforhodl for ${fnr.fnr}")
-            else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
-        }
-    }
-
     override fun toString() = "${javaClass.simpleName} [webClient=$restClient, cfg=$cf]"
 }

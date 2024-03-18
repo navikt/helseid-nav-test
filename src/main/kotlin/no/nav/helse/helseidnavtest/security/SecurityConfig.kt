@@ -4,8 +4,7 @@ import com.nimbusds.jose.jwk.JWK
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor
-import no.nav.helse.helseidnavtest.helseopplysninger.ClaimsExtractor.Companion.oidcUser
+import no.nav.helse.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -69,10 +68,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter { clientRegistration ->
-            when (clientRegistration.registrationId) {
+        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter { reg ->
+            when (reg.registrationId) {
                 "helse-id" -> jwk
-                else -> throw IllegalArgumentException("Unknown client: ${clientRegistration.registrationId}")
+                else -> throw IllegalArgumentException("Unknown client: ${reg.registrationId}")
             }
         })
     }
