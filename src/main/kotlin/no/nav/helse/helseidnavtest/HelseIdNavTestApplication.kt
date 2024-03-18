@@ -27,12 +27,6 @@ class HelseIdNavTestApplication : CommandLineRunner {
     override fun run(vararg args : String) {
         try {
 
-            ctx.getBean(SecurityConfig.SecurityHelper::class.java).apply {
-                token().also {
-                    log.info("Token: $it")
-                }
-            }
-
             ctx.getBean(AdresseWSAdapter::class.java).apply {
                 ping().also {
                     log.info("ping respons: $it")
