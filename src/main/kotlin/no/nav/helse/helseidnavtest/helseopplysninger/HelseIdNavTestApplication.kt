@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import no.nav.boot.conditionals.Cluster.Companion.profiler
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.Fødselsnummer
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege.FastlegeWSAdapter
 
 @SpringBootApplication
@@ -28,7 +29,7 @@ class HelseIdNavTestApplication : CommandLineRunner {
                 bekreftFastlege(7125186  , "19087999648").also {
                     log.info("Fastlegestatus : $it")
                 }
-                fastlegeForPasient("19087999648").also {
+                fastlegeForPasient(Fødselsnummer("19087999648")).also {
                     log.info("Fastlege herID: ${it.patientNIN.value} ${it.gpHerId.value}")
                 }
             }
