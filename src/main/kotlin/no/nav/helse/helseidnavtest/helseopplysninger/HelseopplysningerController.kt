@@ -1,5 +1,6 @@
 package no.nav.helse.helseidnavtest.helseopplysninger
 
+import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege.FastlegeWSAdapter
 import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
