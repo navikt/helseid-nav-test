@@ -10,11 +10,11 @@ import no.nav.helse.helseidnavtest.helseopplysninger.security.ClientCredentialsT
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration
-class ArbeidClientBeanConfig(private val filter: ClientCredentialsTokenInterceptor) {
+class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig) =
+    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig, filter: ClientCredentialsTokenInterceptor) =
         builder
             .baseUrl("${cfg.baseUri}")
             .requestInterceptor(filter)

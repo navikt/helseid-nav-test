@@ -16,7 +16,7 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
             restClient
                 .get()
                 .uri(cf::arbeidsforholdURI)
-                .header("Nav-Personident", fnr.fnr)
+                .header(NAV_PERSONIDENT_HEADER, fnr.fnr)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
@@ -33,4 +33,9 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
             listOf()
         }
     override fun toString() = "${javaClass.simpleName} [webClient=$restClient, cfg=$cf]"
+
+    companion object {
+        private const val NAV_PERSONIDENT_HEADER = "Nav-Personident"
+    }
+
 }
