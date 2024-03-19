@@ -12,6 +12,9 @@ class FastlegeController(private val adapter: FastlegeWSAdapter) {
     @GetMapping("finn")
     fun finnFastlege(@RequestParam fnr: Fødselsnummer) = adapter.fastlegeForPasient(fnr)
 
+    @GetMapping("detaljer")
+    fun detaljer(@RequestParam fnr: Fødselsnummer) = adapter.detaljer(fnr)
+
     @GetMapping("bekreft")
     fun bekreftFastlege(@RequestParam hpr: Int, @RequestParam fnr: Fødselsnummer) = adapter.bekreftFastlege(hpr, fnr.fnr)
 }
