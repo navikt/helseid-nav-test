@@ -1,11 +1,11 @@
-package no.nav.helse.helseidnavtest.security
+package no.nav.helse.helseidnavtest.helseopplysninger.security
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRAutorisasjon
-import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRData
-import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRRekvisisjon
-import no.nav.helse.helseidnavtest.security.ClaimsExtractor.HPRApproval.HPRSpesialitet
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRAutorisasjon
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRData
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRRekvisisjon
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
 @Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims : Map<String,Any>) {
@@ -21,9 +21,9 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
             (this[APPROVALS] as List<*>).map {
                 it as Map<*, *>
                 HPRApproval(it[PROFESSION] as String,
-                    HPRAutorisasjon(ex(it[AUTHORIZATION] as Map<String, String>)),
-                    HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map(::ex)),
-                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map(::ex)))
+                    HPRAutorisasjon(extract(it[AUTHORIZATION] as Map<String, String>)),
+                    HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map(Companion::extract)),
+                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map(Companion::extract)))
             }
         })
 
@@ -55,6 +55,6 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
         private const val VALUE = "value"
         private const val DESCRIPTION = "description"
 
-        private fun ex(m : Map<String, String>) = HPRData(m[VALUE] as String, m[DESCRIPTION] as String)
+        private fun extract(m : Map<String, String>) = HPRData(m[VALUE] as String, m[DESCRIPTION] as String)
     }
 }

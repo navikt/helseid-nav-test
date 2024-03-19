@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest
+package no.nav.helse.helseidnavtest.helseopplysninger
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import no.nav.boot.conditionals.Cluster.Companion.profiler
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.adresse.AdresseWSAdapter
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege.FastlegeWSAdapter
-import no.nav.helse.helseidnavtest.security.SecurityConfig
 
 @SpringBootApplication
 @EnableWebSecurity

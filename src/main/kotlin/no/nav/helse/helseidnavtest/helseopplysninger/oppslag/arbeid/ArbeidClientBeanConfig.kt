@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import no.nav.helse.helseidnavtest.helseopplysninger.health.AbstractPingableHealthIndicator
-import no.nav.helse.helseidnavtest.security.ClientCredentialsTokenInterceptor
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClientCredentialsTokenInterceptor
 import org.springframework.web.client.RestClient.Builder
 
 @Configuration

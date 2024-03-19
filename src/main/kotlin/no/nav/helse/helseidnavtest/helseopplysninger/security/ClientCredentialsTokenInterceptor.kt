@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest.security
+package no.nav.helse.helseidnavtest.helseopplysninger.security
 
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.http.HttpRequest

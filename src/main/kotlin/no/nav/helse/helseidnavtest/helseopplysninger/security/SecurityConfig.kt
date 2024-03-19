@@ -1,10 +1,10 @@
-package no.nav.helse.helseidnavtest.security
+package no.nav.helse.helseidnavtest.helseopplysninger.security
 
 import com.nimbusds.jose.jwk.JWK
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
-import no.nav.helse.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
+import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
