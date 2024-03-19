@@ -46,11 +46,11 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
-        (authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
+        authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
             if (authority is OidcUserAuthority) {
                 with(ClaimsExtractor(authority.userInfo.claims)) {
-                    professions.map { profession ->
-                        SimpleGrantedAuthority("${profession}_${securityLevel}").also {
+                    professions.map { p ->
+                        SimpleGrantedAuthority("${p}_${securityLevel}").also {
                             log.info("La til rolle: $it")
                         }
                     }
@@ -58,7 +58,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
             } else {
                 emptyList()
             }
-        }).also { log.info("Authorities after mapping: $it") }
+        }
     }
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
