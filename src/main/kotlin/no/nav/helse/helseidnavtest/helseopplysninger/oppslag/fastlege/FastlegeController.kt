@@ -6,16 +6,16 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 
-@RestController("fastlege")
+@RestController("/fastlege")
 class FastlegeController(private val adapter: FastlegeWSAdapter) {
 
-    @GetMapping("finn")
+    @GetMapping("/finn")
     fun finnFastlege(@RequestParam fnr: Fødselsnummer) = adapter.fastlegeForPasient(fnr)
 
-    @GetMapping("detaljer")
+    @GetMapping("/detaljer")
     fun detaljer(@RequestParam fnr: Fødselsnummer) = adapter.detaljer(fnr)
 
-    @GetMapping("bekreft")
+    @GetMapping("/bekreft")
     fun bekreftFastlege(@RequestParam hpr: Int, @RequestParam fnr: Fødselsnummer) = adapter.bekreftFastlege(hpr, fnr.fnr)
 }
 
