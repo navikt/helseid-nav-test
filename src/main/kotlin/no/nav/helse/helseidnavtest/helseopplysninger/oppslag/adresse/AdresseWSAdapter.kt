@@ -24,8 +24,6 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
             onSuccess = { it },
             onFailure = { throw IntegrationException("Kunne ikke hente detaljer for herId=$herId", it) }
         )
-        }
+}
 
     //  fastlege(7125186  , "19087999648")
-
-}

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
 import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.Companion.oidcUser
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -42,7 +42,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     private val jwk = JWK.parse(assertion)
 
-    private val log = LoggerFactory.getLogger(SecurityConfig::class.java)
+    private val log = getLogger(SecurityConfig::class.java)
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
