@@ -18,6 +18,8 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun fastlegeForPasient(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr)
 
+    fun detaljer(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr)
+
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
         time = Date()
