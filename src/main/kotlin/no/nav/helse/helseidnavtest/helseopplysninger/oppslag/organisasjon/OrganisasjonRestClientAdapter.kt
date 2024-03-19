@@ -25,9 +25,6 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .onStatus({ !it.is2xxSuccessful }) { req, res ->
                     handleErrors(req, res, orgnr.orgnr)
                 }
-                .onStatus({ it.is2xxSuccessful }) { req, res ->
-                    log.trace("Fikk {} fra {}", res.statusCode, req.uri)
-                }
                 .body<OrganisasjonDTO>()?.fulltNavn ?: orgnr.orgnr
                 .also { log.trace("Organisasjon oppslag response {}", it) }
         }
