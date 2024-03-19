@@ -16,7 +16,7 @@ class FastlegeController(private val adapter: FastlegeWSAdapter) {
     fun detaljer(@RequestParam fnr: Fødselsnummer) = adapter.detaljer(fnr)
 
     @GetMapping("/bekreft")
-    fun bekreftFastlege(@RequestParam hpr: Int, @RequestParam fnr: Fødselsnummer) = adapter.bekreftFastlege(hpr, fnr.fnr)
+    fun bekreftFastlege(@RequestParam hprId: Int, @RequestParam fnr: Fødselsnummer) = adapter.bekreftFastlege(hprId, fnr)
 }
 
   //  fastlege(7125186  , "19087999648")

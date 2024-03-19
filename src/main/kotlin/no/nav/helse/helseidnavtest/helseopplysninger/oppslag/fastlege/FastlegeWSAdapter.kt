@@ -14,7 +14,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun bekreftFastlege(hpr: Int, fnr: String) = client.confirmGP(fnr, hpr, now())
+    fun bekreftFastlege(hpr: Int, fnr: Fødselsnummer) = client.confirmGP(fnr.fnr, hpr, now())
 
     fun fastlegeForPasient(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr)
 

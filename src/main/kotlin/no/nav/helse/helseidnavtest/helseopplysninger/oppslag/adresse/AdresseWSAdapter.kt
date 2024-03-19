@@ -20,13 +20,11 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     override fun pingEndpoint() = cfg.url
 
     fun details(herId: Int) =
-
         runCatching {
             client.getCommunicationPartyDetails(herId)
         }.fold(
             onSuccess = { it },
             onFailure = {
-
                 when (it) {
                     is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw OppslagNotFoundException(it.message ?: "Fant ikke noe for herId=$herId")
                     else -> throw IntegrationException("${it.message}", it)
@@ -35,4 +33,5 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
         )
 }
 
-    //  fastlege(7125186  , "19087999648")
+//       herId 83849
+
