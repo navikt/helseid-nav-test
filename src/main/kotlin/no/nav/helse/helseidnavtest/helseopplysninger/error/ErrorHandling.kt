@@ -10,5 +10,8 @@ import org.springframework.http.client.ClientHttpResponse
         else -> IntegrationException("Fikk response ${res.statusCode} fra ${req.uri}")
     }
 }
-class IntegrationException(msg: String, cause: Throwable? =null) : RuntimeException(msg, cause)
-class OppslagNotFoundException(msg: String) : RuntimeException(msg)
+class IntegrationException(msg: String, cause: Throwable? =null) : RecoverableException(msg, cause)
+class OppslagNotFoundException(msg: String) : IrrecoverableException(msg)
+
+abstract class IrrecoverableException(msg: String, cause: Throwable? =null) : RuntimeException(msg, cause)
+abstract class RecoverableException(msg: String, cause: Throwable? =null) : RuntimeException(msg, cause)
