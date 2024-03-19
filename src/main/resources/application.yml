@@ -46,8 +46,6 @@ spring:
               - helseid://scopes/identity/security_level
               - helseid://scopes/hpr/hpr_number
               - nhn:flr-public/read
-              - hdir:felleskodeverk.api/kodeverk
-              - hdir:felleskodeverk.api/kodeverdier
         provider:
           aad:
             issuer-uri: ${azure.openid.config.issuer}
@@ -58,6 +56,7 @@ spring:
       enabled: true
 
 adresse:
+  url: https://${wshost}/v1/AR/Basic
   username: ${fastlege.username}
   password: ${fastlege.password}
 
@@ -69,3 +68,9 @@ organisasjon:
 
 helse-id:
   issuer: https://${stshost}
+
+fastlege:
+    url: https://${wshost}/v2/flr/Basic
+
+authserver:
+    url: https://${stshost}

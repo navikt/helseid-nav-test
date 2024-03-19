@@ -1,8 +1,0 @@
-fastlege:
-    url: https://${wshost}/v2/flr/Basic
-adresse:
-  url: https://${wshost}/v1/AR/Basic
-authserver:
-   url: https://${stshost}
-
-
