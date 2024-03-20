@@ -1,9 +1,7 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.adresse
 
 
-import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
 import no.nav.helse.helseidnavtest.helseopplysninger.error.NotFoundException
-import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
 import no.nav.helse.helseidnavtest.helseopplysninger.error.RecoverableException
 import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
 import org.springframework.stereotype.Component

@@ -134,6 +134,28 @@
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>xsd-to-java</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageName>no.nav.helseopplysninger.apprec</packageName>
+                    <sources>
+                        <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
+                    </sources>
+                    <xjbSources>
+                        <xjbSources>src/main/resources/kith-apprec/xjb/binding.xml</xjbSources>
+                    </xjbSources>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
                 <version>4.0.2</version>
