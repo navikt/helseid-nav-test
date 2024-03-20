@@ -2,7 +2,9 @@ package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.adresse
 
 
 import no.nav.helse.helseidnavtest.helseopplysninger.error.IntegrationException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.NotFoundException
 import no.nav.helse.helseidnavtest.helseopplysninger.error.OppslagNotFoundException
+import no.nav.helse.helseidnavtest.helseopplysninger.error.RecoverableException
 import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.createPort
@@ -26,8 +28,8 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
             onSuccess = { it },
             onFailure = {
                 when (it) {
-                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw OppslagNotFoundException(it.message ?: "Fant ikke noe for herId=$herId")
-                    else -> throw IntegrationException("${it.message}", it)
+                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message ?: "Fant ikke noe for herId=$herId")
+                    else -> throw RecoverableException("${it.message}", it)
                 }
             }
         )

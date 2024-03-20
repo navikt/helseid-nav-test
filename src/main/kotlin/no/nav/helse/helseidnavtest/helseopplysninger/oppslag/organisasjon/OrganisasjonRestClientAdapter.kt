@@ -1,12 +1,14 @@
 package no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.helseidnavtest.helseopplysninger.error.RecoverableException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
 import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
 import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestClientAdapter
+import org.springframework.retry.annotation.Retryable
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 
@@ -15,7 +17,9 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                                     private val cf: OrganisasjonConfig
 ) : AbstractRestClientAdapter(client, cf) {
 
-    fun orgNavn(orgnr: OrgNummer) =
+
+    @Retryable(include = [RecoverableException::class])
+        fun orgNavn(orgnr: OrgNummer) =
         if (cf.isEnabled) {
             restClient
                 .get()

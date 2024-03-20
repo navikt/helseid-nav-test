@@ -21,8 +21,10 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    @ExceptionHandler(OppslagNotFoundException::class)
-    fun ikkeFunnet(e: OppslagNotFoundException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    @ExceptionHandler(NotFoundException::class)
+    fun notFound(e: NotFoundException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    @ExceptionHandler(IrrecoverableException::class)
+    fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR)
 
     @ExceptionHandler(HttpMessageConversionException::class)
     fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
@@ -34,7 +36,6 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
         status(status)
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
             .body(createProblemDetail(e, status, e.message ?: e.javaClass.simpleName,null, null, req).apply {
-              //  setProperty(NAV_CALL_ID, callId())
             }.also { log(e, it, req, status) })
 
     private fun log(t: Throwable, problem: ProblemDetail, req: NativeWebRequest, status: HttpStatus) {
