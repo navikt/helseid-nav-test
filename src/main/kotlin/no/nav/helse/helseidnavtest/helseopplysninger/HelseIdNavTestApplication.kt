@@ -5,6 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import no.nav.boot.conditionals.Cluster.Companion.profiler
+import no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateAdapter
 import org.springframework.retry.annotation.EnableRetry
 
 @SpringBootApplication

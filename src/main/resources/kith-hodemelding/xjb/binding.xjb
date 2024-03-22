@@ -1,0 +1,30 @@
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb" version="3.0"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <globalBindings>
+        <javaType name="java.time.LocalDate" xmlType="xs:date"
+                  parseMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateAdapter.unmarshal"
+                  printMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateAdapter.marshal" />
+        <javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
+                  parseMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateTimeAdapter.unmarshal"
+                  printMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateTimeAdapter.marshal" />
+    </globalBindings>
+
+    <bindings schemaLocation="../xsd/MsgHead-v1_2.xsd">
+        <schemaBindings>
+            <nameXmlTransform>
+                <typeName prefix="XML"/>
+                <elementName prefix="XML"/>
+            </nameXmlTransform>
+        </schemaBindings>
+    </bindings>
+
+    <bindings schemaLocation="../xsd/xmldsig-core-schema.xsd">
+        <schemaBindings>
+            <nameXmlTransform>
+                <typeName prefix="XML"/>
+                <elementName prefix="XML"/>
+            </nameXmlTransform>
+        </schemaBindings>
+    </bindings>
+</bindings>

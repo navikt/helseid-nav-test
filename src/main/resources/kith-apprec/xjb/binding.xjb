@@ -1,0 +1,21 @@
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <globalBindings>
+        <javaType name="java.time.LocalDate" xmlType="xs:date"
+                  parseMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateAdapter.unmarshal"
+                  printMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateAdapter.marshal" />
+        <javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
+                  parseMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateTimeAdapter.unmarshal"
+                  printMethod="no.nav.helse.helseidnavtest.helseopplysninger.adapters.LocalDateTimeAdapter.marshal" />
+    </globalBindings>
+
+    <bindings schemaLocation="../xsd/AppRec-v1.0.xsd">
+        <schemaBindings>
+            <nameXmlTransform>
+                <typeName prefix="XML"/>
+                <elementName prefix="XML"/>
+            </nameXmlTransform>
+        </schemaBindings>
+    </bindings>
+</bindings>
