@@ -161,7 +161,7 @@
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/generated-sources/apprec</outputDirectory>
+                            <outputDirectory>target/generated-sources/apprecmvn</outputDirectory>
                             <extension>true</extension>
                             <packageName>no.nav.helseopplysninger.apprec</packageName>
                             <sources>
