@@ -163,7 +163,7 @@
                         <configuration>
                             <outputDirectory>target/generated-sources/apprec</outputDirectory>
                             <extension>true</extension>
-                            <packageName>no.nav.helseopplysninger.apprec</packageName>
+                            <packageName>no.nav.helseidnavtest.apprec</packageName>
                             <sources>
                                 <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
                             </sources>
@@ -193,7 +193,7 @@
                             <wsdlFiles>
                                 ${project.basedir}/src/main/resources/flr.wsdl
                             </wsdlFiles>
-                            <packageName>no.nav.helseopplysninger.ws.flr</packageName>
+                            <packageName>no.nav.helseidnavtest.ws.flr</packageName>
                             <sourceDestDir>${sourcesDir}</sourceDestDir>
                             <destDir>${classesDir}</destDir>
                             <extension>true</extension>
@@ -210,7 +210,7 @@
                             <wsdlFiles>
                                 ${project.basedir}/src/main/resources/ar.wsdl
                             </wsdlFiles>
-                            <packageName>no.nav.helseopplysninger.ws.ar</packageName>
+                            <packageName>no.nav.helseidnavtest.ws.ar</packageName>
                             <sourceDestDir>${sourcesDir}</sourceDestDir>
                             <destDir>${classesDir}</destDir>
                         </configuration>
