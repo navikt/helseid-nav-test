@@ -193,7 +193,7 @@
                             <wsdlFiles>
                                 ${project.basedir}/src/main/resources/flr.wsdl
                             </wsdlFiles>
-                            <packageName>no.nav.helse.helseidnavtest.ws.flr</packageName>
+                            <packageName>no.nav.helseopplysninger.ws.flr</packageName>
                             <sourceDestDir>${sourcesDir}</sourceDestDir>
                             <destDir>${classesDir}</destDir>
                             <extension>true</extension>
@@ -210,7 +210,7 @@
                             <wsdlFiles>
                                 ${project.basedir}/src/main/resources/ar.wsdl
                             </wsdlFiles>
-                            <packageName>no.nav.helse.helseidnavtest.ws.ar</packageName>
+                            <packageName>no.nav.helseopplysninger.ws.ar</packageName>
                             <sourceDestDir>${sourcesDir}</sourceDestDir>
                             <destDir>${classesDir}</destDir>
                         </configuration>
