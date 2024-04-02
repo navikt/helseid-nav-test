@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.oppslag.arbeid
 
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestConfig
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helseidnavtest.oppslag.AbstractRestConfig
+import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.PeriodFormat
 import org.springframework.boot.convert.PeriodStyle.*

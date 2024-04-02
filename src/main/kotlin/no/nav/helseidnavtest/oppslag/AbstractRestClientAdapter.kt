@@ -1,10 +1,10 @@
 package no.nav.helseidnavtest.oppslag
 
-import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.MediaType.TEXT_PLAIN
+import no.nav.helseidnavtest.health.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.web.client.RestClient
 
 abstract class AbstractRestClientAdapter(protected open val restClient : RestClient, protected val cfg : AbstractRestConfig,

@@ -1,12 +1,12 @@
 package no.nav.helseidnavtest.oppslag.organisasjon
 
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestConfig
-import java.net.URI
+import no.nav.helseidnavtest.oppslag.AbstractRestConfig
+import no.nav.helseidnavtest.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.bind.DefaultValue
 import org.springframework.web.util.UriBuilder
 import org.springframework.web.util.UriComponentsBuilder
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
+import java.net.URI
 
 @ConfigurationProperties(ORGANISASJON)
 class OrganisasjonConfig(baseUri: URI, private val organisasjonPath: String = V1_ORGANISASJON,

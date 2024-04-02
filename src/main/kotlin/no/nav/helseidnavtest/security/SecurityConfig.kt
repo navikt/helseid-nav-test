@@ -4,7 +4,7 @@ import com.nimbusds.jose.jwk.JWK
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.Companion.oidcUser
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

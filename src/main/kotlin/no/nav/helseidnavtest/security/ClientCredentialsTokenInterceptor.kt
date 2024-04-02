@@ -1,6 +1,6 @@
 package no.nav.helseidnavtest.security
 
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
+import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor

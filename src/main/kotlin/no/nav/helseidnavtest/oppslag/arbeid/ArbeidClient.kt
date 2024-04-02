@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.arbeid
 
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonRestClientAdapter
+
+import no.nav.helseidnavtest.oppslag.organisasjon.OrganisasjonRestClientAdapter
 import org.springframework.stereotype.Component
 
 @Component

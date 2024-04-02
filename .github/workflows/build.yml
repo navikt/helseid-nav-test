@@ -23,13 +23,6 @@ jobs:
             -   name: Sjekker ut kode
                 uses: actions/checkout@v4
 
-            -   name: Setter opp Java 21
-                uses: actions/setup-java@v4
-                with:
-                    java-version: 21
-                    distribution: temurin
-                    cache: maven
-
             -   name: Setter tag-navn
                 run: echo "TAG=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
@@ -40,8 +33,16 @@ jobs:
                     identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
                     team: helseopplysninger
 
+            - name: Setter opp Java 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: 21
+                  distribution: temurin
+                  cache: maven
+
             -   name: Kompilerer, bygger  og pusher image
                 id: kompiler
+
                 env:
                     GITHUB_TOKEN: ${{ github.token }}
                 run: |

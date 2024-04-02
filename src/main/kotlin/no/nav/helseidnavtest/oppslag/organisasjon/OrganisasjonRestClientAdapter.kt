@@ -1,14 +1,14 @@
 package no.nav.helseidnavtest.oppslag.organisasjon
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.helse.helseidnavtest.helseopplysninger.error.RecoverableException
+import no.nav.helseidnavtest.error.RecoverableException
+import no.nav.helseidnavtest.error.handleErrors
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
+import no.nav.helseidnavtest.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrganisasjonConfig.Companion.ORGANISASJON
-import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestClientAdapter
 import org.springframework.retry.annotation.Retryable
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 

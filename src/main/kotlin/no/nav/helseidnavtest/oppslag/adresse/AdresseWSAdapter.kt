@@ -1,13 +1,12 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
-
-import no.nav.helse.helseidnavtest.helseopplysninger.error.NotFoundException
-import no.nav.helse.helseidnavtest.helseopplysninger.error.RecoverableException
-import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
+import no.nav.helseidnavtest.error.NotFoundException
+import no.nav.helseidnavtest.error.RecoverableException
+import no.nav.helseidnavtest.health.Pingable
+import no.nav.helseidnavtest.oppslag.createPort
+import no.nav.helseidnavtest.ws.ar.ICommunicationPartyService
+import no.nav.helseidnavtest.ws.ar.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
 import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.createPort
-import no.nav.helse.helseidnavtest.ws.ar.ICommunicationPartyService
-import no.nav.helse.helseidnavtest.ws.ar.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
 
 @Component
 class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {

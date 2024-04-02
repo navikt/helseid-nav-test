@@ -1,12 +1,12 @@
 package no.nav.helseidnavtest
 
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.fastlege.FastlegeWSAdapter
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor
+
+import no.nav.helseidnavtest.security.ClaimsExtractor
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.ModelAndView
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.Companion.oidcUser
 
 @RestController
 class HelseopplysningerController {

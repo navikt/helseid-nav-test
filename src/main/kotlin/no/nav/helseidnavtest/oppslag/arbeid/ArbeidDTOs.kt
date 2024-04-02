@@ -1,8 +1,7 @@
 package no.nav.helseidnavtest.oppslag.arbeid
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.Arbeidsforhold.Arbeidsavtale
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.organisasjon.OrgNummer
+import no.nav.helseidnavtest.oppslag.organisasjon.OrgNummer
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,10 +15,11 @@ data class ArbeidsforholdDTO(val ansettelsesperiode: AnsettelsesperiodeDTO,
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class ArbeidsavtaleDTO(val stillingsprosent: Double, val antallTimerPrUke: Double) {
-        fun tilAvtale(p: Periode) = Arbeidsavtale(stillingsprosent, antallTimerPrUke, p)
+        fun tilAvtale(p: Periode) = Arbeidsforhold.Arbeidsavtale(stillingsprosent, antallTimerPrUke, p)
     }
 
-    data class ArbeidsgiverDTO(val type: ArbeidsgiverType, val organisasjonsnummer: OrgNummer) {
+    data class ArbeidsgiverDTO(val type: ArbeidsgiverType, val organisasjonsnummer:
+    OrgNummer) {
         enum class ArbeidsgiverType {
             Organisasjon,
             Person

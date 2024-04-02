@@ -1,11 +1,8 @@
 package no.nav.helseidnavtest.security
 
+import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRAutorisasjon
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRData
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRRekvisisjon
-import no.nav.helse.helseidnavtest.helseopplysninger.security.ClaimsExtractor.HPRApproval.HPRSpesialitet
 
 @Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims : Map<String,Any>) {
@@ -23,7 +20,8 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
                 HPRApproval(it[PROFESSION] as String,
                     HPRAutorisasjon(extract(it[AUTHORIZATION] as Map<String, String>)),
                     HPRRekvisisjon((it[REQUISITION_RIGHTS] as List<Map<String, String>>).map(Companion::extract)),
-                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map(Companion::extract)))
+                    HPRSpesialitet((it[SPECIALITIES] as List<Map<String, String>>).map(Companion::extract))
+                )
             }
         })
 

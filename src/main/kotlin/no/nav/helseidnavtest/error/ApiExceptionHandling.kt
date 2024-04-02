@@ -1,18 +1,18 @@
 package no.nav.helseidnavtest.error
 
 import com.fasterxml.jackson.databind.DatabindException
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.status
 import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import org.slf4j.LoggerFactory.getLogger
 
 @ControllerAdvice
 class ApiExceptionHandling : ResponseEntityExceptionHandler() {

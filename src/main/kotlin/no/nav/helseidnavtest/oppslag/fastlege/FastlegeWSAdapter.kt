@@ -1,13 +1,12 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
-import no.nav.helse.helseidnavtest.helseopplysninger.health.Pingable
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.Fødselsnummer
-import java.util.Date
-import java.util.GregorianCalendar
-import javax.xml.datatype.DatatypeFactory.*
+import no.nav.helseidnavtest.health.Pingable
+import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import no.nav.helseidnavtest.oppslag.createPort
+import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
 import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.createPort
-import no.nav.helse.helseidnavtest.ws.flr.IFlrReadOperations
+import java.util.*
+import javax.xml.datatype.DatatypeFactory.*
 
 @Component
 class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {

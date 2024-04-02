@@ -1,13 +1,14 @@
 package no.nav.helseidnavtest.oppslag.arbeid
 
+import no.nav.helseidnavtest.error.handleErrors
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
+import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
-import no.nav.helse.helseidnavtest.helseopplysninger.error.handleErrors
-import no.nav.helse.helseidnavtest.helseopplysninger.oppslag.AbstractRestClientAdapter
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+
 @Component
 class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, private val cf : ArbeidConfig) : AbstractRestClientAdapter(restClient, cf) {
 

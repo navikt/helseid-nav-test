@@ -1,8 +1,8 @@
 package no.nav.helseidnavtest.oppslag.organisasjon
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.boot.conditionals.Cluster.*
 import no.nav.boot.conditionals.Cluster.Companion.currentCluster
+import no.nav.boot.conditionals.Cluster.PROD_GCP
 import org.slf4j.LoggerFactory.getLogger
 
 data class OrgNummer(@get:JsonValue val orgnr : String) {
