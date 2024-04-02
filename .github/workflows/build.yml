@@ -15,6 +15,7 @@ jobs:
         permissions:
             packages: read
             contents: read
+            id-token: write
         runs-on: ubuntu-latest
         outputs:
             image: ${{ steps.kompiler.outputs.image }}
