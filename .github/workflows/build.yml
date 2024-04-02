@@ -13,6 +13,7 @@ env:
 jobs:
     bygg:
         permissions:
+            packages: read
             contents: read
         runs-on: ubuntu-latest
         outputs:
