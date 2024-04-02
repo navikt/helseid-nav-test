@@ -156,7 +156,7 @@
                             <extension>true</extension>
                             <packageName>no.nav.helseopplysninger.hodemelding</packageName>
                             <sources>
-                                <source>src/main/resources/kith-hodemelding/xsd/MsgHead-v1_2.xsd</source>
+                                <source>${project.basedir}/src/main/resources/kith-hodemelding/xsd/MsgHead-v1_2.xsd</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -170,10 +170,10 @@
                             <extension>true</extension>
                             <packageName>no.nav.helseidnavtest.apprec</packageName>
                             <sources>
-                                <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
+                                <source>${project.basedir}/src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
                             </sources>
                             <xjbSources>
-                                <xjbSource>src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
+                                <xjbSource>${project.basedir}/src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
                             </xjbSources>
                         </configuration>
                     </execution>
