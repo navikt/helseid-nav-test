@@ -23,6 +23,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>no.nav.helseopplysninger</groupId>
+            <artifactId>helseopplysninger-adapters</artifactId>
+            <version>1.0.20</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
         </dependency>
