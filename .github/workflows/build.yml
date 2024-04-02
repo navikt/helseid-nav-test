@@ -13,8 +13,7 @@ env:
 jobs:
     bygg:
         permissions:
-            contents: write
-            id-token: write
+            contents: read
         runs-on: ubuntu-latest
         outputs:
             image: ${{ steps.kompiler.outputs.image }}
@@ -43,11 +42,10 @@ jobs:
                 id: kompiler
                 env:
                     GITHUB_USERNAME: x-access-token
-                    GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_TOKEN: ${{ github.token }}
                 run: |
                     echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT
-                    ./mvnw  --settings .github/.m2/settings.xml -Dspring.profiles.active=local -DGAR_TOKEN=${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} -Djib.to.tags=latest,${TAG} -Drevision=${TAG}  package jib:build
+                    ./mvnw  -Dspring.profiles.active=local -DGAR_TOKEN=${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} -Djib.to.tags=latest,${TAG} -Drevision=${TAG}  package jib:build
 
     deploy:
         permissions:
