@@ -13,12 +13,12 @@ env:
 jobs:
     bygg:
         permissions:
-            packages: read
-            contents: read
+            packages: write
+            contents: write
             id-token: write
         runs-on: ubuntu-latest
         outputs:
-            image: ${{ steps.kompiler.outputs.image }}
+            image:  b${{ steps.kompiler.outputs.image }}
         steps:
             -   name: Sjekker ut kode
                 uses: actions/checkout@v4
