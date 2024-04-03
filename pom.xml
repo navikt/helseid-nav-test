@@ -143,23 +143,25 @@
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <execution>
-                        <id>apprec</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/generated-sources/apprec</outputDirectory>
-                            <extension>true</extension>
-                            <packageName>no.nav.helseidnavtest.apprec</packageName>
-                            <sources>
-                                <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
-                            </sources>
-                            <xjbSources>
-                                <xjbSource>src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
-                            </xjbSources>
-                        </configuration>
-                    </execution>
+
+                  <execution>
+                      <id>apprec</id>
+                      <goals>
+                          <goal>xjc</goal>
+                      </goals>
+                      <configuration>
+                          <outputDirectory>target/generated-sources/apprec</outputDirectory>
+                          <extension>true</extension>
+                          <packageName>no.nav.helseidnavtest.apprec</packageName>
+                          <sources>
+                              <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
+                          </sources>
+                          <xjbSources>
+                              <xjbSource>src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
+                          </xjbSources>
+                      </configuration>
+                  </execution>
+                    <!--
                     <execution>
                         <id>hodemelding</id>
                         <goals>
@@ -176,7 +178,7 @@
                                 <source>src/main/resources/kith-hodemelding/xsd/MsgHead-v1_2.xsd</source>
                             </sources>
                         </configuration>
-                    </execution>
+                    </execution> -->
                 </executions>
             </plugin>
             <plugin>
