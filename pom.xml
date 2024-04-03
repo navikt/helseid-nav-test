@@ -144,24 +144,6 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>hodemelding</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/generated-sources/hodemelding</outputDirectory>
-                            <xjbSources>
-                                <xjbSource>./src/main/resources/kith-hodemelding/xjb/binding.xjb</xjbSource>
-                            </xjbSources>
-                            <extension>true</extension>
-                            <packageName>no.nav.helseopplysninger.hodemelding</packageName>
-                            <sources>
-                                <source>./src/main/resources/kith-hodemelding/xsd/MsgHead-v1_2.xsd</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-
                         <id>apprec</id>
                         <goals>
                             <goal>xjc</goal>
@@ -178,7 +160,23 @@
                             </xjbSources>
                         </configuration>
                     </execution>
-
+                    <execution>
+                        <id>hodemelding</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/generated-sources/hodemelding</outputDirectory>
+                            <xjbSources>
+                                <xjbSource>./src/main/resources/kith-hodemelding/xjb/binding.xjb</xjbSource>
+                            </xjbSources>
+                            <extension>true</extension>
+                            <packageName>no.nav.helseopplysninger.hodemelding</packageName>
+                            <sources>
+                                <source>./src/main/resources/kith-hodemelding/xsd/MsgHead-v1_2.xsd</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
