@@ -8,7 +8,7 @@
     </annotation>
     <element name="AppRec">
         <annotation>
-            <documentation>Applikasjonsvittering.</documentation>
+            <documentation>Applikasjonskvittering.</documentation>
         </annotation>
         <complexType>
             <sequence>

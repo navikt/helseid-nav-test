@@ -18,7 +18,7 @@
         <conditionals.version>5.1.2</conditionals.version>
         <java.version>21</java.version>
         <kotlin.version>1.9.23</kotlin.version>
-        <springdoc.version>2.4.0</springdoc.version>
+        <springdoc.version>2.5.0</springdoc.version>
         <swagger.annotations.version>2.2.20</swagger.annotations.version>
     </properties>
     <dependencies>
@@ -153,12 +153,6 @@
                           <outputDirectory>target/generated-sources/apprec</outputDirectory>
                           <extension>true</extension>
                           <packageName>no.nav.helseidnavtest.apprec</packageName>
-                          <sources>
-                              <source>src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
-                          </sources>
-                          <xjbSources>
-                              <xjbSource>src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
-                          </xjbSources>
                       </configuration>
                   </execution>
                     <!--
