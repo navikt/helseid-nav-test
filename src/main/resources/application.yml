@@ -1,3 +1,5 @@
+ibm.mq:
+
 management:
    health:
     ping:
@@ -74,3 +76,10 @@ fastlege:
 
 authserver:
     url: https://${stshost}
+ibm:
+  mq:
+    user: user
+    password: password
+    queue-manager: MQLS02
+    application-name: ${application.name}
+    conn-name: b27apvl220.preprod.local(1413)
