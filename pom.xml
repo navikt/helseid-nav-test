@@ -151,11 +151,11 @@
                         <configuration>
                             <outputDirectory>target/generated-sources/hodemelding</outputDirectory>
                             <xjbSources>
-                                <xjbSource>src/main/resources/kith-hodemelding/xjb</xjbSource>
+                                <xjbSource>src/main/resources/hodemelding/xjb</xjbSource>
                             </xjbSources>
                             <packageName>no.nav.helseopplysninger.hodemelding</packageName>
                             <sources>
-                                <source>src/main/resources/kith-hodemelding/xsd</source>
+                                <source>src/main/resources/hodemelding/xsd</source>
                             </sources>
                         </configuration>
                     </execution>
