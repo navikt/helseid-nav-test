@@ -153,7 +153,7 @@
                             <extension>true</extension>
                             <packageName>no.nav.helseidnavtest.apprec</packageName>
                             <sources>
-                                <source>$./src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
+                                <source>./src/main/resources/kith-apprec/xsd/Apprec-v1.0.xsd</source>
                             </sources>
                             <xjbSources>
                                 <xjbSource>./src/main/resources/kith-apprec/xjb/binding.xjb</xjbSource>
