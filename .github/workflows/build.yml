@@ -20,7 +20,7 @@ jobs:
             id-token: write
         runs-on: ubuntu-latest
         outputs:
-            image:  b${{ steps.kompiler.outputs.image }}
+            image:  ${{ steps.kompiler.outputs.image }}
         steps:
             -   name: Sjekker ut kode
                 uses: actions/checkout@v4
