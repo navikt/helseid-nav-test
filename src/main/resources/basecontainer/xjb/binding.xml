@@ -1,5 +1,5 @@
 <bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0">
-    <bindings schemaLocation="../xsd/Fellesformat_any.xsd">
+<bindings schemaLocation="../xsd/kith-base64.xsd">
         <schemaBindings>
             <nameXmlTransform>
                 <typeName prefix="XML"/>

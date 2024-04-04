@@ -154,18 +154,34 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
+                        <id>basecontainer</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/generated-sources/basecontainer</outputDirectory>
+                            <xjbSources>
+                                <xjbSource>src/main/resources/basecontainer/xjb</xjbSource>
+                            </xjbSources>
+                            <packageName>no.nav.helseopplysninger.basecontainer</packageName>
+                            <sources>
+                                <source>src/main/resources/basecontainer/xsd</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>fellesformat1</id>
                         <goals>
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/generated-sources/fellesformat1</outputDirectory>
+                            <outputDirectory>target/generated-sources/dialogmelding</outputDirectory>
                             <xjbSources>
-                                <xjbSource>src/main/resources/fellesformat1/xjb</xjbSource>
+                                <xjbSource>src/main/resources/dialogmelding/xjb</xjbSource>
                             </xjbSources>
-                            <packageName>no.nav.helseopplysninger.fellesformat1</packageName>
+                            <packageName>no.nav.helseopplysninger.dialogmelding</packageName>
                             <sources>
-                                <source>src/main/resources/fellesformat1/xsd</source>
+                                <source>src/main/resources/dialogmelding/xsd</source>
                             </sources>
                         </configuration>
                     </execution>
