@@ -53,7 +53,7 @@ class TestStuff {
             mottatt = OffsetDateTime.now()
         )
 
-        //val m  =JAXB.opprettDialogmelding(b,arbeidstaker)
-       //println(m.message)
+        val m  =DialogmeldingMapper.opprettDialogmelding(b, arbeidstaker)
+       println(m.message)
     }
 }

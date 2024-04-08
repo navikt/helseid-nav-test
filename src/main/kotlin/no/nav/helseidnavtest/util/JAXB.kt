@@ -1,8 +1,10 @@
 package no.nav.helseidnavtest.util
 
 import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.JAXBElement
 import jakarta.xml.bind.Unmarshaller
 import no.nav.helseidnavtest.domain.*
+import no.nav.helseidnavtest.domain.DialogmeldingKodeverk.*
 import no.nav.helseidnavtest.domain.DialogmeldingType.*
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.apprec.XMLAppRec
@@ -10,12 +12,16 @@ import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLNotat
 import no.nav.helseopplysninger.fellesformat2.XMLMottakenhetBlokk
+import no.nav.helseopplysninger.fellesformat2.XMLSporinformasjonBlokkType
 import no.nav.helseopplysninger.hodemelding.*
+import java.math.BigInteger.*
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Function
 import java.util.stream.Stream
+import javax.xml.datatype.DatatypeConstants.*
+import javax.xml.datatype.DatatypeFactory
 
 val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
 
@@ -28,13 +34,14 @@ val apprecUnmarshaller: Unmarshaller = apprecJaxBContext.createUnmarshaller().ap
 
    val FFOF = no.nav.helseopplysninger.fellesformat2.ObjectFactory()
    val HMOF =  no.nav.helseopplysninger.hodemelding.ObjectFactory()
-
-fun createFellesformat(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker) =
-     FFOF.createXMLEIFellesformat().apply {
-        any.add(createMsgHead(melding, arbeidstaker))
-       // TODO  any.add(createMottakenhetBlokk(melding))
-        // TODO any.add(createSporinformasjonBlokk())
-    }
+object JAXB{
+    fun createFellesformat(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker) =
+        FFOF.createXMLEIFellesformat().apply {
+            any.add(createMsgHead(melding, arbeidstaker))
+            any.add(createMottakenhetBlokk(melding))
+            any.add(createSporinformasjonBlokk())
+        }
+}
 
 fun createMsgHead(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker) =
     HMOF.createXMLMsgHead().apply {
@@ -42,7 +49,33 @@ fun createMsgHead(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arb
         // TODO document.add(createDialogmeldingDocument(melding))
         // TODO document.add(createVedleggDocument(melding))
 }
+fun createMottakenhetBlokk(melding: DialogmeldingToBehandlerBestilling) =
+    with(melding) {
+        if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk)  {
+            throw IllegalArgumentException("Invalid melding type/kodeverk-combinatio $type/$kodeverk")
+        }
+        val storedPartnerId = behandler.kontor.partnerId
+        val partnerId = if (storedPartnerId.value in listOf(14859, 41578)) "60274" else "${storedPartnerId.value}"
+         FFOF.createXMLMottakenhetBlokk().apply {
+            partnerReferanse = partnerId
+            ebRole = "Saksbehandler"
+            ebService =  "HenvendelseFraSaksbehandler"
+            ebAction = "Henvendelse"
+        }
+}
 
+fun createSporinformasjonBlokk(): JAXBElement<XMLSporinformasjonBlokkType> {
+    val xmlSporinformasjonBlokkType = FFOF.createXMLSporinformasjonBlokkType().apply {
+        programID = "Helseopplysninger webapp"
+        programVersjonID = "1.0"
+        programResultatKoder = ZERO
+        tidsstempel = DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar()).apply {
+            millisecond = FIELD_UNDEFINED
+            timezone = FIELD_UNDEFINED
+        }
+    }
+    return FFOF.createSporinformasjonBlokk(xmlSporinformasjonBlokkType)
+}
 
 fun createMsgInfo(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker): XMLMsgInfo {
     return HMOF.createXMLMsgInfo().apply {
@@ -202,17 +235,14 @@ class Fellesformat private constructor(val eIFellesformat: XMLEIFellesformat) {
         )
     }
 }
-class Hodemelding(msgHead: XMLMsgHead) {
-    private val msgHead: XMLMsgHead
-    private val dokumentListe: MutableList<Dokument>
+class Hodemelding(private val msgHead: XMLMsgHead,private val dokumentListe: MutableList<Dokument> = mutableListOf()) {
+
     private val xMLDocumentStream: Stream<XMLDocument>
         get() = Stream.of(msgHead)
             .map { xmlMsgHead: XMLMsgHead -> xmlMsgHead.document }
             .flatMap { obj: List<XMLDocument?> -> obj.stream() }
 
-    fun harVedlegg(): Boolean {
-        return dokumentListe.stream().anyMatch { obj: Dokument -> obj.harVedlegg() }
-    }
+    fun harVedlegg() = dokumentListe.any(Dokument::harVedlegg)
 
     val messageId: String
         get() = msgHead.msgInfo.msgId
@@ -220,8 +250,6 @@ class Hodemelding(msgHead: XMLMsgHead) {
         get() = dokumentListe.stream().flatMap(Dokument::dokIdNotatStream)
 
     init {
-        this.msgHead = msgHead
-        dokumentListe = ArrayList()
         xMLDocumentStream.map(::Dokument)
             .forEach(dokumentListe::add)
     }
@@ -232,40 +260,30 @@ class Dokument(xmlDocument: XMLDocument) {
     private val vedleggListe: MutableList<Vedlegg>
     private fun getContent(xmlDocument: XMLDocument): Stream<Any> {
         return Stream.of(xmlDocument)
-            .map { obj: XMLDocument -> obj.refDoc }
-            .map { obj: XMLRefDoc -> obj.content }
-            .map { obj: XMLRefDoc.Content -> obj.getAny() }
-            .flatMap { obj: List<Any> -> obj.stream() }
+            .map { it.refDoc }
+            .map { it.content }
+            .map(XMLRefDoc.Content::getAny)
+            .flatMap(List<Any>::stream)
     }
 
 
     fun harVedlegg(): Boolean {
-        return !vedleggListe.isEmpty()
+        return vedleggListe.isNotEmpty()
     }
 
    val dokIdNotatStream: Stream<String?>
-        get() = dialogmeldingListe.stream().flatMap { obj: Dialogmelding -> obj.dokIdNotatStream }
+        get() = dialogmeldingListe.stream().flatMap(Dialogmelding::dokIdNotatStream)
 
     init {
         dialogmeldingListe = ArrayList()
         vedleggListe = ArrayList()
         getContent(xmlDocument).forEach { o: Any? ->
-            if (o is XMLDialogmelding) {
-                dialogmeldingListe.add(Dialogmelding1_0(o))
-            }// TODO  else if (o is no.kith.xmlstds.dialog._2013_01_23.XMLDialogmelding) {
-              // TODO   dialogmeldingListe.add(Dialogmelding1_1(o))
-         // TODO  }
-        else if (o is XMLBase64Container) {
-                vedleggListe.add(Vedlegg(o as XMLBase64Container?))
+            when (o) {
+                is XMLDialogmelding -> dialogmeldingListe.add(Dialogmelding1_0(o))
+                is XMLBase64Container -> vedleggListe.add(Vedlegg(o))
             }
         }
     }
-}
-
-class Notat1_1 : Notat {
-    private val xmlNotat: XMLNotat? = null
-    override val dokIdNotat: String?
-        get() = xmlNotat!!.dokIdNotat
 }
 
 class Dialogmelding1_0(dialogmelding1_0: XMLDialogmelding) : DialogmeldingAbstract() {
@@ -285,21 +303,11 @@ class Notat1_0 : Notat {
         get() = xmlNotat!!.dokIdNotat
 }
 
-class Dialogmelding1_1(dialogmelding1_1: XMLDialogmelding) : DialogmeldingAbstract() {
-    override fun versjon(): Dialogmelding.Versjon {
-        return Dialogmelding.Versjon._1_1
-    }
-
-    init {
-        dialogmelding1_1.notat.stream().map(Function { Notat1_1() }).forEach(notatListe::add)
-    }
-}
-
 
 
 interface Dialogmelding {
     @Suppress("ktlint")
-    enum class Versjon { _1_0, _1_1 }
+    enum class Versjon { _1_0}
 
     fun versjon(): Versjon?
     val dokIdNotatStream: Stream<String?>?
