@@ -1,4 +1,13 @@
-<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0">
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">>
+    <globalBindings>
+        <javaType name="java.time.LocalDate" xmlType="xs:date"
+                  parseMethod="no.nav.helseidnavtest.adapters.LocalDateAdapter.unmarshal"
+                  printMethod="no.nav.helseidnavtest.adapters.LocalDateAdapter.marshal" />
+        <javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
+                  parseMethod="no.nav.helseidnavtest.adapters.LocalDateTimeAdapter.unmarshal"
+                  printMethod="no.nav.helseidnavtest.adapters.LocalDateTimeAdapter.marshal" />
+    </globalBindings>
 <bindings schemaLocation="../xsd/Fellesformat2_any.xsd">
         <schemaBindings>
             <nameXmlTransform>

@@ -21,7 +21,6 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.stream.Stream
 import javax.xml.datatype.DatatypeConstants.*
-import javax.xml.datatype.DatatypeFactory
 
 val apprecJaxBContext: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java, XMLAppRec::class.java)
 
@@ -64,18 +63,13 @@ fun createMottakenhetBlokk(melding: DialogmeldingToBehandlerBestilling) =
         }
 }
 
-fun createSporinformasjonBlokk(): JAXBElement<XMLSporinformasjonBlokkType> {
-    val xmlSporinformasjonBlokkType = FFOF.createXMLSporinformasjonBlokkType().apply {
+fun createSporinformasjonBlokk() =
+    FFOF.createSporinformasjonBlokk(FFOF.createXMLSporinformasjonBlokkType().apply {
         programID = "Helseopplysninger webapp"
         programVersjonID = "1.0"
         programResultatKoder = ZERO
-        tidsstempel = DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar()).apply {
-            millisecond = FIELD_UNDEFINED
-            timezone = FIELD_UNDEFINED
-        }
-    }
-    return FFOF.createSporinformasjonBlokk(xmlSporinformasjonBlokkType)
-}
+        tidsstempel = LocalDateTime.now()
+    })
 
 fun createMsgInfo(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker): XMLMsgInfo {
     return HMOF.createXMLMsgInfo().apply {
