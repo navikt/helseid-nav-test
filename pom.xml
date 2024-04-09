@@ -181,7 +181,7 @@
                             </xjbSources>
                             <packageName>no.nav.helseopplysninger.dialogmelding</packageName>
                             <sources>
-                                <source>src/main/resources/dialogmelding/xsd</source>
+                                <source>src/main/resources/dialogmelding/xsd/dialogmelding.xsd</source>
                             </sources>
                         </configuration>
                     </execution>

@@ -5,7 +5,7 @@ import jakarta.xml.bind.JAXBException
 import jakarta.xml.bind.Marshaller.JAXB_ENCODING
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.domain.Arbeidstaker
-import no.nav.helseidnavtest.domain.DialogmeldingToBehandlerBestilling
+import no.nav.helseidnavtest.domain.DialogmeldingBestilling
 import no.nav.helseidnavtest.util.JAXB.createFellesformat
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
@@ -23,7 +23,7 @@ object DialogmeldingMapper {
             XMLBase64Container::class.java,
             XMLSporinformasjonBlokkType::class.java)
 
-    fun opprettDialogmelding(melding: DialogmeldingToBehandlerBestilling, arbeidstaker: Arbeidstaker): Fellesformat {
+    fun opprettDialogmelding(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker): Fellesformat {
         val xmleiFellesformat = createFellesformat(melding = melding, arbeidstaker = arbeidstaker)
         return Fellesformat(xmleiFellesformat, ::marshallDialogmelding)
     }

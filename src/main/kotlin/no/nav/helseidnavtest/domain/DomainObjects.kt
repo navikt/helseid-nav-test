@@ -1,6 +1,9 @@
 package no.nav.helseidnavtest.domain
 
-import no.nav.helseidnavtest.util.*
+import no.nav.helseidnavtest.domain.BehandlerKategori.*
+import no.nav.helseidnavtest.domain.DialogmeldingKode.*
+import no.nav.helseidnavtest.domain.DialogmeldingKodeverk.*
+import no.nav.helseidnavtest.domain.DialogmeldingType.*
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -10,48 +13,41 @@ data class Arbeidstaker(
         val fornavn: String = "",
         val mellomnavn: String? = null,
         val etternavn: String = "",
-        val mottatt: OffsetDateTime,
+        val mottatt: OffsetDateTime = OffsetDateTime.now(),
     )
     data class Personident(val value: String) {
+        private val elevenDigits = Regex("^\\d{11}\$")
         init {
             if (!elevenDigits.matches(value)) {
                 throw IllegalArgumentException("Value is not a valid Personident")
             }
         }
-        fun isDNR() = this.value[0].digitToInt() > 3
+        val type  = if (value[0].digitToInt() > 3) "DNR" else "FNR"
     }
 
-val elevenDigits = Regex("^\\d{11}\$")
 
 
-data class DialogmeldingToBehandlerBestilling(
+data class DialogmeldingBestilling(
     val uuid: UUID,
     val behandler: Behandler,
     val arbeidstakerPersonident: Personident,
     val parentRef: String?,
     val conversationUuid: UUID,
-    val type: DialogmeldingType,
-    val kodeverk: DialogmeldingKodeverk?, // må tillate null her siden persisterte bestillinger kan mangle denne verdien
-    val kode: DialogmeldingKode,
+    val type: DialogmeldingType = DIALOG_NOTAT,
+    val kodeverk: DialogmeldingKodeverk? = HENVENDELSE, // må tillate null her siden persisterte bestillinger kan mangle denne verdien
+    val kode: DialogmeldingKode = KODE8,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
 )
 
-enum class DialogmeldingKode(
-    val value: Int
-) {
-    KODE1(1),
-    KODE2(2),
-    KODE3(3),
-    KODE4(4),
+enum class DialogmeldingKode(val value: Int) {
     KODE8(8),
-    KODE9(9);
 }
 enum class DialogmeldingKodeverk(val kodeverkId: String) {
     HENVENDELSE("2.16.578.1.12.4.1.1.8127"),
 }
 
-enum class DialogmeldingType() {
+enum class DialogmeldingType {
     DIALOG_NOTAT,
 }
 
@@ -65,10 +61,10 @@ data class Behandler(
     val hprId: Int?,
     val telefon: String?,
     val kontor: BehandlerKontor,
-    val kategori: BehandlerKategori,
-    val mottatt: OffsetDateTime,
+    val kategori: BehandlerKategori =  LEGE,
+    val mottatt: OffsetDateTime = OffsetDateTime.now(),
     val invalidated: OffsetDateTime? = null,
-    val suspendert: Boolean,
+    val suspendert: Boolean = false,
 )
 
 data class BehandlerKontor(
@@ -79,34 +75,20 @@ data class BehandlerKontor(
     val postnummer: String?,
     val poststed: String?,
     val orgnummer: Virksomhetsnummer?,
-    val dialogmeldingEnabled: Boolean,
-    val dialogmeldingEnabledLocked: Boolean,
-    val system: String?,
-    val mottatt: OffsetDateTime,
+    val mottatt: OffsetDateTime = OffsetDateTime.now(),
+    val system: String = "Helseopplysninger",
+    val dialogmeldingEnabled: Boolean = true,
+    val dialogmeldingEnabledLocked: Boolean = false,
 )
 
-enum class BehandlerKategori(
-    val kategoriKode: String,
-) {
-    FYSIOTERAPEUT("FT"),
-    KIROPRAKTOR("KI"),
-    LEGE("LE"),
-    MANUELLTERAPEUT("MT"),
-    TANNLEGE("TL");
-
-    companion object {
-        fun fromKategoriKode(kategori: String?): BehandlerKategori? =
-            values().firstOrNull { it.kategoriKode == kategori }
-    }
+enum class BehandlerKategori(val kategoriKode: String ) {
+    LEGE("LE")
 }
 data class PartnerId(val value: Int) {
-    override fun toString(): String {
-        return value.toString()
-    }
+    override fun toString() =  value.toString()
 }
 data class Virksomhetsnummer(val value: String) {
     private val nineDigits = Regex("^\\d{9}\$")
-
     init {
         if (!nineDigits.matches(value)) {
             throw IllegalArgumentException("$value is not a valid Virksomhetsnummer")
