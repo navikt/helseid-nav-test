@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.util
 
 import jakarta.xml.bind.JAXBContext
-import jakarta.xml.bind.JAXBException
 import jakarta.xml.bind.Marshaller.JAXB_ENCODING
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.domain.Arbeidstaker
@@ -16,28 +15,22 @@ import java.io.StringWriter
 import javax.xml.transform.stream.StreamResult
 
 object DialogmeldingMapper {
-        private val DIALOGMELDING_CONTEXT = JAXBContext.newInstance(
-            XMLEIFellesformat::class.java,
-            XMLMsgHead::class.java,
-            XMLDialogmelding::class.java,
-            XMLBase64Container::class.java,
-            XMLSporinformasjonBlokkType::class.java)
-
-    fun opprettDialogmelding(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker): Fellesformat {
-        val xmleiFellesformat = createFellesformat(melding = melding, arbeidstaker = arbeidstaker)
-        return Fellesformat(xmleiFellesformat, ::marshallDialogmelding)
-    }
-
-    private fun marshallDialogmelding(element: Any?): String {
-        return try {
-            val writer = StringWriter()
-            val marshaller = DIALOGMELDING_CONTEXT.createMarshaller()
-            marshaller.setProperty(JAXB_FORMATTED_OUTPUT, true)
-            marshaller.setProperty(JAXB_ENCODING, "UTF-8")
-            marshaller.marshal(element, StreamResult(writer))
-            writer.toString()
-        } catch (e: JAXBException) {
-            throw RuntimeException(e)
+    private val MARSHALLER = JAXBContext.newInstance(
+        XMLEIFellesformat::class.java,
+        XMLMsgHead::class.java,
+        XMLDialogmelding::class.java,
+        XMLBase64Container::class.java,
+        XMLSporinformasjonBlokkType::class.java).createMarshaller().apply {
+            setProperty(JAXB_FORMATTED_OUTPUT, true)
+            setProperty(JAXB_ENCODING, "UTF-8")
         }
-    }
+
+    fun opprettDialogmelding(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall)
+
+    private fun marshall(element: Any?) =
+        run {
+            val writer = StringWriter()
+            MARSHALLER.marshal(element, StreamResult(writer))
+            writer.toString()
+        }
 }
