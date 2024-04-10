@@ -1,13 +1,8 @@
 package no.nav.helse.helseidnavtest.jaxb
 
-import no.nav.helseidnavtest.domain.*
-import no.nav.helseidnavtest.domain.DialogmeldingKode.*
-import no.nav.helseidnavtest.domain.DialogmeldingKodeverk.*
-import no.nav.helseidnavtest.domain.DialogmeldingType.*
-import no.nav.helseidnavtest.util.*
+import no.nav.helseidnavtest.dialogmelding.*
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
-import java.time.OffsetDateTime
 import java.util.*
 
 class TestStuff {

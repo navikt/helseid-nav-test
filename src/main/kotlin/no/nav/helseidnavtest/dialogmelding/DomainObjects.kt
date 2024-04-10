@@ -1,19 +1,19 @@
-package no.nav.helseidnavtest.domain
+package no.nav.helseidnavtest.dialogmelding
 
-import no.nav.helseidnavtest.domain.BehandlerKategori.*
-import no.nav.helseidnavtest.domain.DialogmeldingKode.*
-import no.nav.helseidnavtest.domain.DialogmeldingKodeverk.*
-import no.nav.helseidnavtest.domain.DialogmeldingType.*
+import no.nav.helseidnavtest.dialogmelding.BehandlerKategori.*
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.*
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.*
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
 import java.time.OffsetDateTime
 import java.util.*
 
 
 data class Arbeidstaker(
-        val arbeidstakerPersonident: Personident,
-        val fornavn: String = "",
-        val mellomnavn: String? = null,
-        val etternavn: String = "",
-        val mottatt: OffsetDateTime = OffsetDateTime.now(),
+    val arbeidstakerPersonident: Personident,
+    val fornavn: String = "",
+    val mellomnavn: String? = null,
+    val etternavn: String = "",
+    val mottatt: OffsetDateTime = OffsetDateTime.now(),
     )
     data class Personident(val value: String) {
         private val elevenDigits = Regex("^\\d{11}\$")
@@ -43,7 +43,7 @@ data class DialogmeldingBestilling(
 enum class DialogmeldingKode(val value: Int) {
     KODE8(8),
 }
-enum class DialogmeldingKodeverk(val kodeverkId: String) {
+enum class DialogmeldingKodeverk(val id: String) {
     HENVENDELSE("2.16.578.1.12.4.1.1.8127"),
 }
 

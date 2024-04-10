@@ -1,11 +1,9 @@
-package no.nav.helseidnavtest.util
+package no.nav.helseidnavtest.dialogmelding
 
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller.JAXB_ENCODING
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
-import no.nav.helseidnavtest.domain.Arbeidstaker
-import no.nav.helseidnavtest.domain.DialogmeldingBestilling
-import no.nav.helseidnavtest.util.JAXB.createFellesformat
+import no.nav.helseidnavtest.dialogmelding.JAXB.createFellesformat
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
