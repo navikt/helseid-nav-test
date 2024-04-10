@@ -25,7 +25,7 @@ object GraphQLExtensions {
             Unauthorized -> IrrecoverableGraphQLException.UnauthorizedGraphQLException(UNAUTHORIZED, msg)
             Unauthenticated -> IrrecoverableGraphQLException.UnauthenticatedGraphQLException(FORBIDDEN, msg)
             BadRequest -> IrrecoverableGraphQLException.BadGraphQLException(BAD_REQUEST, msg)
-            NotFound -> IrrecoverableGraphQLException.NotFoundGraphQLException(NOT_FOUND, msg)
+            NotFound -> IrrecoverableGraphQLException.NotFoundGraphQLException(msg)
             else -> RecoverableGraphQLException.UnhandledGraphQLException(INTERNAL_SERVER_ERROR, msg)
         }
 
