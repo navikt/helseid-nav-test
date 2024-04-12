@@ -8,5 +8,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController(PDL)
 class PersonController(private val pdl: PDLWebClientAdapter) {
+
+    @GetMapping("/ping") fun ping() = pdl.ping()
+
     @GetMapping("/$PDL") fun søker(@RequestParam fnr: Fødselsnummer) = pdl.søker(fnr)
 }
