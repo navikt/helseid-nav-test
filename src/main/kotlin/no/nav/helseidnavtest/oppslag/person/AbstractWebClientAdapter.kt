@@ -66,12 +66,10 @@ abstract class AbstractWebClientAdapter(protected open val webClient : WebClient
                         .build())
             }
 
-        fun consumerFilterFunction() = generellFilterFunction(NAV_CONSUMER_ID) { HELSE }
         fun temaFilterFunction() = generellFilterFunction(TEMA) { HELSE }
         fun behandlingFilterFunction() = generellFilterFunction(BEHANDLINGSNUMMER) { BID }
 
         const val NAV_PERSON_IDENT = "Nav-Personident"
-        const val NAV_CONSUMER_TOKEN = "Nav-Consumer-Token"
         const val NAV_CONSUMER_ID = "Nav-Consumer-Id"
         const val NAV_CONSUMER_ID2 = "consumerId"
         const val NAV_CALL_ID = "Nav-CallId"
@@ -85,8 +83,6 @@ abstract class AbstractWebClientAdapter(protected open val webClient : WebClient
             id
         }
 
-        fun callIdAsUUID() = UUID.fromString(callId())
-
         fun consumerId(defaultValue : String) : String = MDC.get(NAV_CONSUMER_ID) ?: run {
             toMDC(NAV_CONSUMER_ID, defaultValue)
             defaultValue
@@ -96,7 +92,6 @@ abstract class AbstractWebClientAdapter(protected open val webClient : WebClient
 
         const val TEMA = "tema"
         const val HELSE = "helseopplysninger"
-        const val AAD = "aad"
         const val BEHANDLINGSNUMMER = "behandlingsnummer"
         const val BID = "B287"
         }
