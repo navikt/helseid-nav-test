@@ -7,7 +7,7 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.*
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.ClientRequest
@@ -35,13 +35,16 @@ class ClientCredentialsTokenInterceptor(private val clientManager: OAuth2Authori
 @Qualifier(PDL)
 class TokenInterceptor(private val clientManager: OAuth2AuthorizedClientManager) : ExchangeFilterFunction {
 
-    override fun filter(request: ClientRequest, next: ExchangeFunction): Mono<ClientResponse> {
+    override fun filter(request: ClientRequest, next: ExchangeFunction) =
         clientManager.authorize(withClientRegistrationId(PDL)
             .principal("anonymous")
             .build()
-        )?.let {
-            request.headers().setBearerAuth(it.accessToken.tokenValue)
-        }
-        return next.exchange(request)
-    }
+        )?.let { c ->
+            next.exchange(
+                ClientRequest.from(request)
+                    .headers {
+                        it.setBearerAuth(c.accessToken.tokenValue)
+                    }.build()
+            )
+        } ?: next.exchange(request)
 }
