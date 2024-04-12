@@ -1,27 +1,22 @@
 package no.nav.helseidnavtest.oppslag.person
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.helseidnavtest.oppslag.person.PDLSøker.*
+import no.nav.helseidnavtest.oppslag.person.PDLSøker.PDLBostedadresse.*
 import java.time.LocalDate
 
 
 data class PDLWrappedSøker(val navn: Set<PDLNavn>,
-                           @JsonProperty("foedsel") val fødsel: Set<PDLSøker.PDLFødsel>,
-                           val bostedsadresse: List<PDLSøker.PDLBostedadresse> = emptyList()) {
+                           @JsonProperty("foedsel") val fødsel: Set<PDLFødsel>,
+                           val bostedsadresse: List<PDLBostedadresse> = emptyList()) {
     val active = PDLSøker(navn.first(), fødsel.firstOrNull(), bostedsadresse.firstOrNull()?.vegadresse)
 }
 
-enum class PDLAdresseBeskyttelse {
-    STRENGT_FORTROLIG_UTLAND,
-    STRENGT_FORTROLIG,
-    FORTROLIG,
-    UGRADERT
-}
-data class PDLGradering(val gradering: PDLAdresseBeskyttelse)
 data class PDLNavn(val fornavn: String, val mellomnavn: String?, val etternavn: String)
 
 data class PDLSøker(val navn: PDLNavn,
                     val fødsel: PDLFødsel?,
-                    val vegadresse: PDLBostedadresse.PDLVegadresse?) {
+                    val vegadresse: PDLVegadresse?) {
 
 
     data class PDLFødsel(@JsonProperty("foedselsdato") val fødselsdato: LocalDate?)
