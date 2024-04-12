@@ -13,7 +13,6 @@ class PDLConfig(baseUri: URI,
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        const val PDL_CREDENTIALS = "client-credentials-pdl"
         const val PDL = "pdl"
         private const val DEFAULT_PING_PATH = ""
     }

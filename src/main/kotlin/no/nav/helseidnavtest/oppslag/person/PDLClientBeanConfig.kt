@@ -3,9 +3,9 @@ package no.nav.helseidnavtest.oppslag.person
 import no.nav.helseidnavtest.error.IntegrationException
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
-import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.PDL_SYSTEM
 import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.behandlingFilterFunction
 import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.temaFilterFunction
+import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -14,6 +14,7 @@ import org.springframework.graphql.client.ClientGraphQlRequest
 import org.springframework.graphql.client.GraphQlClientInterceptor
 import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
 import org.springframework.graphql.client.HttpGraphQlClient
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration(proxyBeanMethods = false)
@@ -23,16 +24,17 @@ class PDLClientBeanConfig {
     fun graphQLErrorHandler() = object : GraphQLErrorHandler {}
 
     @Bean
-    @Qualifier(PDL_SYSTEM)
-    fun pdlSystemWebClient(b: WebClient.Builder, cfg: PDLConfig) =
+    @Qualifier(PDL)
+    fun pdlSystemWebClient(b: WebClient.Builder, cfg: PDLConfig,@Qualifier(PDL) filter: ExchangeFilterFunction) =
         b.baseUrl("${cfg.baseUri}")
+            .filter(filter)
             .filter(temaFilterFunction())
             .filter(behandlingFilterFunction())
             .build()
 
     @Bean
-    @Qualifier(PDL_SYSTEM)
-    fun graphQLSystemWebClient(@Qualifier(PDL_SYSTEM) client: WebClient) =
+    @Qualifier(PDL)
+    fun graphQLSystemWebClient(@Qualifier(PDL) client: WebClient) =
         HttpGraphQlClient.builder(client)
             .interceptor(LoggingGraphQLInterceptor())
             .build()

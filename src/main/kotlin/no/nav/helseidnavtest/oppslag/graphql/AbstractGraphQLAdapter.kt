@@ -1,13 +1,15 @@
-package no.nav.helseidnavtest.oppslag.person
+package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException
+import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import no.nav.helseidnavtest.oppslag.person.GraphQLExtensions.oversett
+import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter
+import no.nav.helseidnavtest.oppslag.person.GraphQLErrorHandler
+import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.springframework.graphql.client.FieldAccessException
 import org.springframework.graphql.client.GraphQlClient
 import org.springframework.graphql.client.GraphQlTransportException
-import org.springframework.http.HttpStatus.*
 import org.springframework.web.reactive.function.client.WebClient
 
 abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConfig, val handler : GraphQLErrorHandler) : AbstractWebClientAdapter(client, cfg) {
@@ -23,7 +25,7 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .onErrorMap {
                     when(it) {
                         is FieldAccessException -> it.oversett()
-                        is GraphQlTransportException -> IrrecoverableGraphQLException.BadGraphQLException(BAD_REQUEST, it.message ?: "Transport feil", it)
+                        is GraphQlTransportException -> BadGraphQLException(it.message ?: "Transport feil", it)
                         else ->  it
                     }
                 }
@@ -32,8 +34,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .block().also {
                     log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
                 }
-        }.getOrElse { t ->
-            handler.handle(t)
-        }
+        }.getOrElse(handler::handle)
 }
 

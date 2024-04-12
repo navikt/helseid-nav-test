@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.error
 
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.client.ClientHttpResponse
 import java.net.URI
 
@@ -18,19 +18,19 @@ open class RecoverableIntegrationException(msg : String?, uri : URI? = null, cau
 
 open class IrrecoverableIntegrationException(msg : String?, uri : URI? = null, cause : Throwable? = null) : IntegrationException(msg, uri, cause)
 
-abstract class IrrecoverableGraphQLException(status : HttpStatus, msg : String, cause : Throwable? = null) : IrrecoverableIntegrationException("$msg (${status.value()})", null, cause) {
+abstract class IrrecoverableGraphQLException(val status : HttpStatus, msg : String?, cause : Throwable? = null) : IrrecoverableIntegrationException("$msg (${status.value()})", null, cause) {
 
-    class NotFoundGraphQLException( msg : String,status : HttpStatus = NOT_FOUND) : IrrecoverableGraphQLException(status, msg)
-    class BadGraphQLException(status : HttpStatus, msg : String, cause : Throwable? = null) : IrrecoverableGraphQLException(status, msg,cause)
-    class UnauthenticatedGraphQLException(status : HttpStatus, msg : String) : IrrecoverableGraphQLException(status, msg)
-    class UnauthorizedGraphQLException(status : HttpStatus, msg : String) : IrrecoverableGraphQLException(status, msg)
+    class NotFoundGraphQLException(msg : String?) : IrrecoverableGraphQLException(NOT_FOUND, msg)
+    class BadGraphQLException(msg : String?, cause : Throwable? = null) : IrrecoverableGraphQLException(BAD_REQUEST, msg,cause)
+    class UnauthenticatedGraphQLException(msg : String?) : IrrecoverableGraphQLException(FORBIDDEN, msg)
+    class UnauthorizedGraphQLException(msg : String) : IrrecoverableGraphQLException(UNAUTHORIZED, msg)
 }
 
-abstract class RecoverableGraphQLException(status : HttpStatus, msg : String, cause : Throwable?) : RecoverableIntegrationException("${status.value()}-$msg", cause = cause) {
+abstract class RecoverableGraphQLException(status : HttpStatus, msg : String?, cause : Throwable?) : RecoverableIntegrationException("${status.value()}-$msg", cause = cause) {
 
-    class UnhandledGraphQLException(status : HttpStatus, msg : String, cause : Throwable? = null) : RecoverableGraphQLException(status, msg, cause)
+    class UnhandledGraphQLException(msg : String, cause : Throwable? = null) : RecoverableGraphQLException(INTERNAL_SERVER_ERROR, msg, cause)
 }
 
-class NotFoundException(msg: String, cause: Throwable? = null) : IrrecoverableException(msg, cause)
+class NotFoundException(msg: String?, cause: Throwable? = null) : IrrecoverableException(msg, cause)
 open class IrrecoverableException(msg: String?, cause: Throwable? = null) : IntegrationException(msg, cause = cause)
-class RecoverableException(msg: String, cause: Throwable? = null) : IntegrationException(msg, cause = cause)
+class RecoverableException(msg: String?, cause: Throwable? = null) : IntegrationException(msg, cause = cause)

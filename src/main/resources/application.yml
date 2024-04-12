@@ -26,6 +26,14 @@ spring:
           issuer-uri: ${helse-id.issuer}
       client:
         registration:
+          pdl:
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
+            client-id: ${azure.app.client.id}
+            client-secret: ${azure.app.client.secret}
+            provider: aad
+            scope:
+              - api://${env}-fss.pdl.pdl-api/.default
           arbeidsforhold:
             authorization-grant-type: client_credentials
             client-authentication-method: client_secret_basic
@@ -76,6 +84,7 @@ fastlege:
 
 authserver:
     url: https://${stshost}
+
 ibm:
   mq:
     user: user
@@ -83,3 +92,5 @@ ibm:
     queue-manager: MQLS02
     application-name: ${application.name}
     conn-name: b27apvl220.preprod.local(1413)
+pdl:
+  base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql

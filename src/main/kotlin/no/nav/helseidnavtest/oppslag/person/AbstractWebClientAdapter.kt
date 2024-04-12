@@ -94,10 +94,8 @@ abstract class AbstractWebClientAdapter(protected open val webClient : WebClient
 
         private fun toMDC(key : String, value : String?, defaultValue : String? = null) = MDC.put(key, value ?: defaultValue)
 
-        const val PDL_SYSTEM = "pdls"
         const val TEMA = "tema"
         const val HELSE = "helseopplysninger"
-        const val IDPORTEN = "idporten"
         const val AAD = "aad"
         const val BEHANDLINGSNUMMER = "behandlingsnummer"
         const val BID = "B287"
