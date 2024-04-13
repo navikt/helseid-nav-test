@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.graphql.AbstractGraphQLAdapter
+import no.nav.helseidnavtest.oppslag.graphql.GraphQLErrorHandler
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import no.nav.helseidnavtest.oppslag.person.PDLMapper.pdlSøkerTilSøker
 import org.springframework.beans.factory.annotation.Qualifier
