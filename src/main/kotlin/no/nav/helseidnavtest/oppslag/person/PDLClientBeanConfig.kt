@@ -3,9 +3,9 @@ package no.nav.helseidnavtest.oppslag.person
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLErrorHandler
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
-import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.behandlingFilterFunction
-import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.correlatingFilterFunction
-import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.temaFilterFunction
+import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter.Companion.behandlingFilterFunction
+import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter.Companion.correlatingFilterFunction
+import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter.Companion.temaFilterFunction
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean

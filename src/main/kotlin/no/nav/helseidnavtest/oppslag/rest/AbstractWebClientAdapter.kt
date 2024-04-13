@@ -1,4 +1,4 @@
-package no.nav.helseidnavtest.oppslag.person
+package no.nav.helseidnavtest.oppslag.rest
 
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.ExchangeFunction
 import org.springframework.web.reactive.function.client.WebClient
 import java.util.*
 
-abstract class AbstractWebClientAdapter(protected open val webClient : WebClient, protected open val cfg : AbstractRestConfig,
+abstract class AbstractWebClientAdapter(protected open val webClient : WebClient, protected val cfg : AbstractRestConfig,
                                         private val pingClient : WebClient = webClient) : Pingable {
 
     override fun ping() : Map<String, String> {

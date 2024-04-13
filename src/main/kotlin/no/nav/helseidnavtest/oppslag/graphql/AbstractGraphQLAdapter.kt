@@ -5,7 +5,7 @@ import no.nav.helseidnavtest.error.IntegrationException
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter
+import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
@@ -41,9 +41,10 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 
     private val log = getLogger(LoggingGraphQLInterceptor::class.java)
 
-    override fun intercept(request : ClientGraphQlRequest, chain : Chain) = chain.next(request).also {
-        log.trace("Eksekverer {} ", request.document)
-    }
+     override fun intercept(request : ClientGraphQlRequest, chain : Chain) =
+         chain.next(request).also {
+             log.trace("Eksekverer {} ", request.document)
+         }
 }
 
 /* Denne kalles når retry har gitt opp */

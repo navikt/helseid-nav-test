@@ -2,6 +2,8 @@ package no.nav.helseidnavtest.oppslag.person
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import no.nav.helseidnavtest.oppslag.person.PDLPerson.*
+import no.nav.helseidnavtest.oppslag.person.PDLPerson.PDLBostedadresse.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import java.time.LocalDate
@@ -10,18 +12,16 @@ object PDLMapper {
 
     private val log = getLogger(javaClass)
 
-    fun pdlSøkerTilSøker(søker : PDLSøker?, fnr : Fødselsnummer) = søker?.let {
-        with(it) {
-            Søker(navnFra(navn), fnr,
-                adresseFra(vegadresse),
-                fødselsdatoFra(fødsel)).also {
-                log.trace(CONFIDENTIAL, "Søker er {}", it)
+    fun pdlPersonTilPerson(person : PDLPerson?, fnr : Fødselsnummer) =
+        person?.let {
+            with(it) {
+                Person(navnFra(navn), fnr,
+                    adresseFra(vegadresse),
+                    fødselsdatoFra(fødsel)).also {
+                    log.trace(CONFIDENTIAL, "Person er {}", it)
+                }
             }
         }
-    }
-
-
-    private fun navnFra(navn : Set<PDLNavn>) = navnFra(navn.first())
 
 
     private fun navnFra(navn : PDLNavn) =
@@ -31,16 +31,16 @@ object PDLMapper {
             }
         }
 
-    private fun adresseFra(adresse : PDLSøker.PDLBostedadresse.PDLVegadresse?) = adresse?.let {
+    private fun adresseFra(adresse : PDLVegadresse?) = adresse?.let {
         with(it) {
             Adresse(adressenavn, husbokstav, husnummer, PostNummer(postnummer))
         }
     }
-    private fun fødselsdatoFra(fødsel : PDLSøker.PDLFødsel?) = fødsel?.fødselsdato
+    private fun fødselsdatoFra(fødsel : PDLFødsel?) = fødsel?.fødselsdato
 
 }
 
-data class Søker(val navn: Navn, val fnr: Fødselsnummer, val adresse: Adresse? = null, val fødseldato: LocalDate? = null)
+data class Person(val navn: Navn, val fnr: Fødselsnummer, val adresse: Adresse? = null, val fødseldato: LocalDate? = null)
 
 data class Navn(val fornavn : String?, val mellomnavn : String?, val etternavn : String?)
 data class Adresse(val adressenavn : String?, val husbokstav : String?, val husnummer : String?, val postnummer : PostNummer?)
