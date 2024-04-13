@@ -9,14 +9,9 @@ import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.b
 import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.correlatingFilterFunction
 import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter.Companion.temaFilterFunction
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
-import org.slf4j.LoggerFactory
-import org.slf4j.LoggerFactory.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.graphql.client.ClientGraphQlRequest
-import org.springframework.graphql.client.GraphQlClientInterceptor
-import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
 import org.springframework.graphql.client.HttpGraphQlClient
 import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
