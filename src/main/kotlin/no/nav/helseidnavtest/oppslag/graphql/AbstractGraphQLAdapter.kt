@@ -1,15 +1,15 @@
 package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.helseidnavtest.error.IrrecoverableGraphQLException
+import no.nav.helseidnavtest.error.IntegrationException
+import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.person.AbstractWebClientAdapter
-import no.nav.helseidnavtest.oppslag.person.GraphQLErrorHandler
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
-import org.springframework.graphql.client.FieldAccessException
-import org.springframework.graphql.client.GraphQlClient
-import org.springframework.graphql.client.GraphQlTransportException
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.graphql.client.*
+import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
 import org.springframework.web.reactive.function.client.WebClient
 
 abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConfig, val handler : GraphQLErrorHandler) : AbstractWebClientAdapter(client, cfg) {
@@ -37,3 +37,19 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
         }.getOrElse(handler::handle)
 }
 
+ class LoggingGraphQLInterceptor : GraphQlClientInterceptor {
+
+    private val log = getLogger(LoggingGraphQLInterceptor::class.java)
+
+    override fun intercept(request : ClientGraphQlRequest, chain : Chain) = chain.next(request).also {
+        log.trace("Eksekverer {} ", request.document)
+    }
+}
+
+/* Denne kalles når retry har gitt opp */
+interface GraphQLErrorHandler {
+    fun handle(e : Throwable) : Nothing = when (e) {
+        is IntegrationException -> throw e
+        else -> throw IrrecoverableException(e.message, cause = e)
+    }
+}
