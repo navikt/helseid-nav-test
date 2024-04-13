@@ -1,7 +1,5 @@
 package no.nav.helseidnavtest.oppslag.person
 
-import no.nav.helseidnavtest.error.IntegrationException
-import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLErrorHandler
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
@@ -22,34 +20,33 @@ import org.springframework.web.reactive.function.client.WebClient.*
 
 
 @Configuration(proxyBeanMethods = false)
-class PDLClientBeanConfig {
+class PDLClientBeanConfig
 
     @Bean
     fun graphQLErrorHandler() = object : GraphQLErrorHandler {}
 
     @Bean
     @Qualifier(PDL)
-    fun pdlWebClient(b: Builder, cfg: PDLConfig,@Qualifier(PDL) oauth: ServerOAuth2AuthorizedClientExchangeFilterFunction) =
+    fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServerOAuth2AuthorizedClientExchangeFilterFunction) =
         b.baseUrl("${cfg.baseUri}")
             .filter(correlatingFilterFunction("helseidnavtest"))
-            .filter(oauth)
+            .filter(oauthFilterFunction)
             .filter(temaFilterFunction())
             .filter(behandlingFilterFunction())
             .build()
 
     @Bean
-    @Qualifier(PDL)
     fun oauthFilterFunction(clientRegistrations: ReactiveClientRegistrationRepository, authorizedClientService: ReactiveOAuth2AuthorizedClientService) =
         ServerOAuth2AuthorizedClientExchangeFilterFunction(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, authorizedClientService)).setDefaultClientRegistrationId(PDL)
-    }
 
     @Bean
-    @Qualifier(PDL)
-    fun graphQLWebClient(@Qualifier(PDL) client: WebClient) =
+    fun graphQLWebClient(client: WebClient) =
         HttpGraphQlClient.builder(client)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
 
     @Bean
     fun pdlHealthIndicator(a: PDLWebClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+
+
 
