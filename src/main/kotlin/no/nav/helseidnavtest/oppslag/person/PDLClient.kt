@@ -5,10 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@RestController(PDL)
-class PersonController(private val pdl: PDLWebClientAdapter) {
-
-    @GetMapping("/ping") fun ping() = pdl.ping()
-
-    @GetMapping("/$PDL") fun søker(@RequestParam fnr: Fødselsnummer) = pdl.person(fnr)
+class PDLClient(private val pdl: PDLWebClientAdapter) {
+    fun ping() = pdl.ping()
+    fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
 }

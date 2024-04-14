@@ -40,7 +40,7 @@ class PDLClientBeanConfig
         ServerOAuth2AuthorizedClientExchangeFilterFunction(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, authorizedClientService)).setDefaultClientRegistrationId(PDL)
 
     @Bean
-    fun graphQLWebClient(client: WebClient) =
+    fun graphQLWebClient(@Qualifier(PDL) client: WebClient) =
         HttpGraphQlClient.builder(client)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
