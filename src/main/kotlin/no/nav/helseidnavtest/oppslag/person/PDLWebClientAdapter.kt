@@ -14,7 +14,7 @@ import org.springframework.graphql.client.GraphQlClient
 import org.springframework.web.reactive.function.client.WebClient
 
 @Component
-class PDLWebClientAdapter( @Qualifier(PDL)  private val graphQlClient : GraphQlClient, @Qualifier(PDL) webClient: WebClient, cfg : PDLConfig, errorHandler: GraphQLErrorHandler) : AbstractGraphQLAdapter(webClient,cfg, errorHandler) {
+class PDLWebClientAdapter(@Qualifier(PDL)  private val graphQlClient : GraphQlClient, @Qualifier(PDL) webClient: WebClient, cfg : PDLConfig, errorHandler: GraphQLErrorHandler) : AbstractGraphQLAdapter(webClient,cfg, errorHandler) {
 
     override fun ping() : Map<String, String> {
         webClient

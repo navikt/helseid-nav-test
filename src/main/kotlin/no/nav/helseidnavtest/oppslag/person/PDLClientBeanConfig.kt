@@ -18,8 +18,8 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.Builder
 
-@Configuration(proxyBeanMethods = false)
-class PDLClientBeanConfig
+@Configuration
+class PDLClientBeanConfig {
 
     @Bean
     fun graphQLErrorHandler() = object : GraphQLErrorHandler {}
@@ -36,16 +36,16 @@ class PDLClientBeanConfig
 
     @Bean
     fun oauthFilterFunction(clientRegistrations: ReactiveClientRegistrationRepository, authorizedClientService: ReactiveOAuth2AuthorizedClientService) =
-        ServerOAuth2AuthorizedClientExchangeFilterFunction(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, authorizedClientService)).setDefaultClientRegistrationId(PDL)
-
+        ServerOAuth2AuthorizedClientExchangeFilterFunction(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, authorizedClientService))
     @Bean
+    @Qualifier(PDL)
     fun graphQLWebClient(@Qualifier(PDL) client: WebClient) =
         HttpGraphQlClient.builder(client)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
-
     @Bean
     fun pdlHealthIndicator(a: PDLWebClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+}
 
 
 
