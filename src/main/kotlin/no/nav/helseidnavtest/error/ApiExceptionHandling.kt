@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.error
 
 import com.fasterxml.jackson.databind.DatabindException
+import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -21,8 +22,8 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    @ExceptionHandler(NotFoundException::class)
-    fun notFound(e: NotFoundException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    @ExceptionHandler(NotFoundException::class, NotFoundGraphQLException::class)
+    fun notFound(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
     @ExceptionHandler(IrrecoverableException::class)
     fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR)
 

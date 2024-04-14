@@ -33,7 +33,7 @@ class PDLWebClientAdapter(private val graphQlClient : GraphQlClient, @Qualifier(
         with(fnr) {
             query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to this.fnr))?.active?.let {
                 pdlPersonTilPerson(it, this)
-            } ?: throw NotFoundGraphQLException("Fant ikke $fnr")
+            } ?: throw NotFoundGraphQLException("Fant ikke $fnr",cfg.baseUri)
         }
 
     override fun toString() =

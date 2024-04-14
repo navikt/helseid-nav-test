@@ -1,9 +1,9 @@
 package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.helseidnavtest.error.IntegrationException
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
+import no.nav.helseidnavtest.error.RecoverableGraphQLException
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
 import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
 import org.springframework.web.reactive.function.client.WebClient
+import java.net.URI
 
 abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConfig, val handler : GraphQLErrorHandler) : AbstractWebClientAdapter(client, cfg) {
 
@@ -24,8 +25,8 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .toEntity(T::class.java)
                 .onErrorMap {
                     when(it) {
-                        is FieldAccessException -> it.oversett()
-                        is GraphQlTransportException -> BadGraphQLException(it.message ?: "Transport feil", it)
+                        is FieldAccessException -> it.oversett(cfg.baseUri)
+                        is GraphQlTransportException -> BadGraphQLException(it.message ?: "Transport feil", cfg.baseUri,it)
                         else ->  it
                     }
                 }
@@ -34,7 +35,9 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .block().also {
                     log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
                 }
-        }.getOrElse(handler::handle)
+        }.getOrElse {
+            handler.handle(cfg.baseUri, it)
+        }
 }
 
  class LoggingGraphQLInterceptor : GraphQlClientInterceptor {
@@ -49,8 +52,8 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 
 /* Denne kalles når retry har gitt opp */
 interface GraphQLErrorHandler {
-    fun handle(e : Throwable) : Nothing = when (e) {
-        is IntegrationException -> throw e
-        else -> throw IrrecoverableException(e.message, cause = e)
+    fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
+        is RecoverableGraphQLException -> throw e
+        else -> throw IrrecoverableException(e.message, uri, e)
     }
 }

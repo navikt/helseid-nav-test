@@ -24,5 +24,5 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
         time = Date()
     })
     override fun ping() = emptyMap<String,String>()
-    override fun pingEndpoint() = cfg.url
+    override fun pingEndpoint() = "${cfg.url}"
 }

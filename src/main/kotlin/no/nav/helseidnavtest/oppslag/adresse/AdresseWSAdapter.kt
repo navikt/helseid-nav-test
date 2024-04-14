@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component
 @Component
 class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
 
-    private val client = createPort<ICommunicationPartyService>(cfg.url) {
+    private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
         proxy {}
         port { withBasicAuth(cfg.username, cfg.password) }
     }
     override fun ping() = mapOf(Pair("ping",client.ping()))
-    override fun pingEndpoint() = cfg.url
+    override fun pingEndpoint() = "${cfg.url}"
 
     fun details(herId: Int) =
         runCatching {
@@ -25,8 +25,8 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
             onSuccess = { it },
             onFailure = {
                 when (it) {
-                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message ?: "Fant ikke noe for herId=$herId")
-                    else -> throw RecoverableException("${it.message}", it)
+                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message ?: "Fant ikke noe for herId=$herId", cfg.url)
+                    else -> throw RecoverableException("${it.message}", cfg.url, it)
                 }
             }
         )

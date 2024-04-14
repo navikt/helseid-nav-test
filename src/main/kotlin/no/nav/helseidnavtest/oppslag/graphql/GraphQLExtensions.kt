@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.error.RecoverableGraphQLException.*
 import org.slf4j.LoggerFactory.*
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
+import java.net.URI
 
 object GraphQLExtensions {
 
@@ -13,18 +14,18 @@ object GraphQLExtensions {
     private const val BadRequest = "bad_request"
     private const val NotFound = "not_found"
     private val log = getLogger(javaClass)
-    fun FieldAccessException.oversett() = response.errors.oversett(message)
-    private fun List<ResponseError>.oversett(message: String?) = oversett(firstOrNull()?.extensions?.get("code")?.toString(), message ?: "Ukjent feil")
+    fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message,uri)
+    private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(firstOrNull()?.extensions?.get("code")?.toString(), message ?: "Ukjent feil", uri)
         .also { e ->
             log.warn("GraphQL oppslag returnerte $size feil. $this, oversatte feilkode $message til ${e.javaClass.simpleName}", this)
         }
 
-    private fun oversett(kode : String?, msg : String) =
+    private fun oversett(kode : String?, msg : String, uri: URI) =
         when (kode) {
-            Unauthorized -> UnauthorizedGraphQLException(msg)
-            Unauthenticated -> UnauthenticatedGraphQLException(msg)
-            BadRequest -> BadGraphQLException(msg)
-            NotFound -> NotFoundGraphQLException(msg)
-            else -> UnhandledGraphQLException(msg)
+            Unauthorized -> UnauthorizedGraphQLException(msg, uri)
+            Unauthenticated -> UnauthenticatedGraphQLException(msg,uri)
+            BadRequest -> BadGraphQLException(msg,uri)
+            NotFound -> NotFoundGraphQLException(msg,uri)
+            else -> UnhandledGraphQLException(msg,uri)
         }
 }
