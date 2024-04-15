@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.error
 import com.fasterxml.jackson.databind.DatabindException
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
+@Order(-1)
 class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
