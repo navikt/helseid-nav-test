@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice
+//@ControllerAdvice
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
