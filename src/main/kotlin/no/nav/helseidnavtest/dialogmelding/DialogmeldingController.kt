@@ -7,18 +7,16 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.ErrorResponseException
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
-@RestController("xml")
+@RestController
+@RequestMapping("/xml")
 class DialogmeldingController(private val pdl: PDLClient) {
 
     private val log = getLogger(DialogmeldingController::class.java)
 
-    @GetMapping(value = ["/xml"], consumes = [APPLICATION_JSON_VALUE],produces = [APPLICATION_XML_VALUE, APPLICATION_PROBLEM_JSON_VALUE])
+    @GetMapping(value = ["/melding"], consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_XML_VALUE, APPLICATION_PROBLEM_JSON_VALUE])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val navn = pdl.navn(pasient).also { log.trace("Navn {}", this) }
 
