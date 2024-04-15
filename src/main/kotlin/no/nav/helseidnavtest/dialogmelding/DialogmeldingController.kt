@@ -18,9 +18,9 @@ class DialogmeldingController(private val pdl: PDLClient) {
 
     private val log = getLogger(DialogmeldingController::class.java)
 
-    @GetMapping(value = ["/xml"], consumes = [APPLICATION_JSON_VALUE],produces = [APPLICATION_XML_VALUE])
+    @GetMapping(value = ["/xml"], consumes = [APPLICATION_JSON_VALUE],produces = [APPLICATION_XML_VALUE, APPLICATION_PROBLEM_JSON_VALUE])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
-        val navn = pdl.navn(pasient)
+        val navn = pdl.navn(pasient).also { log.trace("Navn {}", this) }
 
     val kontor = BehandlerKontor(
         partnerId = PartnerId(123456789),
@@ -56,6 +56,6 @@ class DialogmeldingController(private val pdl: PDLClient) {
         mellomnavn = navn.mellomnavn,
         etternavn = navn.etternavn!!)
     val m  = DialogmeldingMapper.opprettDialogmelding(b, arbeidstaker)
-        return m.message
+        return m.message.also { log.trace("XML {}", this) }
     }
 }
