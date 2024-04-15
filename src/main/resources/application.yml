@@ -19,6 +19,9 @@ management:
        exposure:
         include: '*'
 spring:
+  mvc:
+    problemdetails:
+      enabled: true
   security:
     oauth2:
       resourceserver:
