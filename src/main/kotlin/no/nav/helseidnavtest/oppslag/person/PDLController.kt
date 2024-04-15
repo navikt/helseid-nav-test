@@ -27,11 +27,9 @@ class PDLController(private val pdl: PDLClient) {
 private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
     status(status)
         .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
-        .body(createProblemDetail(e, status, e.message ?: e.javaClass.simpleName,null, null, req).apply {
-        })
+        .body(createProblemDetail(e, status, e.message,req))
 
-fun createProblemDetail(e: Exception, status: HttpStatus, s: String?, nothing: Nothing?, nothing1: Nothing?, req: NativeWebRequest): ProblemDetail {
-    var problemDetail = ProblemDetail.forStatus(status)
-    problemDetail.setTitle("Could not read provided data or did not validate.")
-    return problemDetail
-}
+private fun createProblemDetail(e: Exception, status: HttpStatus, msg: String?, req: NativeWebRequest) =
+    ProblemDetail.forStatus(status).apply {
+        detail = msg
+    }
