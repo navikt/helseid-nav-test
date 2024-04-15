@@ -15,11 +15,13 @@ import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiv
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction
+import org.springframework.web.reactive.config.EnableWebFlux
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.Builder
 
 @Configuration
-class PDLClientBeanConfig {
+@EnableWebFlux
+class PDLClientBeanConfig
 
     @Bean
     fun graphQLErrorHandler() = object : GraphQLErrorHandler {}
@@ -45,7 +47,7 @@ class PDLClientBeanConfig {
             .build()
     @Bean
     fun pdlHealthIndicator(a: PDLWebClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
-}
+
 
 
 
