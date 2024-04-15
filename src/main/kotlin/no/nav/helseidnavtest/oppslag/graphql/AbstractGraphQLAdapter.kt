@@ -10,7 +10,6 @@ import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
 import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.web.reactive.function.client.WebClient
 import java.net.URI
@@ -34,11 +33,11 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                     }
                 }
                // .retryWhen(retrySpec(log, "/graphql") { it is RecoverableGraphQLException })
-                .contextCapture()
                 .block().also {
                     log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
                 }
         }.getOrElse {
+            log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             handler.handle(cfg.baseUri, it)
         }
 }
