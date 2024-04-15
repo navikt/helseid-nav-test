@@ -17,24 +17,24 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.Builder
 
 @Configuration
-class PDLClientBeanConfig
+class PDLClientBeanConfig {
 
     @Bean
     fun graphQLErrorHandler() = object : GraphQLErrorHandler {}
 
-@Bean
-@Qualifier(PDL)
-fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServletOAuth2AuthorizedClientExchangeFilterFunction) =
-    b.apply(oauthFilterFunction.oauth2Configuration())
-        .baseUrl("${cfg.baseUri}")
-        .filter(correlatingFilterFunction("helseidnavtest"))
-        .filter(temaFilterFunction())
-        .filter(behandlingFilterFunction())
-        .build()
+    @Bean
+    @Qualifier(PDL)
+    fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServletOAuth2AuthorizedClientExchangeFilterFunction) =
+        b.apply(oauthFilterFunction.oauth2Configuration())
+            .baseUrl("${cfg.baseUri}")
+            .filter(correlatingFilterFunction("helseidnavtest"))
+            .filter(temaFilterFunction())
+            .filter(behandlingFilterFunction())
+            .build()
 
     @Bean
     fun oauthFilterFunction(authorizedClientManager: OAuth2AuthorizedClientManager) : ServletOAuth2AuthorizedClientExchangeFilterFunction {
-       val ff =  ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+        val ff =  ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
         ff.setDefaultClientRegistrationId(PDL)
         return ff
     }
@@ -47,6 +47,8 @@ fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServletOAuth2A
             .build()
     @Bean
     fun pdlHealthIndicator(a: PDLWebClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+
+}
 
 
 
