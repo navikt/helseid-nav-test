@@ -17,7 +17,7 @@ object GraphQLExtensions {
     fun FieldAccessException.oversett(uri: URI) = response.errors.oversett(message,uri)
     private fun List<ResponseError>.oversett(message: String?, uri: URI) = oversett(firstOrNull()?.extensions?.get("code")?.toString(), message ?: "Ukjent feil", uri)
         .also { e ->
-            log.warn("GraphQL oppslag returnerte $size feil. $this, oversatte feilkode $message til ${e.javaClass.simpleName}", this)
+            log.warn("GraphQL oppslag returnerte $size feil, oversatte $message til ${e.javaClass.simpleName}", this)
         }
 
     private fun oversett(kode : String?, msg : String, uri: URI) =
