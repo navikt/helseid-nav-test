@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity.status
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -17,8 +19,9 @@ class DialogmeldingController(private val pdl: PDLClient) {
     private val log = getLogger(DialogmeldingController::class.java)
 
     @GetMapping(value = ["/melding"])
-    fun xml(@RequestParam pasient: Fødselsnummer) : String? {
-        val navn = pdl.navn(pasient).also { log.trace("Navn {}", this) }
+    fun xml(@RequestParam pasient: Fødselsnummer,@AuthenticationPrincipal userDetails: UserDetails) : String? {
+       log.info("Current user ${userDetails.username}")
+        val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
 
     val kontor = BehandlerKontor(
         partnerId = PartnerId(123456789),
