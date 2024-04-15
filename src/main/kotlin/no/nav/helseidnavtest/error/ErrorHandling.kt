@@ -29,5 +29,5 @@ abstract class RecoverableGraphQLException(msg : String?, uri: URI,cause: Throwa
 }
 
 class NotFoundException(msg: String?, uri: URI, cause: Throwable? = null) : IrrecoverableException(msg, uri, cause)
-abstract class IrrecoverableException(msg: String?, uri: URI? = null, cause: Throwable? = null) :RuntimeException("$uri $msg", cause)
+open class IrrecoverableException(msg: String?, uri: URI? = null, cause: Throwable? = null) :RuntimeException("$uri $msg", cause)
 open class RecoverableException(msg: String?, uri: URI? = null,cause: Throwable? = null) : RuntimeException("$uri $msg", cause)
