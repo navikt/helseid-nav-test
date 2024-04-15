@@ -24,7 +24,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
 
-    @ExceptionHandler(ErrorResponseException::class)
+    //@ExceptionHandler(ErrorResponseException::class)
     fun irrecoverable(e: ErrorResponseException, req: NativeWebRequest) = createProblem(e)
 
     private fun createProblem(e: ErrorResponseException) =
