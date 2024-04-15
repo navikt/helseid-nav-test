@@ -10,6 +10,8 @@ import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
 import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.web.reactive.function.client.WebClient
 import java.net.URI
 
@@ -55,6 +57,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
         is RecoverableGraphQLException -> throw e
-        else -> throw IrrecoverableException(e.message, uri, e)
+        else -> throw IrrecoverableException(e.message, uri, BAD_REQUEST,e)
     }
 }

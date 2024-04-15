@@ -6,8 +6,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity.status
+import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -22,14 +22,10 @@ class PDLController(private val pdl: PDLClient) {
     @GetMapping("/$PDL") fun navn(@RequestParam fnr: Fødselsnummer) = pdl.navn(fnr)
 
     @ExceptionHandler(NotFoundGraphQLException::class)
-    fun notFound(e: NotFoundGraphQLException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)}
+    fun notFound(e: NotFoundGraphQLException) = createProblem(e, NOT_FOUND)}
 
-private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
+private fun createProblem(e: ErrorResponseException, status: HttpStatus) =
     status(status)
         .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
-        .body(createProblemDetail(e, status, e.message,req))
+        .body(e.body)
 
-private fun createProblemDetail(e: Exception, status: HttpStatus, msg: String?, req: NativeWebRequest) =
-    ProblemDetail.forStatus(status).apply {
-        detail = msg
-    }
