@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
-@RestController("/xml")
+@RestController("xml")
 class DialogmeldingController(private val pdl: PDLClient) {
 
     private val log = getLogger(DialogmeldingController::class.java)
