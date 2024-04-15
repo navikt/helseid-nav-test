@@ -5,10 +5,10 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
     <springProfile name="dev">
-        <logger name="org.springframework.security" level="trace"/>
+        <logger name="org.springframework.security" level="info"/>
         <logger name="reactor.netty.http.client.HttpClient" level="trace"/>
         <logger name="no.nav.helse" level="trace"/>
-        <logger name="org.springframework.web" level="trace"/>
+        <logger name="org.springframework.web" level="info"/>
     </springProfile>
     <springProfile name="local,test">
         <appender name="stdout"
