@@ -10,12 +10,13 @@ import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity.status
 import org.springframework.http.converter.HttpMessageConversionException
+import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-//@ControllerAdvice
+@ControllerAdvice
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
@@ -23,11 +24,13 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
 
-    @ExceptionHandler(IrrecoverableException::class)
-    fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR).also { log.debug(e.message,e) }
+    @ExceptionHandler(ErrorResponseException::class)
+    fun irrecoverable(e: ErrorResponseException, req: NativeWebRequest) = createProblem(e)
 
-    @ExceptionHandler(HttpMessageConversionException::class)
-    fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
+    private fun createProblem(e: ErrorResponseException) =
+        status(e.statusCode)
+            .headers(e.headers.apply { contentType = APPLICATION_PROBLEM_JSON })
+            .body(e.body)
 
     @ExceptionHandler(Exception::class)
     fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
