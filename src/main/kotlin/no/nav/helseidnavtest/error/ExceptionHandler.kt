@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 @Order(-1)
-class ApiExceptionHandling : ResponseEntityExceptionHandler() {
+class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
