@@ -33,8 +33,8 @@ class PDLClientBeanConfig {
             .build()
 
     @Bean
-    fun oauthFilterFunction(authorizedClientManager: OAuth2AuthorizedClientManager) : ServletOAuth2AuthorizedClientExchangeFilterFunction {
-        val ff =  ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    fun oauthFilterFunction(cm: OAuth2AuthorizedClientManager) : ServletOAuth2AuthorizedClientExchangeFilterFunction {
+        val ff =  ServletOAuth2AuthorizedClientExchangeFilterFunction(cm)
         ff.setDefaultClientRegistrationId(PDL)
         return ff
     }
