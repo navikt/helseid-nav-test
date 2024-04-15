@@ -23,7 +23,7 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
     @ExceptionHandler(NotFoundGraphQLException::class)
-    fun notFound(e: NotFoundGraphQLException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND)
+    fun notFound(e: NotFoundGraphQLException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND).also { log.warn(e.message,e) }
 
     @ExceptionHandler(IrrecoverableException::class)
     fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR)
