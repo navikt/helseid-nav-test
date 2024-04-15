@@ -1,10 +1,10 @@
 package no.nav.helseidnavtest.oppslag.graphql
 
-import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
-import no.nav.helseidnavtest.error.RecoverableGraphQLException.*
+import no.nav.helseidnavtest.error.IrrecoverableException
 import org.slf4j.LoggerFactory.*
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
+import org.springframework.http.HttpStatus.*
 import java.net.URI
 
 object GraphQLExtensions {
@@ -22,10 +22,10 @@ object GraphQLExtensions {
 
     private fun oversett(kode : String?, msg : String, uri: URI) =
         when (kode) {
-            Unauthorized -> UnauthorizedGraphQLException(msg, uri)
-            Unauthenticated -> UnauthenticatedGraphQLException(msg,uri)
-            BadRequest -> BadGraphQLException(msg,uri)
-            NotFound -> NotFoundGraphQLException(msg,uri)
-            else -> UnhandledGraphQLException(msg,uri)
+            Unauthorized -> IrrecoverableException(msg, uri,UNAUTHORIZED)
+            Unauthenticated -> IrrecoverableException(msg,uri,FORBIDDEN)
+            BadRequest -> IrrecoverableException(msg,uri, BAD_REQUEST)
+            NotFound -> IrrecoverableException(msg, uri, NOT_FOUND)
+            else -> IrrecoverableException(msg,uri,INTERNAL_SERVER_ERROR)
         }
 }

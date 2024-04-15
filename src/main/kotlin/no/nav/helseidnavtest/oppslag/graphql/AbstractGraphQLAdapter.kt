@@ -2,9 +2,7 @@ package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.error.IrrecoverableException
-import no.nav.helseidnavtest.error.IrrecoverableGraphQLException
-import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
-import no.nav.helseidnavtest.error.RecoverableGraphQLException
+import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
@@ -29,7 +27,7 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .onErrorMap {
                     when(it) {
                         is FieldAccessException -> it.oversett(cfg.baseUri)
-                        is GraphQlTransportException -> BadGraphQLException(it.message ?: "Transport feil", cfg.baseUri,it)
+                        is GraphQlTransportException -> RecoverableException(it.message ?: "Transport feil", cfg.baseUri,INTERNAL_SERVER_ERROR,it)
                         else ->  it
                     }
                 }
@@ -56,8 +54,7 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 /* Denne kalles når retry har gitt opp */
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
-        is IrrecoverableGraphQLException -> throw e
-        is RecoverableGraphQLException -> throw e
-        else -> throw IrrecoverableException(e.message, uri,BAD_REQUEST,e)
+        is IrrecoverableException -> throw e
+        else -> throw IrrecoverableException(e.message ?: "", uri,BAD_REQUEST,e)
     }
 }
