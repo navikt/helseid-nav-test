@@ -16,7 +16,7 @@ class DialogmeldingController(private val pdl: PDLClient) {
 
     private val log = getLogger(DialogmeldingController::class.java)
 
-    @GetMapping(value = ["/melding"], consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_XML_VALUE, APPLICATION_PROBLEM_JSON_VALUE])
+    @GetMapping(value = ["/melding"])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val navn = pdl.navn(pasient).also { log.trace("Navn {}", this) }
 
