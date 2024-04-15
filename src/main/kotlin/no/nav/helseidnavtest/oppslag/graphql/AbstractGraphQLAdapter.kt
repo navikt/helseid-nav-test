@@ -58,6 +58,6 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
         is IrrecoverableGraphQLException -> throw e
         is RecoverableGraphQLException -> throw e
-        else -> throw IrrecoverableException(e.message, uri, BAD_REQUEST,e)
+        else -> throw IrrecoverableException(e.message, uri,e)
     }
 }

@@ -28,7 +28,7 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
             onFailure = {
                 when (it) {
                     is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message ?: "Fant ikke noe for herId=$herId", cfg.url)
-                    else -> throw RecoverableException("${it.message}", cfg.url, BAD_REQUEST,it)
+                    else -> throw RecoverableException("${it.message}", cfg.url,it)
                 }
             }
         )
