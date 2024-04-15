@@ -19,8 +19,7 @@ class DialogmeldingController(private val pdl: PDLClient) {
     private val log = getLogger(DialogmeldingController::class.java)
 
     @GetMapping(value = ["/melding"])
-    fun xml(@RequestParam pasient: Fødselsnummer,@AuthenticationPrincipal userDetails: UserDetails) : String? {
-       log.info("Current user ${userDetails.username}")
+    fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
 
     val kontor = BehandlerKontor(

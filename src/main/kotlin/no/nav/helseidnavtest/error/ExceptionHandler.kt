@@ -52,9 +52,9 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     private fun logError(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) {
-        log.error("$req $problem ${status.reasonPhrase}: ${t.message}", t)
+        log.error("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
     }
 
     private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) =
-        log.warn("$req $problem ${status.reasonPhrase}: ${t.message}", t)
+        log.warn("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
 }
