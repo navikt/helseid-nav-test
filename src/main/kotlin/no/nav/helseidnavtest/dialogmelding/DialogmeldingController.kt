@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
-@RestController("emottak")
+@RestController("xml")
 class DialogmeldingController(private val pdl: PDLClient) {
 
     private val log = getLogger(DialogmeldingController::class.java)
 
-    @GetMapping("/xml", consumes = [APPLICATION_JSON_VALUE],produces = [APPLICATION_XML_VALUE])
+    @GetMapping(consumes = [APPLICATION_JSON_VALUE],produces = [APPLICATION_XML_VALUE])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val navn = pdl.navn(pasient)
 
