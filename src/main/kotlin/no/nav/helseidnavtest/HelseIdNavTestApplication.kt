@@ -9,13 +9,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @SpringBootApplication
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
 @ConfigurationPropertiesScan
 @EnableRetry
 class HelseIdNavTestApplication
 
 fun main(args: Array<String>) {
-    runApplication<no.nav.helseidnavtest.HelseIdNavTestApplication>(*args) {
+    runApplication<HelseIdNavTestApplication>(*args) {
         setAdditionalProfiles(*profiler())
     }
 }
