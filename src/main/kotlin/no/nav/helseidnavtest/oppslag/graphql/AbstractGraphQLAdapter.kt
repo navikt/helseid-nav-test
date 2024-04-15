@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.error.IrrecoverableException
+import no.nav.helseidnavtest.error.IrrecoverableGraphQLException
 import no.nav.helseidnavtest.error.IrrecoverableGraphQLException.*
 import no.nav.helseidnavtest.error.RecoverableGraphQLException
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
@@ -55,6 +56,7 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 /* Denne kalles når retry har gitt opp */
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
+        is IrrecoverableGraphQLException -> throw e
         is RecoverableGraphQLException -> throw e
         else -> throw IrrecoverableException(e.message, uri, BAD_REQUEST,e)
     }
