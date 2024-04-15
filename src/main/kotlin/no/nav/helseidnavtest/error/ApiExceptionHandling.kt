@@ -20,19 +20,19 @@ class ApiExceptionHandling : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
-    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.info(e.message,e) }
 
     @ExceptionHandler(NotFoundGraphQLException::class)
-    fun notFound(e: NotFoundGraphQLException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND).also { log.warn(e.message,e) }
+    fun notFound(e: NotFoundGraphQLException, req: NativeWebRequest) = createProblem(e, req, NOT_FOUND).also { log.info(e.message,e) }
 
     @ExceptionHandler(IrrecoverableException::class)
-    fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR)
+    fun irrecoverable(e: IrrecoverableException, req: NativeWebRequest) = createProblem(e, req, INTERNAL_SERVER_ERROR).also { log.info(e.message,e) }
 
     @ExceptionHandler(HttpMessageConversionException::class)
-    fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+    fun messageConversion(e: HttpMessageConversionException, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.info(e.message,e) }
 
     @ExceptionHandler(Exception::class)
-    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.info(e.message,e) }
 
     private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
         status(status)

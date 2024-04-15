@@ -13,8 +13,6 @@ fun handleErrors(req: HttpRequest, res: ClientHttpResponse, detail: String) {
     }
 }
 
-
-
 abstract class IrrecoverableGraphQLException(val status : HttpStatus, msg : String?, uri: URI, cause: Throwable? = null) : IrrecoverableException("$msg (${status.value()})", uri, cause) {
 
     class NotFoundGraphQLException(msg : String?, uri: URI,cause: Throwable? = null) : IrrecoverableGraphQLException(NOT_FOUND, msg,uri,cause)
@@ -24,7 +22,6 @@ abstract class IrrecoverableGraphQLException(val status : HttpStatus, msg : Stri
 }
 
 abstract class RecoverableGraphQLException(msg : String?, uri: URI,cause: Throwable? = null) : RecoverableException(msg,uri,cause) {
-
     class UnhandledGraphQLException(msg : String, uri: URI,cause: Throwable? = null) : RecoverableGraphQLException(msg, uri,cause)
 }
 
