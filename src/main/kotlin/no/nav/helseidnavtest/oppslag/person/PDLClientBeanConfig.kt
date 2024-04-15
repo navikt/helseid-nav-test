@@ -12,15 +12,15 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpGraphQlClient
 import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction
-import org.springframework.web.reactive.config.EnableWebFlux
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.Builder
 
 @Configuration
-@EnableWebFlux
 class PDLClientBeanConfig
 
     @Bean
@@ -28,17 +28,21 @@ class PDLClientBeanConfig
 
     @Bean
     @Qualifier(PDL)
-    fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServerOAuth2AuthorizedClientExchangeFilterFunction) =
+    fun pdlWebClient(b: Builder, cfg: PDLConfig, oauthFilterFunction: ServletOAuth2AuthorizedClientExchangeFilterFunction) =
         b.baseUrl("${cfg.baseUri}")
+            .apply(oauthFilterFunction.oauth2Configuration())
             .filter(correlatingFilterFunction("helseidnavtest"))
-            .filter(oauthFilterFunction)
             .filter(temaFilterFunction())
             .filter(behandlingFilterFunction())
             .build()
 
     @Bean
-    fun oauthFilterFunction(clientRegistrations: ReactiveClientRegistrationRepository, authorizedClientService: ReactiveOAuth2AuthorizedClientService) =
-        ServerOAuth2AuthorizedClientExchangeFilterFunction(AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, authorizedClientService))
+    fun oauthFilterFunction(authorizedClientManager: OAuth2AuthorizedClientManager) : ServletOAuth2AuthorizedClientExchangeFilterFunction {
+       val s =  ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+        s.setDefaultClientRegistrationId(PDL)
+        return s
+    }
+
     @Bean
     @Qualifier(PDL)
     fun graphQLWebClient(@Qualifier(PDL) client: WebClient) =
