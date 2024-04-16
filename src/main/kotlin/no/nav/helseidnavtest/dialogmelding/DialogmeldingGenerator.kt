@@ -27,7 +27,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
             is OAuth2AuthenticationToken -> {
                 log.info(a.toString())
                 //a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
-                val behandler = behandler(a.navn(),a.herid(), behandlerKontor())
+                val behandler = behandler(a.navn(),a.hpr(), behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
                 opprettDialogmelding(bestilling, arbeidstaker).message.also {
@@ -59,15 +59,15 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     private fun behandler(
         behandlerNavn: Navn,
-        herid: Int,
+        hpr: Int,
         kontor: BehandlerKontor
     ) = Behandler(
         UUID.randomUUID(),
         fornavn = behandlerNavn.fornavn,
         mellomnavn = behandlerNavn.mellomnavn,
         etternavn = behandlerNavn.etternavn,
-        herId = herid,
-        hprId = 987654321,
+        herId = 42,
+        hprId = hpr,
         telefon = "12345678",
         personident = Personident("12345678901"),
         kontor = kontor
@@ -85,7 +85,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 }
 private fun OAuth2AuthenticationToken.attribute(a: String) = principal.attribute(a)
 
-private fun OAuth2AuthenticationToken.herid() = attribute("helseid://claims/her/her_id").toInt()
+private fun OAuth2AuthenticationToken.hpr() = attribute("helseid://claims/hpr/hpr_number").toInt()
 
 
 private fun OAuth2AuthenticationToken.navn() =
