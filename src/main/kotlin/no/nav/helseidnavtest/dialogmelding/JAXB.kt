@@ -168,7 +168,7 @@ fun createXMLIdentForPersonident(personident: Personident) =
             v = personident.type
         }
     }
-class Fellesformat(fellesformat: XMLEIFellesformat, marshaller: Function<XMLEIFellesformat?, String?>)  {
+class Fellesformat(fellesformat: XMLEIFellesformat, marshaller: Function<XMLEIFellesformat, String>)  {
         val message = marshaller.apply(fellesformat)
 }
 

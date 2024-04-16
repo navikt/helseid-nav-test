@@ -27,11 +27,7 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .onErrorMap {
                     when(it) {
                         is FieldAccessException -> it.oversett(cfg.baseUri)
-                        is GraphQlTransportException -> RecoverableException(
-                            INTERNAL_SERVER_ERROR,
-                            it.message ?: "Transport feil",
-                            cfg.baseUri,
-                            it
+                        is GraphQlTransportException -> RecoverableException(INTERNAL_SERVER_ERROR, it.message ?: "Transport feil", cfg.baseUri, it
                         )
                         else ->  it
                     }
