@@ -13,7 +13,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.retry.annotation.Retryable
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -25,9 +25,9 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
-            is OAuth2AuthenticationToken -> {
-                val extractor = ClaimsExtractor(a.oidcUser().claims)
-                a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
+            is OidcUser -> {
+                val extractor = ClaimsExtractor(a.claims)
+                a.claims.forEach { (k, v) -> log.info("key: $k, value: $v") }
                 val behandler = behandler(extractor.navn,extractor.hprNumber, extractor.fnr, behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
