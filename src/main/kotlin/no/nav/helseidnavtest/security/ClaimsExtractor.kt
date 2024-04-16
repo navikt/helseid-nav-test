@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 class ClaimsExtractor(private val claims : Map<String,Any>) {
 
     val professions = claims.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
-    val hprNumber = stringClaim(HPR_NUMBER)
+    val hprNumber = stringClaim(HPR_NUMBER)?.toInt() ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler HPR nummer", HPR_NUMBER)
     val securityLevel = stringClaim(SECURITY_LEVEL)
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
     fun stringClaim(claim: String) = claims[claim] as? String
@@ -62,7 +62,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
 
         fun OAuth2AuthenticationToken.attribute(a: String) = principal.attribute(a)
 
-        fun OAuth2AuthenticationToken.hpr() = attribute(HPR_NUMBER).toInt()
+       // fun OAuth2AuthenticationToken.hpr() = attribute(HPR_NUMBER).toInt()
 
         fun OAuth2AuthenticationToken.fnr() = Fødselsnummer(attribute(PID))
 

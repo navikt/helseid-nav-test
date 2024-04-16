@@ -6,8 +6,8 @@ import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
+import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.fnr
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.hpr
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.navn
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
@@ -27,13 +27,12 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
             is OAuth2AuthenticationToken -> {
+                val extractor = ClaimsExtractor(a.principal.attributes)
                 a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
-                val behandler = behandler(a.navn(),a.hpr(), a.fnr(), behandlerKontor())
+                val behandler = behandler(a.navn(),extractor.hprNumber, a.fnr(), behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
-                opprettDialogmelding(bestilling, arbeidstaker).message.also {
-                    log.trace("XML {}", this)
-                }
+                opprettDialogmelding(bestilling, arbeidstaker).message
             }
             else -> {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", a::class.java)
