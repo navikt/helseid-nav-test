@@ -20,7 +20,5 @@ import java.util.*
 class DialogmeldingController(private val generator: DialogmeldingGenerator) {
 
     @GetMapping(value = ["/melding"])
-    fun xml(@RequestParam pasient: Fødselsnummer) : String? {
-        return generator.genererDialogmelding(pasient)
-    }
+    fun xml(@RequestParam pasient: Fødselsnummer) = generator.genererDialogmelding(pasient)
 }

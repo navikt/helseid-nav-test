@@ -1,10 +1,11 @@
 package no.nav.helseidnavtest.dialogmelding
 
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.opprettDialogmelding
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
-import no.nav.helseidnavtest.oppslag.person.Person
+import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
@@ -21,17 +22,11 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) : String {
-        val behandlerNavn: Person.Navn
         when (val a = SecurityContextHolder.getContext().authentication) {
         is OAuth2AuthenticationToken -> {
             log.info(a.toString())
-            behandlerNavn = Person.Navn(a.principal.getAttribute("given_name")!!, a.principal.getAttribute("middle_name"), a.principal.getAttribute("family_name")!!)
-            a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
-            log.info("name is {}", a.name)
-            a.name.also { log.info("Token name  is {}", it)
-                val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
-
-                val kontor = BehandlerKontor(
+            //a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
+            val kontor = BehandlerKontor(
                     partnerId = PartnerId(123456789),
                     navn = "Et legekontor",
                     orgnummer = Virksomhetsnummer("123456789"),
@@ -40,7 +35,8 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
                     adresse = "Fyrstikkalleen 1",
                     herId = 12345678)
 
-                val behandler =  Behandler(
+            val behandlerNavn = a.navn()
+            val behandler =  Behandler(
                     UUID.randomUUID(),
                     fornavn = behandlerNavn.fornavn,
                     mellomnavn =behandlerNavn.mellomnavn,
@@ -51,7 +47,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
                     personident = Personident("12345678901"),
                     kontor = kontor)
 
-                val b = DialogmeldingBestilling(uuid = UUID.randomUUID(),
+            val bestilling = DialogmeldingBestilling(uuid = UUID.randomUUID(),
                     behandler = behandler,
                     arbeidstakerPersonident =  Personident("01010111111"),
                     parentRef = "parent ref",
@@ -59,13 +55,11 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
                     tekst = "dette er litt tekst",
                     vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
                 )
-                val arbeidstaker = Arbeidstaker(
-                    arbeidstakerPersonident = Personident(pasient.fnr),
-                    fornavn = navn.fornavn,
-                    mellomnavn = navn.mellomnavn,
-                    etternavn = navn.etternavn)
-                val m  = DialogmeldingMapper.opprettDialogmelding(b, arbeidstaker)
-                return m.message.also { log.trace("XML {}", this) }
+            with(pdl.navn(pasient)) {
+                val arbeidstaker = Arbeidstaker(Personident(pasient.fnr), fornavn, mellomnavn, etternavn)
+                return opprettDialogmelding(bestilling, arbeidstaker).message.also {
+                    log.trace("XML {}", this)
+                }
             }
         }
         else -> {
@@ -75,3 +69,8 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     }
     }
 }
+
+private fun OAuth2AuthenticationToken.navn() =
+    with(principal)  {
+        Navn(getAttribute("given_name")!!, getAttribute("middle_name"), getAttribute("family_name")!!)
+    }

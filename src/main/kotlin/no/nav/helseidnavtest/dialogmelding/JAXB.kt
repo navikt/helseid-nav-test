@@ -153,12 +153,6 @@ fun dialogmelding(melding: DialogmeldingBestilling) =
         }
     }
 
-
-
-
-
-
-
 fun createXMLIdentForPersonident(personident: Personident) =
     HMOF.createXMLIdent().apply {
         id = personident.value
