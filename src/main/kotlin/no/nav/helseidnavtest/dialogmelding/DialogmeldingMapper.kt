@@ -23,7 +23,7 @@ object DialogmeldingMapper {
             setProperty(JAXB_ENCODING, "UTF-8")
         }
 
-    fun opprettDialogmelding(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall)
+    fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall)
 
     private fun marshall(element: Any?) =
         run {

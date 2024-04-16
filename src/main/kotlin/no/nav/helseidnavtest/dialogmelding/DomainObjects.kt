@@ -27,7 +27,7 @@ data class Arbeidstaker(
 
 
 
-data class DialogmeldingBestilling(
+data class Dialogmelding(
     val uuid: UUID,
     val behandler: Behandler,
     val arbeidstakerPersonident: Personident,

@@ -1,6 +1,6 @@
 package no.nav.helseidnavtest.dialogmelding
 
-import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.opprettDialogmelding
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.xmlFra
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
@@ -24,26 +24,24 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
-            is OAuth2AuthenticationToken -> lagDialogmelding(a, pasient)
+            is OAuth2AuthenticationToken -> dialogmelding(ClaimsExtractor(a.principal.attributes), pasient)
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${a::class.java}").also {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", a::class.java)
             }
         }
 
-    private fun lagDialogmelding(a: OAuth2AuthenticationToken, pasient: Fødselsnummer): String {
-        val behandler = ClaimsExtractor(a.principal.attributes).let { behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor()) }
-        val bestilling = bestilling(behandler)
-        val arbeidstaker = arbeidstaker(pasient)
-        return opprettDialogmelding(bestilling, arbeidstaker).message
-    }
+    private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
+        xmlFra(dialogmelding(extractor.let {
+            behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor())
+        }), arbeidstaker(pasient)).message
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
         with(pdl.navn(pasient)) {
             Arbeidstaker(Personident(pasient.fnr), fornavn, mellomnavn, etternavn)
         }
 
-    private fun bestilling(behandler: Behandler) =
-        DialogmeldingBestilling(
+    private fun dialogmelding(behandler: Behandler) =
+        Dialogmelding(
             UUID.randomUUID(),
             behandler,
             Personident("01010111111"),

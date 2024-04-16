@@ -27,7 +27,7 @@ class TestStuff {
             personident = Personident("12345678901"),
             kontor = kontor)
 
-        val b = DialogmeldingBestilling(uuid = UUID.randomUUID(),
+        val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
             arbeidstakerPersonident =  Personident("01010111111"),
             parentRef = "parent ref",
@@ -40,7 +40,7 @@ class TestStuff {
             fornavn = "Ola",
             mellomnavn = "Mellomnavn",
             etternavn = "Olsen")
-        val m  = DialogmeldingMapper.opprettDialogmelding(b, arbeidstaker)
+        val m  = DialogmeldingMapper.xmlFra(b, arbeidstaker)
        println(m.message)
     }
 }

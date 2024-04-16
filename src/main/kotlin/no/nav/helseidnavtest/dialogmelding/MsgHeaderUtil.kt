@@ -39,7 +39,7 @@ object MsgHeaderUtil {
             }
         }
 
-    fun mottaker(bestiling: DialogmeldingBestilling) =
+    fun mottaker(bestiling: Dialogmelding) =
         HMOF.createXMLReceiver().apply {
             with(bestiling.behandler)  {
                 organisation = HMOF.createXMLOrganisation().apply {

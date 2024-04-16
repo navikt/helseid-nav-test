@@ -32,7 +32,7 @@ val FFOF = no.nav.helseopplysninger.fellesformat2.ObjectFactory()
 val VOF = no.nav.helseopplysninger.basecontainer.ObjectFactory()
 
 object JAXB{
-    fun createFellesformat(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) =
+    fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         FFOF.createXMLEIFellesformat().apply {
             any.add(msgHead(melding, arbeidstaker))
             any.add(mottakenhetBlokk(melding))
@@ -40,14 +40,14 @@ object JAXB{
         }
 }
 
-fun msgHead(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) =
+fun msgHead(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
     HMOF.createXMLMsgHead().apply {
         msgInfo = msgInfo(melding, arbeidstaker)
         document.add(dialogmeldingDocument(melding))
         document.add(vedleggDocument(melding))
 }
 
-fun mottakenhetBlokk(melding: DialogmeldingBestilling) =
+fun mottakenhetBlokk(melding: Dialogmelding) =
     with(melding) {
         if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk)  {
             throw IllegalArgumentException("Ugyldig melding/type kombinasjon $type/$kodeverk")
@@ -68,7 +68,7 @@ fun sporinformasjonBlokk() =
         tidsstempel = now()
     })
 
-fun msgInfo(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) =
+fun msgInfo(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
     HMOF.createXMLMsgInfo().apply {
         type = HMOF.createXMLCS().apply {
             dn = "Notat"
@@ -93,7 +93,7 @@ fun msgInfo(melding: DialogmeldingBestilling, arbeidstaker: Arbeidstaker) =
     }
 
 
-fun vedleggDocument(melding: DialogmeldingBestilling) =
+fun vedleggDocument(melding: Dialogmelding) =
     HMOF.createXMLDocument().apply {
         documentConnection = HMOF.createXMLCS().apply {
             dn = "Vedlegg"
@@ -115,7 +115,7 @@ fun vedleggDocument(melding: DialogmeldingBestilling) =
             }
         }
     }
-fun dialogmeldingDocument(melding: DialogmeldingBestilling) =
+fun dialogmeldingDocument(melding: Dialogmelding) =
     HMOF.createXMLDocument().apply {
         documentConnection = HMOF.createXMLCS().apply {
             dn = "Hoveddokument"
@@ -131,12 +131,12 @@ fun dialogmeldingDocument(melding: DialogmeldingBestilling) =
             }
             mimeType = TEXT_XML_VALUE
             content = HMOF.createXMLRefDocContent().apply {
-                any.add(dialogmelding(melding))
+                any.add(xmlFra(melding))
             }
         }
     }
 
-fun dialogmelding(melding: DialogmeldingBestilling) =
+fun xmlFra(melding: Dialogmelding) =
     with(melding) {
         require(type == DIALOG_NOTAT) { "Kan ikke lage dialogmelding, ukjent type '$type'" }
         require(kodeverk != null) { "Kan ikke lage dialogmelding, kodeverk ikke satt" }
