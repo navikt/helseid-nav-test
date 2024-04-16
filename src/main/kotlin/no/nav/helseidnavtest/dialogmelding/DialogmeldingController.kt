@@ -25,7 +25,6 @@ class DialogmeldingController(private val pdl: PDLClient) {
         val a = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
         a.principal.name.also { log.info("principal name is {}", it) }
         a.name.also { log.info("Token name  is {}", it)
-        //log.info("User is {}", a)
         val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
 
     val kontor = BehandlerKontor(
@@ -63,5 +62,6 @@ class DialogmeldingController(private val pdl: PDLClient) {
         etternavn = navn.etternavn!!)
     val m  = DialogmeldingMapper.opprettDialogmelding(b, arbeidstaker)
         return m.message.also { log.trace("XML {}", this) }
+        }
     }
 }
