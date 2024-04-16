@@ -2,7 +2,6 @@ package no.nav.helseidnavtest.security
 
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
-import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.security.core.Authentication
@@ -14,7 +13,6 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
     val professions = claims.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val hprNumber = stringClaim(HPR_NUMBER).toInt()
     val securityLevel = stringClaim(SECURITY_LEVEL)
-    val navn = Navn(stringClaim("given_name"), stringClaim("middle_name"), stringClaim("family_name"))
 
     val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
     val fnr = Fødselsnummer(stringClaim(PID))

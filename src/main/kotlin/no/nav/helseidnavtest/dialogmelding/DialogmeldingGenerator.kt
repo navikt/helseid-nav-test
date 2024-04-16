@@ -26,9 +26,9 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
             is OidcUser -> {
+                val navn = a.userInfo.let { Navn(it.givenName,it.middleName,it.familyName) }
                 val extractor = ClaimsExtractor(a.claims)
-                a.claims.forEach { (k, v) -> log.info("key: $k, value: $v") }
-                val behandler = behandler(extractor.navn,extractor.hprNumber, extractor.fnr, behandlerKontor())
+                val behandler = extractor.let { behandler(navn,it.hprNumber,it.fnr,behandlerKontor()) }
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
                 opprettDialogmelding(bestilling, arbeidstaker).message
