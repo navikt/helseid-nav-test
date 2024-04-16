@@ -55,6 +55,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
         is IrrecoverableException -> throw e
-        else -> throw IrrecoverableException(e.message ?: "", uri,BAD_REQUEST,e)
+        else -> throw IrrecoverableException(e.message ?: "", uri,INTERNAL_SERVER_ERROR,e)
     }
 }

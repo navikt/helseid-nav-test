@@ -3,17 +3,16 @@ package no.nav.helseidnavtest.error
 import com.fasterxml.jackson.databind.DatabindException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.annotation.Order
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
+import org.springframework.http.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity.status
 import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.NativeWebRequest
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
@@ -25,7 +24,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
 
     //@ExceptionHandler(ErrorResponseException::class)
-    fun irrecoverable(e: ErrorResponseException, req: NativeWebRequest) = createProblem(e)
+    //fun irrecoverable(e: ErrorResponseException, req: NativeWebRequest) = createProblem(e)
 
     private fun createProblem(e: ErrorResponseException) =
         status(e.statusCode)
