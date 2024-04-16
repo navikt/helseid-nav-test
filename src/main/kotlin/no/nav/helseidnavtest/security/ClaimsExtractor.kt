@@ -1,8 +1,14 @@
 package no.nav.helseidnavtest.security
 
+import no.nav.helseidnavtest.error.IrrecoverableException
+import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.oauth2.core.user.OAuth2User
 
 @Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims : Map<String,Any>) {
@@ -45,6 +51,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
         private const val SECURITY_LEVEL = "helseid://claims/identity/security_level"
         private const val HPR_NUMBER = "helseid://claims/hpr/hpr_number"
         private const val HPR_DETAILS = "helseid://claims/hpr/hpr_details"
+        private const val PID = "helseid://claims/identity/pid"
         private const val APPROVALS = "approvals"
         private const val PROFESSION = "profession"
         private const val AUTHORIZATION = "authorization"
@@ -52,6 +59,21 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
         private const val SPECIALITIES = "specialities"
         private const val VALUE = "value"
         private const val DESCRIPTION = "description"
+
+        fun OAuth2AuthenticationToken.attribute(a: String) = principal.attribute(a)
+
+        fun OAuth2AuthenticationToken.hpr() = attribute(HPR_NUMBER).toInt()
+
+        fun OAuth2AuthenticationToken.fnr() = Fødselsnummer(attribute(PID))
+
+
+        fun OAuth2AuthenticationToken.navn() =
+            with(principal)  {
+                Navn(attribute("given_name"), attribute("middle_name"), attribute("family_name"))
+            }
+
+        fun OAuth2User.attribute(a: String) =
+            getAttribute<String>(a) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler attributt $a", a)
 
         private fun extract(m : Map<String, String>) = HPRData(m[VALUE] as String, m[DESCRIPTION] as String)
     }

@@ -6,13 +6,15 @@ import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.fnr
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.hpr
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.navn
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.retry.annotation.Retryable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -79,17 +81,3 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
         herId = 12345678
     )
 }
-private fun OAuth2AuthenticationToken.attribute(a: String) = principal.attribute(a)
-
-private fun OAuth2AuthenticationToken.hpr() = attribute("helseid://claims/hpr/hpr_number").toInt()
-
-private fun OAuth2AuthenticationToken.fnr() = Fødselsnummer(attribute("helseid://claims/identity/pid"))
-
-
-private fun OAuth2AuthenticationToken.navn() =
-    with(principal)  {
-        Navn(attribute("given_name"), attribute("middle_name"), attribute("family_name"))
-    }
-
-private fun OAuth2User.attribute(a: String) =
-   getAttribute<String>(a) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler attributt $a", a)
