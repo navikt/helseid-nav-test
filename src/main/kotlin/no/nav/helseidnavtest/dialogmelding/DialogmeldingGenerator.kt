@@ -25,8 +25,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
             is OAuth2AuthenticationToken -> {
-                log.info(a.toString())
-                //a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
+                a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
                 val behandler = behandler(a.navn(),a.hpr(), a.fnr(), behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
@@ -35,7 +34,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
                 }
             }
             else -> {
-                log.error("Uventet type {}", a::class.java)
+                log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", a::class.java)
                 throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${a::class.java}")
             }
         }
@@ -93,4 +92,4 @@ private fun OAuth2AuthenticationToken.navn() =
     }
 
 private fun OAuth2User.attribute(a: String) =
-   getAttribute<String>(a) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler attributt", a)
+   getAttribute<String>(a) ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler attributt $a", a)
