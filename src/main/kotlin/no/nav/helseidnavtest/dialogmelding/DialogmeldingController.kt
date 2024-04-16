@@ -24,6 +24,16 @@ class DialogmeldingController(private val pdl: PDLClient) {
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val a = SecurityContextHolder.getContext().authentication //as OAuth2AuthenticationToken
        // a.principal.name.also { log.info("principal name is {}", it) }
+        when (a) {
+            is OAuth2AuthenticationToken -> {
+                log.info(a.toString())
+                a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
+                 log.info("name is {}", a.name)
+            }
+            else -> {
+                log.error("Uventet type {}", a::class.java)
+            }
+        }
         log.info("auth is {}", a)
         a.name.also { log.info("Token name  is {}", it)
         val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
