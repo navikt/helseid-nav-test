@@ -23,7 +23,8 @@ class DialogmeldingController(private val pdl: PDLClient) {
     @GetMapping(value = ["/melding"])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
         val a = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
-        a.name.also { log.info("User is {}", it)
+        a.principal.name.also { log.info("principal name is {}", it) }
+        a.name.also { log.info("Token name  is {}", it)
         //log.info("User is {}", a)
         val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
 
