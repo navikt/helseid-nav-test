@@ -37,16 +37,16 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
         with(pdl.navn(pasient)) {
-            Arbeidstaker(Personident(pasient.fnr), fornavn, mellomnavn, etternavn)
+            Arbeidstaker(pasient, fornavn, mellomnavn, etternavn)
         }
 
     private fun dialogmelding(behandler: Behandler) =
-        Dialogmelding(randomUUID(), behandler, Personident("01010111111"), "parent ref",
+        Dialogmelding(randomUUID(), behandler, Fødselsnummer("01010111111"), "parent ref",
             randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
     private fun behandler(navn: Navn, hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
-        Behandler(randomUUID(), Personident(fnr.fnr),
+        Behandler(randomUUID(), fnr,
             navn.fornavn, navn.mellomnavn, navn.etternavn,
             42, hpr, "12345678", kontor)
 

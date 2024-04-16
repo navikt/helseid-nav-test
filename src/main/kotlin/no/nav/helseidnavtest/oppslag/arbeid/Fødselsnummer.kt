@@ -8,6 +8,7 @@ data class Fødselsnummer(@get:JsonValue val fnr : String) {
         require(mod11(W1, fnr) == fnr[9] - '0') { "Første kontrollsiffer $fnr[9] ikke validert" }
         require(mod11(W2, fnr) == fnr[10] - '0') { "Andre kontrollsiffer $fnr[10] ikke validert" }
     }
+    val type  = if (fnr[0].digitToInt() > 3) "DNR" else "FNR"
 
     companion object {
 

@@ -4,33 +4,26 @@ import no.nav.helseidnavtest.dialogmelding.BehandlerKategori.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
+import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import java.time.OffsetDateTime
 import java.util.*
 
 
 data class Arbeidstaker(
-    val arbeidstakerPersonident: Personident,
+    val arbeidstakerPersonident: Fødselsnummer,
     val fornavn: String = "",
     val mellomnavn: String? = null,
     val etternavn: String = "",
     val mottatt: OffsetDateTime = OffsetDateTime.now(),
     )
-    data class Personident(val value: String) {
-        private val elevenDigits = Regex("^\\d{11}\$")
-        init {
-            if (!elevenDigits.matches(value)) {
-                throw IllegalArgumentException("Value is not a valid Personident")
-            }
-        }
-        val type  = if (value[0].digitToInt() > 3) "DNR" else "FNR"
-    }
+
 
 
 
 data class Dialogmelding(
     val uuid: UUID,
     val behandler: Behandler,
-    val arbeidstakerPersonident: Personident,
+    val arbeidstakerPersonident: Fødselsnummer,
     val parentRef: String?,
     val conversationUuid: UUID,
     val tekst: String?,
@@ -53,7 +46,7 @@ enum class DialogmeldingType {
 
 data class Behandler(
     val behandlerRef: UUID,
-    val personident: Personident?,
+    val personident: Fødselsnummer?,
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,

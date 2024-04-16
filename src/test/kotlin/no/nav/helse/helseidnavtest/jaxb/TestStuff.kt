@@ -1,6 +1,7 @@
 package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
+import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
 import java.util.*
@@ -24,19 +25,19 @@ class TestStuff {
             herId = 123456789,
             hprId = 987654321,
             telefon = "12345678",
-            personident = Personident("12345678901"),
+            personident = Fødselsnummer("12345678901"),
             kontor = kontor)
 
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
-            arbeidstakerPersonident =  Personident("01010111111"),
+            arbeidstakerPersonident =  Fødselsnummer("01010111111"),
             parentRef = "parent ref",
             conversationUuid =  UUID.randomUUID(),
             tekst = "dette er litt tekst",
             vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
             )
         val arbeidstaker = Arbeidstaker(
-            arbeidstakerPersonident = Personident("03016536325"),
+            arbeidstakerPersonident = Fødselsnummer("03016536325"),
             fornavn = "Ola",
             mellomnavn = "Mellomnavn",
             etternavn = "Olsen")

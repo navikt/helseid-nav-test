@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.HMOF
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.mottaker
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.pasient
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.avsender
+import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
@@ -153,13 +154,13 @@ fun xmlFra(melding: Dialogmelding) =
         }
     }
 
-fun createXMLIdentForPersonident(personident: Personident) =
+fun createXMLIdentForPersonident(fnr: Fødselsnummer) =
     HMOF.createXMLIdent().apply {
-        id = personident.value
+        id = fnr.fnr
         typeId = HMOF.createXMLCV().apply {
-            dn = if (personident.type == "DNR") "D-nummer" else "Fødselsnummer"
+            dn = if (fnr.type == "DNR") "D-nummer" else "Fødselsnummer"
             s = "2.16.578.1.12.4.1.1.8116"
-            v = personident.type
+            v = fnr.type
         }
     }
 class Fellesformat(fellesformat: XMLEIFellesformat, marshaller: Function<XMLEIFellesformat, String>)  {
