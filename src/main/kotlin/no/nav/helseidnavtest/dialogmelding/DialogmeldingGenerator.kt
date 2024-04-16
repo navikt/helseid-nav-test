@@ -7,8 +7,7 @@ import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nav.helseidnavtest.security.ClaimsExtractor
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.fnr
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.navn
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
@@ -27,9 +26,9 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
             is OAuth2AuthenticationToken -> {
-                val extractor = ClaimsExtractor(a.principal.attributes)
+                val extractor = ClaimsExtractor(a.oidcUser().claims)
                 a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
-                val behandler = behandler(a.navn(),extractor.hprNumber, a.fnr(), behandlerKontor())
+                val behandler = behandler(extractor.navn,extractor.hprNumber, extractor.fnr, behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
                 opprettDialogmelding(bestilling, arbeidstaker).message
