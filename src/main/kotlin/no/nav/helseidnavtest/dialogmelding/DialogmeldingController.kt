@@ -7,6 +7,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity.status
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.*
@@ -20,6 +21,8 @@ class DialogmeldingController(private val pdl: PDLClient) {
 
     @GetMapping(value = ["/melding"])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
+        val a = SecurityContextHolder.getContext().authentication
+        log.info("User is {}", a)
         val navn = pdl.navn(pasient).also { log.info("Navn er {}", this) }
 
     val kontor = BehandlerKontor(

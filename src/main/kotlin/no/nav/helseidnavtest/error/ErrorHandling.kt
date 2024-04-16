@@ -16,8 +16,7 @@ fun handleErrors(req: HttpRequest, res: ClientHttpResponse, detail: String): Not
 
 class NotFoundException(title: String? = "Ikke funnet", detail: String, uri: URI, cause: Throwable? = null) : IrrecoverableException(NOT_FOUND, title, detail, uri, cause)
 open class IrrecoverableException(status: HttpStatus, title: String? = null, detail: String, uri: URI? = null, cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, title, detail, uri),  cause)
-open class RecoverableException(status: HttpStatus, detail: String, uri: URI? = null, cause: Throwable? = null): ErrorResponseException(status,problemDetail(status, "title", detail,uri
-), cause)
+open class RecoverableException(status: HttpStatus, detail: String, uri: URI? = null, cause: Throwable? = null): ErrorResponseException(status,problemDetail(status, "title", detail,uri), cause)
 
 private fun problemDetail(status: HttpStatus, title: String?, detail: String, uri: URI?) =
     forStatusAndDetail(status, detail).apply {
