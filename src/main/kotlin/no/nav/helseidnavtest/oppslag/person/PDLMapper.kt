@@ -46,7 +46,7 @@ object PDLMapper {
 }
 
 data class Person(val navn: Navn, val fnr: Fødselsnummer, val adresse: Adresse? = null, val fødseldato: LocalDate? = null) {
-    data class Navn(val fornavn : String?, val mellomnavn : String?, val etternavn : String?)
+    data class Navn(val fornavn : String, val mellomnavn : String?, val etternavn : String)
     data class Adresse(val adressenavn : String?, val husbokstav : String?, val husnummer : String?, val postnummer : PostNummer?){
         data class PostNummer(val postnr : String?, val poststed : String?) {
             constructor(postnr : String?) : this(postnr, poststeder[postnr] ?: "Ukjent poststed for $postnr")

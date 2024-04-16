@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.dialogmelding
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
+import no.nav.helseidnavtest.oppslag.person.Person
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType.*
@@ -22,16 +23,19 @@ class DialogmeldingController(private val pdl: PDLClient) {
 
     @GetMapping(value = ["/melding"])
     fun xml(@RequestParam pasient: Fødselsnummer) : String? {
+        val behandlerNavn: Person.Navn
         val a = SecurityContextHolder.getContext().authentication //as OAuth2AuthenticationToken
        // a.principal.name.also { log.info("principal name is {}", it) }
         when (a) {
             is OAuth2AuthenticationToken -> {
                 log.info(a.toString())
+                behandlerNavn = Person.Navn(a.principal.getAttribute("given_name")!!, a.principal.getAttribute("middle_name"), a.principal.getAttribute("family_name")!!)
                 a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
                  log.info("name is {}", a.name)
             }
             else -> {
                 log.error("Uventet type {}", a::class.java)
+                throw IllegalStateException("Uventet type ${a::class.java}")
             }
         }
         log.info("auth is {}", a)
@@ -49,9 +53,9 @@ class DialogmeldingController(private val pdl: PDLClient) {
 
     val behandler =  Behandler(
         UUID.randomUUID(),
-        fornavn = "Ole",
-        mellomnavn ="Mellomnavn",
-        etternavn = "Olsen",
+        fornavn = behandlerNavn.fornavn,
+        mellomnavn =behandlerNavn.mellomnavn,
+        etternavn = behandlerNavn.etternavn,
         herId = 123456789,
         hprId = 987654321,
         telefon = "12345678",
