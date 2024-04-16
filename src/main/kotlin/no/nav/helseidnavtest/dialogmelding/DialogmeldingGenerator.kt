@@ -14,7 +14,7 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.UUID.*
 
 @Component
 class DialogmeldingGenerator(private val pdl: PDLClient) {
@@ -32,7 +32,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
         xmlFra(dialogmelding(extractor.let {
-            behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor())
+            behandler(it.navn, it.hprNumber, it.fnr, kontor())
         }), arbeidstaker(pasient)).message
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
@@ -41,36 +41,16 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
         }
 
     private fun dialogmelding(behandler: Behandler) =
-        Dialogmelding(
-            UUID.randomUUID(),
-            behandler,
-            Personident("01010111111"),
-            "parent ref",
-            UUID.randomUUID(),
-            tekst = "dette er litt tekst",
-            vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
+        Dialogmelding(randomUUID(), behandler, Personident("01010111111"), "parent ref",
+            randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
     private fun behandler(navn: Navn, hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
-        Behandler(
-            UUID.randomUUID(),
-            fornavn = navn.fornavn,
-            mellomnavn = navn.mellomnavn,
-            etternavn = navn.etternavn,
-            herId = 42,
-            hprId = hpr,
-            telefon = "12345678",
-            personident = Personident(fnr.fnr),
-            kontor = kontor
-        )
+        Behandler(randomUUID(), Personident(fnr.fnr),
+            navn.fornavn, navn.mellomnavn, navn.etternavn,
+            42, hpr, "12345678", kontor)
 
-    private fun behandlerKontor() = BehandlerKontor(
-        partnerId = PartnerId(123456789),
-        navn = "Et legekontor",
-        orgnummer = Virksomhetsnummer("123456789"),
-        postnummer = "1234",
-        poststed = "Oslo",
-        adresse = "Fyrstikkalleen 1",
-        herId = 12345678
-    )
+    private fun kontor() = BehandlerKontor(PartnerId(123456789), 12345678, "Et legekontor",
+        "Fyrstikkalleen 1", "1234", "Oslo",
+        Virksomhetsnummer("123456789"))
 }

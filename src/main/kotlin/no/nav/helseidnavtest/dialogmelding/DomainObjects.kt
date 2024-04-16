@@ -33,11 +33,11 @@ data class Dialogmelding(
     val arbeidstakerPersonident: Personident,
     val parentRef: String?,
     val conversationUuid: UUID,
+    val tekst: String?,
+    val vedlegg: ByteArray? = null,
     val type: DialogmeldingType = DIALOG_NOTAT,
     val kodeverk: DialogmeldingKodeverk? = HENVENDELSE, // må tillate null her siden persisterte bestillinger kan mangle denne verdien
     val kode: DialogmeldingKode = KODE8,
-    val tekst: String?,
-    val vedlegg: ByteArray? = null,
 )
 
 enum class DialogmeldingKode(val value: Int) {
