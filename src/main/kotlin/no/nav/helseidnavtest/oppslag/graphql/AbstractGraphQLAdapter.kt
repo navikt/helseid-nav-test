@@ -27,7 +27,12 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                 .onErrorMap {
                     when(it) {
                         is FieldAccessException -> it.oversett(cfg.baseUri)
-                        is GraphQlTransportException -> RecoverableException(it.message ?: "Transport feil", cfg.baseUri,INTERNAL_SERVER_ERROR,it)
+                        is GraphQlTransportException -> RecoverableException(
+                            INTERNAL_SERVER_ERROR,
+                            it.message ?: "Transport feil",
+                            cfg.baseUri,
+                            it
+                        )
                         else ->  it
                     }
                 }
@@ -55,6 +60,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
         is IrrecoverableException -> throw e
-        else -> throw IrrecoverableException(e.message ?: "", uri,INTERNAL_SERVER_ERROR,e)
+        else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message ?: "", uri, e)
     }
 }

@@ -22,10 +22,10 @@ object GraphQLExtensions {
 
     private fun oversett(kode : String?, msg : String, uri: URI) =
         when (kode) {
-            Unauthorized -> IrrecoverableException(msg, uri,UNAUTHORIZED)
-            Unauthenticated -> IrrecoverableException(msg,uri,FORBIDDEN)
-            BadRequest -> IrrecoverableException(msg,uri, BAD_REQUEST)
-            NotFound -> IrrecoverableException(msg, uri, NOT_FOUND)
-            else -> IrrecoverableException(msg,uri,INTERNAL_SERVER_ERROR)
+            Unauthorized -> IrrecoverableException(UNAUTHORIZED, "Uautorisert", msg, uri)
+            Unauthenticated -> IrrecoverableException(FORBIDDEN, "Uautentisert", msg, uri)
+            BadRequest -> IrrecoverableException(BAD_REQUEST, "Bad request", msg, uri)
+            NotFound -> IrrecoverableException(NOT_FOUND, "Ikke funnet", msg, uri)
+            else -> IrrecoverableException(INTERNAL_SERVER_ERROR, "Ukjent feil", msg, uri)
         }
 }

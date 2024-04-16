@@ -6,7 +6,6 @@ import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.ar.ICommunicationPartyService
 import no.nav.helseidnavtest.ws.ar.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
@@ -27,8 +26,12 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
             onSuccess = { it },
             onFailure = {
                 when (it) {
-                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message ?: "Fant ikke noe for herId=$herId", cfg.url)
-                    else -> throw RecoverableException("${it.message}", cfg.url,BAD_REQUEST,it)
+                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
+                        "Ukjent herId",
+                        it.message ?: "Fant ikke noe for herId=$herId",
+                        cfg.url
+                    )
+                    else -> throw RecoverableException(BAD_REQUEST, "${it.message}", cfg.url, it)
                 }
             }
         )
