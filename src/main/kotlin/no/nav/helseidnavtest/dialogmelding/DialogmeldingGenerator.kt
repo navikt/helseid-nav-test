@@ -27,7 +27,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
             is OAuth2AuthenticationToken -> {
                 log.info(a.toString())
                 //a.principal.attributes.forEach { (k, v) -> log.info("key: $k, value: $v") }
-                val behandler = behandler(a.navn(),a.hpr(), behandlerKontor())
+                val behandler = behandler(a.navn(),a.hpr(), a.fnr(), behandlerKontor())
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
                 opprettDialogmelding(bestilling, arbeidstaker).message.also {
@@ -57,21 +57,18 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
             vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
-    private fun behandler(
-        behandlerNavn: Navn,
-        hpr: Int,
-        kontor: BehandlerKontor
-    ) = Behandler(
-        UUID.randomUUID(),
-        fornavn = behandlerNavn.fornavn,
-        mellomnavn = behandlerNavn.mellomnavn,
-        etternavn = behandlerNavn.etternavn,
-        herId = 42,
-        hprId = hpr,
-        telefon = "12345678",
-        personident = Personident("12345678901"),
-        kontor = kontor
-    )
+    private fun behandler(navn: Navn, hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
+        Behandler(
+            UUID.randomUUID(),
+            fornavn = navn.fornavn,
+            mellomnavn = navn.mellomnavn,
+            etternavn = navn.etternavn,
+            herId = 42,
+            hprId = hpr,
+            telefon = "12345678",
+            personident = Personident(fnr.fnr),
+            kontor = kontor
+        )
 
     private fun behandlerKontor() = BehandlerKontor(
         partnerId = PartnerId(123456789),
@@ -86,6 +83,8 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 private fun OAuth2AuthenticationToken.attribute(a: String) = principal.attribute(a)
 
 private fun OAuth2AuthenticationToken.hpr() = attribute("helseid://claims/hpr/hpr_number").toInt()
+
+private fun OAuth2AuthenticationToken.fnr() = Fødselsnummer(attribute("helseid://claims/identity/pid"))
 
 
 private fun OAuth2AuthenticationToken.navn() =
