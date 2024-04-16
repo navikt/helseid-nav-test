@@ -7,13 +7,12 @@ import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nav.helseidnavtest.security.ClaimsExtractor
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.retry.annotation.Retryable
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -25,10 +24,9 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
-            is OidcUser -> {
-                val navn = a.userInfo.let { Navn(it.givenName,it.middleName,it.familyName) }
-                val extractor = ClaimsExtractor(a.claims)
-                val behandler = extractor.let { behandler(navn,it.hprNumber,it.fnr,behandlerKontor()) }
+            is OAuth2AuthenticationToken -> {
+                val extractor = ClaimsExtractor(a.principal.attributes)
+                val behandler = extractor.let { behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor()) }
                 val bestilling = bestilling(behandler)
                 val arbeidstaker = arbeidstaker(pasient)
                 opprettDialogmelding(bestilling, arbeidstaker).message
