@@ -24,19 +24,18 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val a = SecurityContextHolder.getContext().authentication) {
-            is OAuth2AuthenticationToken -> {
-                val extractor = ClaimsExtractor(a.principal.attributes)
-                val behandler = extractor.let { behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor()) }
-                val bestilling = bestilling(behandler)
-                val arbeidstaker = arbeidstaker(pasient)
-                opprettDialogmelding(bestilling, arbeidstaker).message
-            }
-            else -> {
+            is OAuth2AuthenticationToken -> lagDialogmelding(a, pasient)
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${a::class.java}").also {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", a::class.java)
-                throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${a::class.java}")
             }
         }
 
+    private fun lagDialogmelding(a: OAuth2AuthenticationToken, pasient: Fødselsnummer): String {
+        val behandler = ClaimsExtractor(a.principal.attributes).let { behandler(it.navn, it.hprNumber, it.fnr, behandlerKontor()) }
+        val bestilling = bestilling(behandler)
+        val arbeidstaker = arbeidstaker(pasient)
+        return opprettDialogmelding(bestilling, arbeidstaker).message
+    }
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
         with(pdl.navn(pasient)) {
