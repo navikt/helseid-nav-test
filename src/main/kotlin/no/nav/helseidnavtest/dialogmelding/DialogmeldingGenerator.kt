@@ -32,7 +32,9 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
         xmlFra(dialogmelding(extractor.let {
-            behandler(it.navn, it.hprNumber, it.fnr, kontor())
+            with(it)  {
+                behandler(navn, hprNumber, fnr, kontor())
+            }
         }), arbeidstaker(pasient)).message
 
     private fun arbeidstaker(pasient: Fødselsnummer) =

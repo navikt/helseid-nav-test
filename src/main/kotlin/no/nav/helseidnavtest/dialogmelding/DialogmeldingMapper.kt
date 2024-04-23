@@ -29,6 +29,6 @@ object DialogmeldingMapper {
         run {
             val writer = StringWriter()
             MARSHALLER.marshal(element, StreamResult(writer))
-            writer.toString()
+            "$writer"
         }
 }

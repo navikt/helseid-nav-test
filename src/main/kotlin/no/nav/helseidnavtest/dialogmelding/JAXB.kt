@@ -8,6 +8,9 @@ import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.HMOF
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.mottaker
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.pasient
 import no.nav.helseidnavtest.dialogmelding.MsgHeaderUtil.avsender
+import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
+import no.nav.helseidnavtest.dialogmelding.ObjectFactories.FFOF
+import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
@@ -28,9 +31,12 @@ val apprecUnmarshaller: Unmarshaller = apprecJaxBContext.createUnmarshaller().ap
    // TODO setAdapter(LocalDateXmlAdapter::class.java, XMLDateAdapter())
 }
 
-val DMOF = no.nav.helseopplysninger.dialogmelding.ObjectFactory()
-val FFOF = no.nav.helseopplysninger.fellesformat2.ObjectFactory()
-val VOF = no.nav.helseopplysninger.basecontainer.ObjectFactory()
+object ObjectFactories{
+    val DMOF = no.nav.helseopplysninger.dialogmelding.ObjectFactory()
+    val FFOF = no.nav.helseopplysninger.fellesformat2.ObjectFactory()
+    val VOF = no.nav.helseopplysninger.basecontainer.ObjectFactory()
+}
+
 
 object JAXB{
     fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
