@@ -35,9 +35,11 @@ val VOF = no.nav.helseopplysninger.basecontainer.ObjectFactory()
 object JAXB{
     fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         FFOF.createXMLEIFellesformat().apply {
-            any.add(msgHead(melding, arbeidstaker))
-            any.add(mottakenhetBlokk(melding))
-            any.add(sporinformasjonBlokk())
+            with(any) {
+                add(msgHead(melding, arbeidstaker))
+                add(mottakenhetBlokk(melding))
+                add(sporinformasjonBlokk())
+            }
         }
 }
 

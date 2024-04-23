@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.retry.annotation.Retryable
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.UUID.*
@@ -23,10 +23,10 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
-        when (val a = SecurityContextHolder.getContext().authentication) {
-            is OAuth2AuthenticationToken -> dialogmelding(ClaimsExtractor(a.principal.attributes), pasient)
-            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${a::class.java}").also {
-                log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", a::class.java)
+        when (val auth = getContext().authentication) {
+            is OAuth2AuthenticationToken -> dialogmelding(ClaimsExtractor(auth.principal.attributes), pasient)
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${auth::class.java}").also {
+                log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", auth::class.java)
             }
         }
 

@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("/fastlege")
 class FastlegeController(private val adapter: FastlegeWSAdapter) {
 
-    @GetMapping("/finn")
-    fun finnFastlege(@RequestParam fnr: Fødselsnummer) = adapter.fastlegeForPasient(fnr)
-
     @GetMapping("/detaljer")
     fun detaljer(@RequestParam fnr: Fødselsnummer) = adapter.detaljer(fnr)
 

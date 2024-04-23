@@ -15,9 +15,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun bekreftFastlege(hpr: Int, fnr: Fødselsnummer) = client.confirmGP(fnr.fnr, hpr, now())
 
-    fun fastlegeForPasient(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr)
-
-    fun detaljer(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr)
+    fun detaljer(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr).gpContract.value.gpOffice.value
 
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
