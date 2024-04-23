@@ -41,7 +41,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
         }
 
     private fun dialogmelding(behandler: Behandler) =
-        Dialogmelding(randomUUID(), behandler, Fødselsnummer("01010111111"), "parent ref",
+        Dialogmelding(randomUUID(), behandler, Fødselsnummer("26900799232"), "parent ref",
             randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
