@@ -25,12 +25,12 @@ class TestStuff {
             herId = 123456789,
             hprId = 987654321,
             telefon = "12345678",
-            personident = Fødselsnummer("12345678901"),
+            personident = Fødselsnummer("26900799232"),
             kontor = kontor)
 
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
-            arbeidstakerPersonident =  Fødselsnummer("01010111111"),
+            arbeidstakerPersonident =  Fødselsnummer("26900799232"),
             parentRef = "parent ref",
             conversationUuid =  UUID.randomUUID(),
             tekst = "dette er litt tekst",
