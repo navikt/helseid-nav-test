@@ -25,11 +25,13 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
                 herId = gpHerId.value,
                 navn = gpContract.value.gpOffice.value.name.value,
                 orgnummer = Virksomhetsnummer(gpContract.value.gpOfficeOrganizationNumber),
-                postnummer = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.toString(),
+                postnummer = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),
                 poststed = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
                 adresse = "Gata 1"
             )
         }
+
+    private fun Int.postcode() = if (this < 1000) "0" + toString() else toString()
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
         time = Date()
