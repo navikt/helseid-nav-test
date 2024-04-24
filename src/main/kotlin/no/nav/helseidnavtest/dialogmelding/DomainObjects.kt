@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -68,7 +69,7 @@ data class BehandlerKontor(
     val postnummer: String?,
     val poststed: String?,
     val orgnummer: Virksomhetsnummer?,
-    val mottatt: OffsetDateTime = OffsetDateTime.now(),
+    val mottatt: LocalDateTime = LocalDateTime.now(),
     val system: String = "Helseopplysninger",
     val dialogmeldingEnabled: Boolean = true,
     val dialogmeldingEnabledLocked: Boolean = false,

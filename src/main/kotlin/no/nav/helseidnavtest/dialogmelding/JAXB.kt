@@ -89,12 +89,13 @@ fun msgInfo(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
                 dn = "Ja"
                 v = "J"
             }
+            /*
             conversationRef = HMOF.createXMLConversationRef().apply {
                 with(melding) {
                     refToConversation = "$conversationUuid"
                     refToParent = parentRef ?: "$conversationUuid"
                 }
-            }
+            } */
         }
         sender = avsender()
         receiver = mottaker(melding)
