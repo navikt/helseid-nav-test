@@ -1,5 +1,8 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
+import no.nav.helseidnavtest.dialogmelding.BehandlerKontor
+import no.nav.helseidnavtest.dialogmelding.PartnerId
+import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.createPort
@@ -15,8 +18,18 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun bekreftFastlege(hpr: Int, fnr: Fødselsnummer) = client.confirmGP(fnr.fnr, hpr, now())
 
-    fun detaljer(fnr: Fødselsnummer) = client.getPatientGPDetails(fnr.fnr).gpContract.value.gpOffice.value.name.value
-
+    fun kontor(fnr: Fødselsnummer) =
+        with(client.getPatientGPDetails(fnr.fnr)) {
+            BehandlerKontor(
+                partnerId = PartnerId(42),
+                herId = gpHerId.value,
+                navn = gpContract.value.gpOffice.value.name.value,
+                orgnummer = Virksomhetsnummer(gpContract.value.gpOfficeOrganizationNumber),
+                postnummer = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.toString(),
+                poststed = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
+                adresse = "Gata 1"
+            )
+        }
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
         time = Date()

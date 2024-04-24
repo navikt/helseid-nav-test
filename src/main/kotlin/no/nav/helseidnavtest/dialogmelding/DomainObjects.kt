@@ -80,10 +80,10 @@ enum class BehandlerKategori(val kategoriKode: String ) {
 data class PartnerId(val value: Int) {
     override fun toString() =  value.toString()
 }
-data class Virksomhetsnummer(val value: String) {
+data class Virksomhetsnummer(val value: Int) {
     private val nineDigits = Regex("^\\d{9}\$")
     init {
-        if (!nineDigits.matches(value)) {
+        if (!nineDigits.matches(value.toString())) {
             throw IllegalArgumentException("$value is not a valid Virksomhetsnummer")
         }
     }

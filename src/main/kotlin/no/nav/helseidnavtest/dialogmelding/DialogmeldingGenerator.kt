@@ -4,6 +4,7 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.xmlFra
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nav.helseidnavtest.security.ClaimsExtractor
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
 import java.util.UUID.*
 
 @Component
-class DialogmeldingGenerator(private val pdl: PDLClient) {
+class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: FastlegeClient) {
 
     private val log = getLogger(DialogmeldingGenerator::class.java)
 
@@ -54,5 +55,5 @@ class DialogmeldingGenerator(private val pdl: PDLClient) {
 
     private fun kontor() = BehandlerKontor(PartnerId(123456789), 12345678, "Et legekontor",
         "Fyrstikkalleen 1", "1234", "Oslo",
-        Virksomhetsnummer("123456789"))
+        Virksomhetsnummer(123456789))
 }
