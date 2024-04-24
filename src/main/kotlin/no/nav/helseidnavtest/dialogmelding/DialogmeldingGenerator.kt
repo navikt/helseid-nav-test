@@ -34,7 +34,7 @@ class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: F
     private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
         xmlFra(dialogmelding(extractor.let {
             with(it)  {
-                behandler(navn, hprNumber, fnr, kontor())
+                behandler(navn, hprNumber, fnr, kontor(pasient))
             }
         }), arbeidstaker(pasient)).message
 
@@ -53,7 +53,5 @@ class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: F
             navn.fornavn, navn.mellomnavn, navn.etternavn,
             42, hpr, "12345678", kontor)
 
-    private fun kontor() = BehandlerKontor(PartnerId(123456789), 12345678, "Et legekontor",
-        "Fyrstikkalleen 1", "1234", "Oslo",
-        Virksomhetsnummer(123456789))
+    private fun kontor(pasient: Fødselsnummer) = fastlege.kontor(pasient)
 }
