@@ -12,7 +12,7 @@ class TestStuff {
         val kontor = BehandlerKontor(
             partnerId = PartnerId(123456789),
             navn = "Et egekontor",
-            orgnummer = Virksomhetsnummer("123456789"),
+            orgnummer = Virksomhetsnummer(123456789),
             postnummer = "1234",
             poststed = "Oslo",
             adresse = "Fyrstikkalleen 1",
