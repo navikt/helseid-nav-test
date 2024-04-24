@@ -54,7 +54,7 @@ object MsgHeaderUtil {
                     })
                     kontor.orgnummer?.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
-                            id = orgnummer.value
+                            id = orgnummer.value.toString()
                             typeId = HMOF.createXMLCV().apply {
                                 dn = "Organisasjonsnummeret i Enhetsregisteret"
                                 s = "2.16.578.1.12.4.1.1.9051"
