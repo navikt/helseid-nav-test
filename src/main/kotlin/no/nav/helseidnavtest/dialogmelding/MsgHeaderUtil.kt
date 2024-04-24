@@ -45,7 +45,7 @@ object MsgHeaderUtil {
                 organisation = HMOF.createXMLOrganisation().apply {
                     organisationName = kontor.navn
                     ident.add(HMOF.createXMLIdent().apply {
-                        id = kontor.herId.toString()
+                        id = "${kontor.herId}"
                         typeId = HMOF.createXMLCV().apply {
                             dn = "Identifikator fra Helsetjenesteenhetsregisteret (HER-id)"
                             s = "2.16.578.1.12.4.1.1.9051"

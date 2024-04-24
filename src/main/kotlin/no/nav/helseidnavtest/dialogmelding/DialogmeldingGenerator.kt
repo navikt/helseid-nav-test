@@ -32,10 +32,8 @@ class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: F
         }
 
     private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
-        xmlFra(dialogmelding(extractor.let {
-            with(it)  {
-                behandler(navn, hprNumber, fnr, kontor(pasient))
-            }
+        xmlFra(dialogmelding(with(extractor)  {
+            behandler(navn, herID, hprNumber, fnr, kontor(pasient))
         }), arbeidstaker(pasient)).message
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
@@ -48,10 +46,10 @@ class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: F
             randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
-    private fun behandler(navn: Navn, hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
+    private fun behandler(navn: Navn, herID: Int,hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
         Behandler(randomUUID(), fnr,
             navn.fornavn, navn.mellomnavn, navn.etternavn,
-            42, hpr, "12345678", kontor)
+            herID, hpr, "12345678", kontor)
 
     private fun kontor(pasient: Fødselsnummer) = fastlege.kontor(pasient)
 }

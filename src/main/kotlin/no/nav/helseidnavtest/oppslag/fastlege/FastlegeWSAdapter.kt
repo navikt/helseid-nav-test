@@ -20,6 +20,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun kontor(fnr: Fødselsnummer) =
         with(client.getPatientGPDetails(fnr.fnr)) {
+            gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.forEach(::println)
             BehandlerKontor(
                 partnerId = PartnerId(42),
                 herId = gpHerId.value,
@@ -27,7 +28,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
                 orgnummer = Virksomhetsnummer(gpContract.value.gpOfficeOrganizationNumber),
                 postnummer = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),
                 poststed = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
-                adresse = "Gata 1"
+                adresse = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().streetAddress.value
             )
         }
 

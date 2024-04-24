@@ -56,8 +56,8 @@ data class Behandler(
     val telefon: String?,
     val kontor: BehandlerKontor,
     val kategori: BehandlerKategori =  LEGE,
-    val mottatt: OffsetDateTime = OffsetDateTime.now(),
-    val invalidated: OffsetDateTime? = null,
+    val mottatt: LocalDateTime = LocalDateTime.now(),
+    val invalidated: LocalDateTime? = null,
     val suspendert: Boolean = false,
 )
 

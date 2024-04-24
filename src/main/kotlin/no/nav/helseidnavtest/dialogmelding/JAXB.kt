@@ -42,14 +42,14 @@ object JAXB{
     fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
-                add(msgHead(melding, arbeidstaker))
+                add(hodemelding(melding, arbeidstaker))
                 add(mottakenhetBlokk(melding))
                 add(sporinformasjonBlokk())
             }
         }
 }
 
-fun msgHead(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
+fun hodemelding(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
     HMOF.createXMLMsgHead().apply {
         msgInfo = msgInfo(melding, arbeidstaker)
         document.add(dialogmeldingDocument(melding))
@@ -85,17 +85,6 @@ fun msgInfo(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
             miGversion = "v1.2 2006-05-24"
             genDate = now()
             msgId = melding.uuid.toString()
-            ack = HMOF.createXMLCS().apply {
-                dn = "Ja"
-                v = "J"
-            }
-            /*
-            conversationRef = HMOF.createXMLConversationRef().apply {
-                with(melding) {
-                    refToConversation = "$conversationUuid"
-                    refToParent = parentRef ?: "$conversationUuid"
-                }
-            } */
         }
         sender = avsender()
         receiver = mottaker(melding)
@@ -172,7 +161,7 @@ fun createXMLIdentForPersonident(fnr: Fødselsnummer) =
             v = fnr.type
         }
     }
-class Fellesformat(fellesformat: XMLEIFellesformat, marshaller: Function<XMLEIFellesformat, String>)  {
+data class Fellesformat(val fellesformat: XMLEIFellesformat, val marshaller: Function<XMLEIFellesformat, String>)  {
         val message = marshaller.apply(fellesformat)
 }
 
