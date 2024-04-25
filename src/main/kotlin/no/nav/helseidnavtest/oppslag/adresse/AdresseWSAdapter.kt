@@ -19,16 +19,16 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
-    fun details(herId: Int) =
+    fun details(orgnr: Int) =
         runCatching {
-            client.getCommunicationPartyDetails(herId)
+            client.searchById(orgnr.toString())
         }.fold(
             onSuccess = { it },
             onFailure = {
                 when (it) {
                     is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
                         "Ukjent herId",
-                        it.message ?: "Fant ikke noe for herId=$herId",
+                        it.message ?: "Fant ikke noe for orgnr=$orgnr",
                         cfg.url
                     )
                     else -> throw RecoverableException(BAD_REQUEST, "${it.message}", cfg.url, it)
