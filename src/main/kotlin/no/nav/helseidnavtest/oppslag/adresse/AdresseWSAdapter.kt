@@ -19,7 +19,7 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
-    fun details(orgnr: Int) =
+    fun search(orgnr: Int) =
         runCatching {
             client.searchById(orgnr.toString())
         }.fold(

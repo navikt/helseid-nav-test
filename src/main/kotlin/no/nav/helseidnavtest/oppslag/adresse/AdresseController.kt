@@ -5,6 +5,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("adresse")
 class AdresseController(private val adresse: AdresseWSAdapter) {
-    @GetMapping("/details") fun detaila(@RequestParam herId: Int) = adresse.details(herId)
+    @GetMapping("/details") fun search(@RequestParam orgnr: Int) = adresse.search(orgnr)
 
 }
