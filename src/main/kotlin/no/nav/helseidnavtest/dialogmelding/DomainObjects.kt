@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import com.fasterxml.jackson.annotation.JsonValue
+import no.nav.boot.conditionals.Cluster
 import no.nav.boot.conditionals.Cluster.Companion.currentCluster
 import no.nav.boot.conditionals.Cluster.DEV_GCP
 import no.nav.helseidnavtest.dialogmelding.BehandlerKategori.*
@@ -89,7 +90,7 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
     private  val log : Logger = getLogger(javaClass)
     init {
         require(value.length == 11) { "Fødselsnummer $value er ikke 11 siffer" }
-        if (currentCluster() != DEV_GCP) {
+        if (currentCluster() == Cluster.PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
             require(mod11(W1, value) == value[9] - '0') { "Første kontrollsiffer $value[9] ikke validert" }
             require(mod11(W2, value) == value[10] - '0') { "Andre kontrollsiffer $value[10] ikke validert" }
@@ -124,7 +125,7 @@ data class Virksomhetsnummer(@get:JsonValue val value : String) {
 
     init {
         require(value.length == 9) { "Orgnr må ha lengde 9, $value har lengde ${value.length} " }
-        if (currentCluster() != DEV_GCP) {
+        if (currentCluster() == Cluster.PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
             require(value.startsWith("8") || value.startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
             require(value[8].code - 48 == mod11(value.substring(0, 8))) { "${value[8]} feilet mod11 validering" }
