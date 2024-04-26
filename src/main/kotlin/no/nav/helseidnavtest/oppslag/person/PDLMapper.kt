@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.oppslag.person
 
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
-import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.PDLPersonResponse.*
 import no.nav.helseidnavtest.oppslag.person.PDLPersonResponse.PDLPerson.*
 import no.nav.helseidnavtest.oppslag.person.PDLPersonResponse.PDLPerson.PDLBostedadresse.*

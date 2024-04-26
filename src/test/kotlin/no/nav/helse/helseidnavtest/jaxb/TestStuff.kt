@@ -1,7 +1,6 @@
 package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
-import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
 import java.util.*

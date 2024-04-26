@@ -3,7 +3,6 @@ package no.nav.helseidnavtest.dialogmelding
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.xmlFra
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
-import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*

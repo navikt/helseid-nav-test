@@ -1,10 +1,11 @@
 package no.nav.helseidnavtest.oppslag.adresse
+import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("adresse")
 class AdresseController(private val adresse: AdresseWSAdapter) {
-    @GetMapping("/details") fun search(@RequestParam orgnr: Int) = adresse.search(orgnr)
+    @GetMapping("/orgnr") fun search(@RequestParam orgnr: Virksomhetsnummer) = adresse.herId(orgnr)
 
 }

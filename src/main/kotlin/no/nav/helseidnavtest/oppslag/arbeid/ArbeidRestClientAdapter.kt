@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.arbeid
 
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.error.handleErrors
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
@@ -17,11 +18,11 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
             restClient
                 .get()
                 .uri(cf::arbeidsforholdURI)
-                .header(NAV_PERSONIDENT_HEADER, fnr.fnr)
+                .header(NAV_PERSONIDENT_HEADER, fnr.value)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
-                   handleErrors(req, res, fnr.fnr)
+                   handleErrors(req, res, fnr.value)
                 }
                 .body<List<ArbeidsforholdDTO>>().also {
                     log.trace("Arbeidsforhold response {}", it)

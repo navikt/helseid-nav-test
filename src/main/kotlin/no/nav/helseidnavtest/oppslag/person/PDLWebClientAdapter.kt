@@ -1,10 +1,10 @@
 package no.nav.helseidnavtest.oppslag.person
 
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.error.NotFoundException
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.stereotype.Component
-import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.graphql.AbstractGraphQLAdapter
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLErrorHandler
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
@@ -31,7 +31,7 @@ class PDLWebClientAdapter(@Qualifier(PDL)  private val graphQlClient : GraphQlCl
 
     fun person(fnr: Fødselsnummer) =
         with(fnr) {
-            query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to this.fnr))?.active?.let {
+            query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to this.value))?.active?.let {
                 pdlPersonTilPerson(it, this)
             } ?: throw NotFoundException("Ikke funnet", "Fant ikke $fnr", cfg.baseUri)
         }

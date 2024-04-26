@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
+import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
@@ -19,9 +20,9 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
-    fun search(orgnr: Int) =
+    fun herId(orgnr: Virksomhetsnummer) =
         runCatching {
-            client.searchById(orgnr.toString())
+            client.searchById("${orgnr.value}").communicationParty.first().herId
         }.fold(
             onSuccess = { it },
             onFailure = {

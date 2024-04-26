@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.security
 
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.error.IrrecoverableException
-import no.nav.helseidnavtest.oppslag.arbeid.Fødselsnummer
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
