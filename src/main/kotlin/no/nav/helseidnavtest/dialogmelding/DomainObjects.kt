@@ -29,12 +29,11 @@ data class Dialogmelding(
     val uuid: UUID,
     val behandler: Behandler,
     val arbeidstakerPersonident: Fødselsnummer,
-    val parentRef: String?,
     val conversationUuid: UUID,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
     val type: DialogmeldingType = DIALOG_NOTAT,
-    val kodeverk: DialogmeldingKodeverk? = HENVENDELSE, // må tillate null her siden persisterte bestillinger kan mangle denne verdien
+    val kodeverk: DialogmeldingKodeverk = HENVENDELSE,
     val kode: DialogmeldingKode = KODE8,
 )
 

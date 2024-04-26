@@ -37,10 +37,10 @@ class HelseopplysningerController {
 
     return """
             <h1>/hello1</h1>
-            <p>Hello from <b>${extractor.stringClaim("name")}</b></p>
+            <p>Hello from <b>${extractor.claim("name")}</b></p>
             <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>
             <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}</b></p>
-            <p>Verifisert med: <b>${extractor.stringClaim("idp")}</b></p>
+            <p>Verifisert med: <b>${extractor.claim("idp")}</b></p>
             <br>
             <p>Requested authorities</p>
             <ul>$scopes</ul>

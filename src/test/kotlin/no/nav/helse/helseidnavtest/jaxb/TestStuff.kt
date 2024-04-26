@@ -30,7 +30,6 @@ class TestStuff {
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
             arbeidstakerPersonident =  Fødselsnummer("26900799232"),
-            parentRef = "parent ref",
             conversationUuid =  UUID.randomUUID(),
             tekst = "dette er litt tekst",
             vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),

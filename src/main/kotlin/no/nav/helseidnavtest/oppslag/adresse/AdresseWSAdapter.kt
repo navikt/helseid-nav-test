@@ -20,22 +20,25 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
-    fun herId(orgnr: Virksomhetsnummer) =
-        runCatching {
-            client.searchById("${orgnr.value}").communicationParty.first().herId
-        }.fold(
-            onSuccess = { it },
-            onFailure = {
-                when (it) {
-                    is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
-                        "Ukjent herId",
-                        it.message ?: "Fant ikke noe for orgnr=$orgnr",
-                        cfg.url
-                    )
-                    else -> throw RecoverableException(BAD_REQUEST, "${it.message}", cfg.url, it)
-                }
+    fun herIdForHpr(hpr: Int) = searchById(hpr.toString())
+
+    fun herIdForKontor(kontor: Virksomhetsnummer) = searchById(kontor.value)
+
+    private fun searchById(id: String) = runCatching {
+        client.searchById(id).communicationParty.first().herId
+    }.fold(
+        onSuccess = { it },
+        onFailure = {
+            when (it) {
+                is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
+                    "Ukjent herId",
+                    it.message ?: "Fant ikke noe for $id",
+                    cfg.url
+                )
+                else -> throw RecoverableException(BAD_REQUEST, "${it.message}", cfg.url, it)
             }
-        )
+        }
+    )
 }
 
 //       herId 83849

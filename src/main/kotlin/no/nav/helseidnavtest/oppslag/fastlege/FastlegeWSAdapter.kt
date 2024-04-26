@@ -21,20 +21,24 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun bekreftFastlege(hpr: Int, fnr: Fødselsnummer) = client.confirmGP(fnr.value, hpr, now())
+    fun fastlegeHerId(pasient: Fødselsnummer) = client.getPatientGPDetails(pasient.value).gpHerId.value
 
-    fun kontor(fnr: Fødselsnummer) =
-        with(client.getPatientGPDetails(fnr.value)) {
-            gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.forEach{ log.info("{}", it) }
-            BehandlerKontor(
-                partnerId = PartnerId(42),
-               // herId = herId, //  gpHerId.value, // TODO Dette er legen, ikke kontoret
-                navn = gpContract.value.gpOffice.value.name.value,
-                orgnummer = Virksomhetsnummer(gpContract.value.gpOfficeOrganizationNumber),
-                postnummer = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),
-                poststed = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
-                adresse = gpContract.value.gpOffice.value.physicalAddresses.value.physicalAddress.first().streetAddress.value
-            )
+    fun bekreftFastlege(hpr: Int, pasient: Fødselsnummer) = client.confirmGP(pasient.value, hpr, now())
+
+    fun kontor(pasient: Fødselsnummer) =
+        with(client.getPatientGPDetails(pasient.value)) {
+            log.info("Legens herid: {} for pasient ${pasient.value}", gpHerId.value)
+            with(gpContract.value) {
+                BehandlerKontor(
+                    partnerId = PartnerId(42),
+                    navn = gpOffice.value.name.value,
+                    orgnummer = Virksomhetsnummer(gpOfficeOrganizationNumber),
+                    postnummer = gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),
+                    poststed = gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
+                    adresse = gpOffice.value.physicalAddresses.value.physicalAddress.first().streetAddress.value
+                )
+            }
+
         }
 
     private fun Int.postcode() = format("%04d", this)

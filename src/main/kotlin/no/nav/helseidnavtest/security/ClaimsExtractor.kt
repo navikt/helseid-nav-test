@@ -12,14 +12,14 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 class ClaimsExtractor(private val claims : Map<String,Any>) {
 
     val professions = claims.get(HPR_DETAILS)?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
-    val hprNumber = stringClaim(HPR_NUMBER).toInt()
-    val securityLevel = stringClaim(SECURITY_LEVEL)
-    val navn = Navn(stringClaim("given_name"), stringClaim("middle_name"), stringClaim("family_name"))
+    val hprNumber = claim(HPR_NUMBER).toInt()
+    val securityLevel = claim(SECURITY_LEVEL)
+    val navn = Navn(claim("given_name"), claim("middle_name"), claim("family_name"))
 
-    val assuranceLevel = stringClaim(ASSURANCE_LEVEL)
-    val fnr = Fødselsnummer(stringClaim(PID))
+    val assuranceLevel = claim(ASSURANCE_LEVEL)
+    val fnr = Fødselsnummer(claim(PID))
 
-    fun stringClaim(claim: String) = claims[claim] as? String ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $claim", claim)
+    fun claim(claim: String) = claims[claim] as? String ?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $claim", claim)
 
     private fun hprDetails(respons : Map<*, *>) =
         HPRDetails(with((respons)) {
@@ -47,11 +47,16 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
     companion object {
 
         fun Authentication.oidcUser() =  principal as OidcUser
-        private const val ASSURANCE_LEVEL = "helseid://claims/identity/assurance_level"
-        private const val SECURITY_LEVEL = "helseid://claims/identity/security_level"
-        private const val HPR_NUMBER = "helseid://claims/hpr/hpr_number"
-        private const val HPR_DETAILS = "helseid://claims/hpr/hpr_details"
-        private const val PID = "helseid://claims/identity/pid"
+        private const val CLAIMS = "helseid://claims/"
+        private const val IDENTITY_CLAIM = CLAIMS + "identity/"
+        private const val ASSURANCE_LEVEL = IDENTITY_CLAIM +"assurance_level"
+        private const val SECURITY_LEVEL =IDENTITY_CLAIM +"security_level"
+        private const val PID = IDENTITY_CLAIM +"pid"
+
+        private const val HPR_CLAIM = CLAIMS + "hpr/"
+        private const val HPR_NUMBER = HPR_CLAIM + "hpr_number"
+        private const val HPR_DETAILS = HPR_CLAIM + "hpr_details"
+
         private const val APPROVALS = "approvals"
         private const val PROFESSION = "profession"
         private const val AUTHORIZATION = "authorization"
@@ -59,6 +64,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
         private const val SPECIALITIES = "specialities"
         private const val VALUE = "value"
         private const val DESCRIPTION = "description"
+
         private fun extract(m : Map<String, String>) = HPRData(m[VALUE] as String, m[DESCRIPTION] as String)
     }
 }
