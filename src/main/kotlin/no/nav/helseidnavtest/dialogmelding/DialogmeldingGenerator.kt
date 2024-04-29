@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.dialogmelding
 
-import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.xmlFra
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
@@ -17,23 +16,21 @@ import org.springframework.stereotype.Component
 import java.util.UUID.*
 
 @Component
-class DialogmeldingGenerator(private val pdl: PDLClient, private val fastlege: FastlegeClient) {
+class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
 
     private val log = getLogger(DialogmeldingGenerator::class.java)
 
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val auth = getContext().authentication) {
-            is OAuth2AuthenticationToken -> dialogmelding(ClaimsExtractor(auth.principal.attributes), pasient)
-            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,"Uventet type", "${auth::class.java}").also {
+            is OAuth2AuthenticationToken -> mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
+                behandler(navn, 42, hprNumber, fnr, kontor(pasient))
+            }), arbeidstaker(pasient)).message
+
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Uventet type", "${auth::class.java}").also {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", auth::class.java)
             }
         }
-
-    private fun dialogmelding(extractor: ClaimsExtractor, pasient: Fødselsnummer) =
-        xmlFra(dialogmelding(with(extractor)  {
-            behandler(navn, 42, hprNumber, fnr, kontor(pasient))
-        }), arbeidstaker(pasient)).message
 
     private fun arbeidstaker(pasient: Fødselsnummer) =
         with(pdl.navn(pasient)) {
