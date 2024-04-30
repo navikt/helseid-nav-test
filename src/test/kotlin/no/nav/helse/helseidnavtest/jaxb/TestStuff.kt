@@ -48,7 +48,7 @@ class TestStuff {
             fornavn = "Ola",
             mellomnavn = "Mellomnavn",
             etternavn = "Olsen")
-        val m  = DialogmeldingMapper().xmlFra(b, arbeidstaker)
+        val m  = DialogmeldingMapper(adresse).xmlFra(b, arbeidstaker)
        println(m.message)
     }
 }
