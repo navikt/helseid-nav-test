@@ -32,9 +32,9 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
     private fun searchById(id: String): Int = runCatching {
 
         val res = client.searchById(id).communicationParty
-        res.forEach { log.info("Fant ${res.size} parties for $id") }
+        log.info("Fant ${res.size} parties for $id")
         res.forEach { log.info("Fant herId ${it.herId} for $id") }
-        return res.first().herId
+        return res.first().herId.also { log.info("Returning $it")}
     }.fold(
         onSuccess = { it },
         onFailure = {
