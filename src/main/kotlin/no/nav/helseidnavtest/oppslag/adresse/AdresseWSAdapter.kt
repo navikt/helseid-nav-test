@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
@@ -7,11 +8,15 @@ import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.ar.ICommunicationPartyService
 import no.nav.helseidnavtest.ws.ar.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
 @Component
 class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
+
+    private val log = getLogger(AdresseWSAdapter::class.java)
+
 
     private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
         proxy {}
@@ -24,8 +29,11 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
 
     fun herIdForVirksomhet(nummer: Virksomhetsnummer) = searchById(nummer.verdi)
 
-    private fun searchById(id: String) = runCatching {
-        client.searchById(id).communicationParty.first().herId
+    private fun searchById(id: String): Int = runCatching {
+
+        val res = client.searchById(id).communicationParty
+        res.forEach { log.info("Fant herId ${it.herId} for $id") }
+        return res.first().herId
     }.fold(
         onSuccess = { it },
         onFailure = {
