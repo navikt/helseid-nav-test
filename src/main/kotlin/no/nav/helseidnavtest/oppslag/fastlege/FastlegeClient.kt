@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 @Service
 class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val adresseAdapter: AdresseWSAdapter) {
     fun kontor(fnr: Fødselsnummer) = fastlegeAdapter.kontor(fnr).apply {
-        herId =  adresseAdapter.herIdForKontor(orgnummer)
+        herId =  adresseAdapter.herIdForVirksomhet(orgnummer)
     }
     fun herId(pasient: Fødselsnummer) = fastlegeAdapter.herId(pasient.value)
 }

@@ -22,7 +22,7 @@ import java.util.function.Function
 import javax.xml.transform.stream.StreamResult
 
 @Component
-class DialogmeldingMapper {
+class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
 
     fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall)
 
@@ -158,7 +158,7 @@ class DialogmeldingMapper {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "NAV"
                 ident.add(HMOF.createXMLIdent().apply {
-                    id = NAV_ORGNR
+                    id = "$NAV_ORGNR"
                     typeId = HMOF.createXMLCV().apply {
                         dn = "Organisasjonsnummeret i Enhetsregisteret"
                         s = NAV_OID
@@ -166,7 +166,7 @@ class DialogmeldingMapper {
                     }
                 })
                 ident.add(HMOF.createXMLIdent().apply {
-                    id = "79768"
+                    id = adresseWSAdapter.herIdForVirksomhet(Virksomhetsnummer(NAV_ORGNR)).toString()   //"79768"
                     typeId = HMOF.createXMLCV().apply {
                         dn = "Identifikator fra Helsetjenesteenhetsregisteret (HER-id)"
                         s = NAV_OID
@@ -201,7 +201,7 @@ class DialogmeldingMapper {
                     })
                     kontor.orgnummer?.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
-                            id = orgnummer.value
+                            id = orgnummer.verdi
                             typeId = HMOF.createXMLCV().apply {
                                 dn = "Organisasjonsnummeret i Enhetsregisteret"
                                 s = "2.16.578.1.12.4.1.1.9051"
@@ -250,7 +250,7 @@ class DialogmeldingMapper {
             }
         }
     companion object {
-        private val NAV_ORGNR  = "889640782"
+        private val NAV_ORGNR  = 889640782
         private val NAV_OID = "2.16.578.1.12.4.1.1.9051"
     }
     data class Fellesformat(val fellesformat: XMLEIFellesformat, val marshaller: Function<XMLEIFellesformat, String>)  {

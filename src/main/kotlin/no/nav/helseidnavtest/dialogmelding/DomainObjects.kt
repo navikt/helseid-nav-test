@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import com.fasterxml.jackson.annotation.JsonValue
-import no.nav.boot.conditionals.Cluster
 import no.nav.boot.conditionals.Cluster.*
 import no.nav.boot.conditionals.Cluster.Companion.currentCluster
 import no.nav.helseidnavtest.dialogmelding.BehandlerKategori.*
@@ -122,21 +121,21 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
     }
 }
 
-data class Virksomhetsnummer(@get:JsonValue val value : String) {
+data class Virksomhetsnummer(@get:JsonValue val verdi : String) {
 
     constructor(orgnr : Int) : this(orgnr.toString())
 
     private  val log : Logger = getLogger(javaClass)
 
     init {
-        require(value.length == 9) { "Virksomhetsnummer må ha lengde 9, $value har lengde ${value.length} " }
+        require(verdi.length == 9) { "Virksomhetsnummer må ha lengde 9, $verdi har lengde ${verdi.length} " }
         if (currentCluster() == PROD_GCP) {
-            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
-            require(value.first() in listOf('8', '9')) { "Virksomhetsnummer må begynne med 8 eller 9" }
-            require(value[8].code - 48 == mod11(value.substring(0, 8))) { "Kontrollsiffer ${value[8]} ikke validert" }
+            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), verdi)
+            require(verdi.first() in listOf('8', '9')) { "Virksomhetsnummer må begynne med 8 eller 9" }
+            require(verdi[8].code - 48 == mod11(verdi.substring(0, 8))) { "Kontrollsiffer ${verdi[8]} ikke validert" }
         }
         else {
-            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), value)
+            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), verdi)
         }
     }
 

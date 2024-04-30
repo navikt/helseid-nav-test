@@ -2,11 +2,8 @@ package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.core.io.ClassPathResource
 import java.util.*
 import org.mockito.kotlin.whenever
@@ -19,7 +16,7 @@ class TestStuff {
     lateinit var adresse: AdresseWSAdapter
     //@Test
     fun stuff() {
-        whenever(adresse.herIdForKontor(any(Virksomhetsnummer::class.java))).thenReturn(12345678)
+        whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(12345678)
         val kontor = BehandlerKontor(
             partnerId = PartnerId(123456789),
             navn = "Et egekontor",

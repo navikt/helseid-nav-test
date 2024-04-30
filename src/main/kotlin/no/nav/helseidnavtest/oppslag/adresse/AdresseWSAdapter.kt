@@ -22,7 +22,7 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
 
     fun herIdForHpr(hpr: Int) = searchById(hpr.toString())
 
-    fun herIdForKontor(kontor: Virksomhetsnummer) = searchById(kontor.value)
+    fun herIdForVirksomhet(nummer: Virksomhetsnummer) = searchById(nummer.verdi)
 
     private fun searchById(id: String) = runCatching {
         client.searchById(id).communicationParty.first().herId
