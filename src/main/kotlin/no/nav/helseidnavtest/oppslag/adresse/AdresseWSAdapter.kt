@@ -33,8 +33,7 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
 
         val res = client.searchById(id).communicationParty
         log.info("Fant ${res.size} parties for $id")
-        res.forEach { log.info("Fant herId ${it.herId} for $id") }
-        return res.first().herId.also { log.info("Returning $it")}
+        return res.first().herId.also { log.info("Returning $it fra $res")}
     }.fold(
         onSuccess = { it },
         onFailure = {
