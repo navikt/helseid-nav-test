@@ -1,19 +1,14 @@
 package no.nav.helseidnavtest.dialogmelding
 
-import jakarta.xml.bind.JAXBContext
-import jakarta.xml.bind.Marshaller.JAXB_ENCODING
-import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
+
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.HENVENDELSE
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.DIALOG_NOTAT
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.FFOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
-import no.nav.helseopplysninger.basecontainer.XMLBase64Container
-import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
+import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
-import no.nav.helseopplysninger.fellesformat2.XMLSporinformasjonBlokkType
-import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -28,15 +23,6 @@ import javax.xml.transform.stream.StreamResult
 
 @Component
 class DialogmeldingMapper {
-    private val MARSHALLER = JAXBContext.newInstance(
-        XMLEIFellesformat::class.java,
-        XMLMsgHead::class.java,
-        XMLDialogmelding::class.java,
-        XMLBase64Container::class.java,
-        XMLSporinformasjonBlokkType::class.java).createMarshaller().apply {
-            setProperty(JAXB_FORMATTED_OUTPUT, true)
-            setProperty(JAXB_ENCODING, "UTF-8")
-        }
 
     fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall)
 
@@ -91,9 +77,9 @@ class DialogmeldingMapper {
                 v = DIALOG_NOTAT.name
                 miGversion = "v1.2 2006-05-24"
                 genDate = now()
-                msgId = melding.uuid.toString()
+                msgId = "${melding.uuid}"
             }
-            sender = avsender()
+            sender = avsenderNAV()
             receiver = mottaker(melding)
             patient = pasient(arbeidstaker)
         }
@@ -161,21 +147,21 @@ class DialogmeldingMapper {
         HMOF.createXMLIdent().apply {
             id = fnr.value
             typeId = HMOF.createXMLCV().apply {
-                dn = if (fnr.type == "DNR") "D-nummer" else "Fødselsnummer"
+                dn = fnr.type.verdi
                 s = "2.16.578.1.12.4.1.1.8116"
-                v = fnr.type
+                v = fnr.type.name
             }
         }
 
-    private fun avsender() =
+    private fun avsenderNAV() =
         HMOF.createXMLSender().apply {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "NAV"
                 ident.add(HMOF.createXMLIdent().apply {
-                    id = "889640782"
+                    id = NAV_ORGNR
                     typeId = HMOF.createXMLCV().apply {
                         dn = "Organisasjonsnummeret i Enhetsregisteret"
-                        s = "2.16.578.1.12.4.1.1.9051"
+                        s = NAV_OID
                         v = "ENH"
                     }
                 })
@@ -183,7 +169,7 @@ class DialogmeldingMapper {
                     id = "79768"
                     typeId = HMOF.createXMLCV().apply {
                         dn = "Identifikator fra Helsetjenesteenhetsregisteret (HER-id)"
-                        s = "2.16.578.1.12.4.1.1.9051"
+                        s = NAV_OID
                         v = "HER"
                     }
                 })
@@ -215,7 +201,7 @@ class DialogmeldingMapper {
                     })
                     kontor.orgnummer?.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
-                            id = orgnummer.value.toString()
+                            id = orgnummer.value
                             typeId = HMOF.createXMLCV().apply {
                                 dn = "Organisasjonsnummeret i Enhetsregisteret"
                                 s = "2.16.578.1.12.4.1.1.9051"
@@ -263,7 +249,12 @@ class DialogmeldingMapper {
                 }
             }
         }
+    companion object {
+        private val NAV_ORGNR  = "889640782"
+        private val NAV_OID = "2.16.578.1.12.4.1.1.9051"
+    }
     data class Fellesformat(val fellesformat: XMLEIFellesformat, val marshaller: Function<XMLEIFellesformat, String>)  {
         val message = marshaller.apply(fellesformat)
     }
+
 }

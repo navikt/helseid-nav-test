@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.dialogmelding
 
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
+import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
@@ -16,17 +17,19 @@ import org.springframework.stereotype.Component
 import java.util.UUID.*
 
 @Component
-class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
+class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient, private val adresseAdapter: AdresseWSAdapter) {
 
     private val log = getLogger(DialogmeldingGenerator::class.java)
 
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
         when (val auth = getContext().authentication) {
-            is OAuth2AuthenticationToken -> mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
-                behandler(navn, 42, hprNumber, fnr, kontor(pasient))
+            is OAuth2AuthenticationToken -> {
+                val kontor = kontor(pasient)
+                mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
+                behandler(navn, adresseAdapter.herIdForKontor(kontor.orgnummer), hprNumber, fnr, kontor)
             }), arbeidstaker(pasient)).message
-
+        }
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Uventet type", "${auth::class.java}").also {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", auth::class.java)
             }
@@ -45,7 +48,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
     private fun behandler(navn: Navn, herID: Int,hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
         Behandler(randomUUID(), fnr,
             navn.fornavn, navn.mellomnavn, navn.etternavn,
-            herID, hpr, "12345678", kontor)
+            herID, hpr, "12345678", kontor) // TODO
 
     private fun kontor(pasient: Fødselsnummer) = fastlege.kontor(pasient)
 }

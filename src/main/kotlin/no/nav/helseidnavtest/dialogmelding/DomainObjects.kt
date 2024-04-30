@@ -2,12 +2,13 @@ package no.nav.helseidnavtest.dialogmelding
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.boot.conditionals.Cluster
+import no.nav.boot.conditionals.Cluster.*
 import no.nav.boot.conditionals.Cluster.Companion.currentCluster
-import no.nav.boot.conditionals.Cluster.DEV_GCP
 import no.nav.helseidnavtest.dialogmelding.BehandlerKategori.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer.Type.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalDateTime
@@ -71,7 +72,7 @@ data class BehandlerKontor(
     val adresse: String?,
     val postnummer: String?,
     val poststed: String?,
-    val orgnummer: Virksomhetsnummer?,
+    val orgnummer: Virksomhetsnummer,
     var herId: Int? = null,
     val mottatt: LocalDateTime = LocalDateTime.now(),
     val system: String = "Helseopplysninger",
@@ -90,7 +91,7 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
     private  val log : Logger = getLogger(javaClass)
     init {
         require(value.length == 11) { "Fødselsnummer $value er ikke 11 siffer" }
-        if (currentCluster() == Cluster.PROD_GCP) {
+        if (currentCluster() == PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
             require(mod11(W1, value) == value[9] - '0') { "Første kontrollsiffer $value[9] ikke validert" }
             require(mod11(W2, value) == value[10] - '0') { "Andre kontrollsiffer $value[10] ikke validert" }
@@ -99,7 +100,11 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
             log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), value)
         }
     }
-    val type  = if (value[0].digitToInt() > 3) "DNR" else "FNR"
+    val type  = if (value[0].digitToInt() > 3) DNR else FNR
+
+    enum class Type(val verdi: String) {
+        DNR("D-nummer"), FNR("Fødselsnummer")
+    }
 
     companion object {
 
@@ -124,11 +129,11 @@ data class Virksomhetsnummer(@get:JsonValue val value : String) {
     private  val log : Logger = getLogger(javaClass)
 
     init {
-        require(value.length == 9) { "Orgnr må ha lengde 9, $value har lengde ${value.length} " }
-        if (currentCluster() == Cluster.PROD_GCP) {
+        require(value.length == 9) { "Virksomhetsnummer må ha lengde 9, $value har lengde ${value.length} " }
+        if (currentCluster() == PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
-            require(value.startsWith("8") || value.startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
-            require(value[8].code - 48 == mod11(value.substring(0, 8))) { "${value[8]} feilet mod11 validering" }
+            require(value.first() in listOf('8', '9')) { "Virksomhetsnummer må begynne med 8 eller 9" }
+            require(value[8].code - 48 == mod11(value.substring(0, 8))) { "Kontrollsiffer ${value[8]} ikke validert" }
         }
         else {
             log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), value)
