@@ -66,7 +66,6 @@ data class Behandler(
 )
 
 data class BehandlerKontor(
-    val partnerId: PartnerId,
     val navn: String?,
     val adresse: String?,
     val postnummer: String?,

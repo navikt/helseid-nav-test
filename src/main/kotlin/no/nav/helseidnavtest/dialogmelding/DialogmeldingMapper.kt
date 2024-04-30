@@ -9,6 +9,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
+import no.nav.helseopplysninger.hodemelding.XMLIdent
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -36,8 +37,9 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
     private fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
-                add(hodemelding(melding, arbeidstaker))
-                add(mottakenhetBlokk(melding))
+                val hm = hodemelding(melding, arbeidstaker)
+                add(hm)
+                add(mottakenhetBlokk(melding,hm.msgInfo.receiver.organisation.ident.find { it.typeId.v == "HER" }!!.id))
                 add(sporinformasjonBlokk())
             }
         }
@@ -49,14 +51,14 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
             document.add(dialogmeldingDocument(melding))
             document.add(vedleggDocument(melding))
         }
-    private fun mottakenhetBlokk(melding: Dialogmelding) =
+    private fun mottakenhetBlokk(melding: Dialogmelding, herId: String) =
         with(melding) {
             if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk)  {
                 throw IllegalArgumentException("Ugyldig melding/type kombinasjon $type/$kodeverk")
             }
             FFOF.createXMLMottakenhetBlokk().apply {
-                partnerReferanse = behandler.kontor.partnerId.value.toString()
                 ebRole = "Saksbehandler"
+                herIdentifikator = herId
                 ebService =  "HenvendelseFraSaksbehandler"
                 ebAction = "Henvendelse"
             }
@@ -199,7 +201,7 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                             v = "HER"
                         }
                     })
-                    kontor.orgnummer?.let { orgnummer ->
+                    kontor.orgnummer.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
                             id = orgnummer.verdi
                             typeId = HMOF.createXMLCV().apply {

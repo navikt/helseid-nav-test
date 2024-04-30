@@ -30,7 +30,6 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
             log.info("Legens herid: {} for pasient ${pasient.value}", gpHerId.value)
             with(gpContract.value) {
                 BehandlerKontor(
-                    partnerId = PartnerId(42),
                     navn = gpOffice.value.name.value,
                     orgnummer = Virksomhetsnummer(gpOfficeOrganizationNumber),
                     postnummer = gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),

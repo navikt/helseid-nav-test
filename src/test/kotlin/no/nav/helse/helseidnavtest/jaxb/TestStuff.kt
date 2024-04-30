@@ -18,7 +18,6 @@ class TestStuff {
     fun stuff() {
         whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(12345678)
         val kontor = BehandlerKontor(
-            partnerId = PartnerId(123456789),
             navn = "Et egekontor",
             orgnummer = Virksomhetsnummer(123456789),
             postnummer = "1234",
