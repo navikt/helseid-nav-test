@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.UUID.randomUUID
 import java.util.function.Function
 import javax.xml.transform.stream.StreamResult
+import kotlin.math.E
 
 @Component
 class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
@@ -147,11 +148,7 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
     private fun ident(fnr: Fødselsnummer) =
         HMOF.createXMLIdent().apply {
             id = fnr.value
-            typeId = HMOF.createXMLCV().apply {
-                dn = fnr.type.verdi
-                s = "2.16.578.1.12.4.1.1.8116"
-                v = fnr.type.name
-            }
+            typeId = HMOF.type(HER_OID, fnr.type.name, fnr.type.verdi)
         }
 
     private fun avsenderNAV() =
@@ -159,20 +156,12 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "NAV"
                 ident.add(HMOF.createXMLIdent().apply {
-                    id = "$NAV_ORGNR"
-                    typeId = HMOF.createXMLCV().apply {
-                        dn = "Organisasjonsnummeret i Enhetsregisteret"
-                        s = NAV_OID
-                        v = ENH
-                    }
+                    id = NAV_ORGNR.verdi
+                    typeId = HMOF.type(NAV_OID, ENH, ENHET_DESC)
                 })
                 ident.add(HMOF.createXMLIdent().apply {
-                    id = adresseWSAdapter.herIdForVirksomhet(Virksomhetsnummer(NAV_ORGNR)).toString()   //"79768"
-                    typeId = HMOF.createXMLCV().apply {
-                        dn = "Identifikator fra Helsetjenesteenhetsregisteret (HER-id)"
-                        s = NAV_OID
-                        v = HER
-                    }
+                    id = adresseWSAdapter.herIdForVirksomhet(NAV_ORGNR).toString()   //"79768"
+                    typeId = HMOF.type(NAV_OID, HER, HER_DESC)
                 })
             }
         }
@@ -194,20 +183,12 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                     organisationName = kontor.navn
                     ident.add(HMOF.createXMLIdent().apply {
                         id = "${kontor.herId}"
-                        typeId = HMOF.createXMLCV().apply {
-                            dn = "Identifikator fra Helsetjenesteenhetsregisteret (HER-id)"
-                            s = "2.16.578.1.12.4.1.1.9051"
-                            v = HER
-                        }
+                        typeId = HMOF.type(NAV_OID, HER, HER_DESC)
                     })
                     kontor.orgnummer.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
                             id = orgnummer.verdi
-                            typeId = HMOF.createXMLCV().apply {
-                                dn = "Organisasjonsnummeret i Enhetsregisteret"
-                                s = "2.16.578.1.12.4.1.1.9051"
-                                v = ENH
-                            }
+                            typeId = HMOF.type(NAV_OID, ENH, ENHET_DESC)
                         })
                     }
                     address = HMOF.createXMLAddress().apply {
@@ -215,9 +196,11 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                             dn = "Besøksadresse"
                             v = "RES"
                         }
-                        streetAdr = kontor.adresse
-                        postalCode = kontor.postnummer.formattert
-                        city = kontor.poststed
+                        with(kontor) {
+                            streetAdr = adresse
+                            postalCode = postnummer.verdi
+                            city = poststed
+                        }
                     }
                     healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
                         familyName = etternavn
@@ -229,35 +212,33 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                         hprId?.let {
                             ident.add(HMOF.createXMLIdent().apply {
                                 id = "$it"
-                                typeId = HMOF.createXMLCV().apply {
-                                    dn = "HPR-nummer"
-                                    s = HER_OID
-                                    v = "HPR"
-                                }
+                                typeId = HMOF.type(HER_OID, HPR,  "HPR-nummer")
                             })
                         }
                         herId?.let {
                             ident.add(HMOF.createXMLIdent().apply {
                                 id = "$it"
-                                typeId = HMOF.createXMLCV().apply {
-                                    dn = "Identifikator fra Helsetjenesteenhetsregisteret"
-                                    s = HER_OID
-                                    v = HER
-                                }
+                                typeId = HMOF.type(HER_OID, HER,  HER_DESC)
                             })
                         }
                     }
                 }
             }
         }
+
     companion object {
-        private val NAV_ORGNR  = 889640782
-        private val NAV_OID = "2.16.578.1.12.4.1.1.9051"
-        private val HER_OID ="2.16.578.1.12.4.1.1.8116"
-        private val ENH = "ENH"
-        private val HER = "HER"
+        private const val ENHET_DESC = "Organisasjonsnummeret i Enhetsregisteret"
+        private const val HER_DESC = "Identifikator fra Helsetjenesteenhetsregisteret"
+        private val NAV_ORGNR  = Virksomhetsnummer(889640782)
+        private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
+        private const val HER_OID ="2.16.578.1.12.4.1.1.8116"
+        private const val ENH = "ENH"
+        private const val HER = "HER"
+        private const val HPR = "HPR"
     }
-    private  data class Fellesformat(val fellesformat: XMLEIFellesformat, val marshaller: Function<XMLEIFellesformat, String>)  {
+    private  data class Fellesformat(private val fellesformat: XMLEIFellesformat, private val marshaller: Function<XMLEIFellesformat, String>)  {
         val message = marshaller.apply(fellesformat)
     }
+
+
 }

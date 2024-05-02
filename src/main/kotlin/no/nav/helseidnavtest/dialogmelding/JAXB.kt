@@ -3,7 +3,6 @@ package no.nav.helseidnavtest.dialogmelding
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller.JAXB_ENCODING
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
-import jakarta.xml.bind.Unmarshaller
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
@@ -34,7 +33,12 @@ object ObjectFactories{
     val HMOF =  no.nav.helseopplysninger.hodemelding.ObjectFactory()
 }
 
-
+fun no.nav.helseopplysninger.hodemelding.ObjectFactory.type(s: String, v: String, dn: String) =
+    no.nav.helseopplysninger.hodemelding.XMLCV().apply {
+    this.s = s
+    this.v = v
+    this.dn = dn
+}
 
 
 

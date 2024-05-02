@@ -121,8 +121,10 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
     }
 }
 
-data class Postnummer(val verdi : Int) {
-    val formattert = format("%04d",verdi)
+
+
+data class Postnummer(private val raw : Int) {
+    val verdi = format("%04d",raw)
 }
 
 data class Virksomhetsnummer(@get:JsonValue val verdi : String) {

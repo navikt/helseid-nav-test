@@ -18,7 +18,7 @@ class TestStuff {
     fun stuff() {
         whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(12345678)
         val kontor = BehandlerKontor(
-            navn = "Et egekontor",
+            navn = "Et legekontor",
             orgnummer = Virksomhetsnummer(123456789),
             postnummer = Postnummer(1234),
             poststed = "Oslo",
@@ -26,14 +26,8 @@ class TestStuff {
             herId = 12345678)
 
         val behandler =  Behandler(UUID.randomUUID(),
-            fornavn = "Ole",
-            mellomnavn ="Mellomnavn",
-            etternavn = "Olsen",
-            herId = 123456789,
-            hprId = 987654321,
-            telefon = "12345678",
-            personident = Fødselsnummer("26900799232"),
-            kontor = kontor)
+            Fødselsnummer("26900799232"), "Ole", "Mellomnavn", "Olsen",
+            123456789, 987654321, "12345678", kontor)
 
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
