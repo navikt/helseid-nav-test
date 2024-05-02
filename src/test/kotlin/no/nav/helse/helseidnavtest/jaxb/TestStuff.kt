@@ -2,6 +2,7 @@ package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
+import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
 import org.springframework.core.io.ClassPathResource
@@ -17,30 +18,21 @@ class TestStuff {
     //@Test
     fun stuff() {
         whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(HerId(12345678))
-        val kontor = BehandlerKontor(
-            navn = "Et legekontor",
-            orgnummer = Virksomhetsnummer(123456789),
-            postnummer = Postnummer(1234),
-            poststed = "Oslo",
-            adresse = "Fyrstikkalleen 1",
-            herId = 12345678)
+        val kontor = BehandlerKontor("Et legekontor", "Fyrstikkalleen 1", Postnummer(1234),
+             "Oslo", Virksomhetsnummer(123456789), HerId(12345678))
 
         val behandler =  Behandler(UUID.randomUUID(),
-            Fødselsnummer("26900799232"), "Ole", "Mellomnavn", "Olsen",
+            Fødselsnummer("26900799232"), Navn("Ole", "Mellomnavn", "Olsen"),
             HerId(123456789), HprId(987654321), "12345678", kontor)
 
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,
-            arbeidstakerPersonident =  Fødselsnummer("26900799232"),
+            id =  Fødselsnummer("26900799232"),
             conversationUuid =  UUID.randomUUID(),
             tekst = "dette er litt tekst",
             vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
             )
-        val arbeidstaker = Arbeidstaker(
-            arbeidstakerPersonident = Fødselsnummer("03016536325"),
-            fornavn = "Ola",
-            mellomnavn = "Mellomnavn",
-            etternavn = "Olsen")
+        val arbeidstaker = Arbeidstaker(Fødselsnummer("03016536325"), Navn( "Ola", "Mellomnavn", "Olsen"))
         val m  = DialogmeldingMapper(adresse).xmlFra(b, arbeidstaker)
        println(m)
     }

@@ -29,15 +29,11 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
                     behandler(navn, fastlege.herId(pasient), HprId(hprNumber), fnr, fastlege.kontor(pasient))
             }), arbeidstaker(pasient))
         }
-            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Uventet type", "${auth::class.java}").also {
-                log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", auth::class.java)
-            }
+            else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
         }
 
-    private fun arbeidstaker(pasient: Fødselsnummer) =
-        with(pdl.navn(pasient)) {
-            Arbeidstaker(pasient, fornavn, mellomnavn, etternavn)
-        }
+    private fun arbeidstaker(pasient: Fødselsnummer) = Arbeidstaker(pasient, pdl.navn(pasient))
+
 
     private fun dialogmelding(behandler: Behandler) =
         Dialogmelding(randomUUID(), behandler, Fødselsnummer("26900799232"),
@@ -47,7 +43,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
     private fun behandler(navn: Navn, herId: HerId,hprId: HprId, fnr: Fødselsnummer, kontor: BehandlerKontor) =
         with(navn) {
             Behandler(randomUUID(), fnr,
-                fornavn, mellomnavn, etternavn,
+                Navn(fornavn, mellomnavn, etternavn),
                 herId, hprId, "12345678", kontor) // TODO
         }
 }

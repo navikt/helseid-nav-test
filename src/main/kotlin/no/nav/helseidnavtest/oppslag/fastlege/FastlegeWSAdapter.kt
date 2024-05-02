@@ -1,9 +1,6 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
-import no.nav.helseidnavtest.dialogmelding.BehandlerKontor
-import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
-import no.nav.helseidnavtest.dialogmelding.Postnummer
-import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
+import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
@@ -20,7 +17,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun herId(pasient: String) = client.getPatientGPDetails(pasient).gpHerId.value
+    fun herId(pasient: String) = HerId(client.getPatientGPDetails(pasient).gpHerId.value)
 
     fun bekreftFastlege(hpr: Int, pasient: Fødselsnummer) = client.confirmGP(pasient.value, hpr, now())
 

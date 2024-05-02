@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer.Type.*
+import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
 import java.lang.String.format
@@ -17,10 +18,8 @@ import java.util.*
 
 
 data class Arbeidstaker(
-    val arbeidstakerPersonident: Fødselsnummer,
-    val fornavn: String = "",
-    val mellomnavn: String? = null,
-    val etternavn: String = "",
+    val id: Fødselsnummer,
+    val navn: Navn,
     val mottatt: OffsetDateTime = OffsetDateTime.now(),
     )
 
@@ -30,7 +29,7 @@ data class Arbeidstaker(
 data class Dialogmelding(
     val uuid: UUID,
     val behandler: Behandler,
-    val arbeidstakerPersonident: Fødselsnummer,
+    val id: Fødselsnummer,
     val conversationUuid: UUID,
     val tekst: String?,
     val vedlegg: ByteArray? = null,
@@ -53,9 +52,7 @@ enum class DialogmeldingType {
 data class Behandler(
     val behandlerRef: UUID,
     val personident: Fødselsnummer?,
-    val fornavn: String,
-    val mellomnavn: String?,
-    val etternavn: String,
+    val navn: Navn,
     val herId: HerId,
     val hprId: HprId,
     val telefon: String?,
@@ -72,7 +69,7 @@ data class BehandlerKontor(
     val postnummer: Postnummer,
     val poststed: String?,
     val orgnummer: Virksomhetsnummer,
-    var herId: Int? = null,
+    var herId: HerId? = null,
     val mottatt: LocalDateTime = LocalDateTime.now(),
     val system: String = "Helseopplysninger",
     val dialogmeldingEnabled: Boolean = true,

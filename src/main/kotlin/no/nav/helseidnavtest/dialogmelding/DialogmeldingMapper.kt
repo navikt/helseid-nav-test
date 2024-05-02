@@ -165,10 +165,10 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
     private fun pasient(arbeidstaker: Arbeidstaker) =
         HMOF.createXMLPatient().apply {
             with(arbeidstaker) {
-                familyName = etternavn
-                middleName = mellomnavn
-                givenName = fornavn
-                ident.add(ident(arbeidstakerPersonident))
+                familyName = navn.etternavn
+                middleName = navn.mellomnavn
+                givenName = navn.fornavn
+                ident.add(ident(id))
             }
         }
 
@@ -199,9 +199,9 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                         }
                     }
                     healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                        familyName = etternavn
-                        middleName = mellomnavn
-                        givenName = fornavn
+                        familyName = navn.etternavn
+                        middleName = navn.mellomnavn
+                        givenName = navn.fornavn
                         personident?.let {
                             ident.add(ident(it))
                         }
