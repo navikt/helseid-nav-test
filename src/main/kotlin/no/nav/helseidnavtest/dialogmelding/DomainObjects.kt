@@ -10,6 +10,7 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.*
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer.Type.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
+import java.lang.String.format
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
@@ -68,7 +69,7 @@ data class Behandler(
 data class BehandlerKontor(
     val navn: String?,
     val adresse: String?,
-    val postnummer: String?,
+    val postnummer: Postnummer,
     val poststed: String?,
     val orgnummer: Virksomhetsnummer,
     var herId: Int? = null,
@@ -118,6 +119,10 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
                 }
             }
     }
+}
+
+data class Postnummer(val verdi : Int) {
+    val formattert = format("%04d",verdi)
 }
 
 data class Virksomhetsnummer(@get:JsonValue val verdi : String) {

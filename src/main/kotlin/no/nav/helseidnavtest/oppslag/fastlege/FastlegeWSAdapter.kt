@@ -2,14 +2,14 @@ package no.nav.helseidnavtest.oppslag.fastlege
 
 import no.nav.helseidnavtest.dialogmelding.BehandlerKontor
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
-import no.nav.helseidnavtest.dialogmelding.PartnerId
+import no.nav.helseidnavtest.dialogmelding.Postnummer
 import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
+import no.nav.helseidnavtest.ws.flr.WSGPOffice
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
-import java.lang.String.format
 import java.util.*
 import javax.xml.datatype.DatatypeFactory.*
 
@@ -17,7 +17,6 @@ import javax.xml.datatype.DatatypeFactory.*
 class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val log = getLogger(javaClass)
-
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
@@ -27,20 +26,18 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun kontor(pasient: Fødselsnummer) =
         with(client.getPatientGPDetails(pasient.value)) {
-            log.info("Legens herid: {} for pasient ${pasient.value}", gpHerId.value)
             with(gpContract.value) {
-                BehandlerKontor(
-                    navn = gpOffice.value.name.value,
-                    orgnummer = Virksomhetsnummer(gpOfficeOrganizationNumber),
-                    postnummer = gpOffice.value.physicalAddresses.value.physicalAddress.first().postalCode.postcode(),
-                    poststed = gpOffice.value.physicalAddresses.value.physicalAddress.first().city.value,
-                    adresse = gpOffice.value.physicalAddresses.value.physicalAddress.first().streetAddress.value
-                )
+              kontor(gpOffice.value, gpOfficeOrganizationNumber)
             }
-
         }
 
-    private fun Int.postcode() = format("%04d", this)
+    private fun kontor(kontor: WSGPOffice, orgnr: Int) =
+        with(kontor) {
+            with(physicalAddresses.value.physicalAddress.first()) {
+                BehandlerKontor(name.value, streetAddress.value,
+                   Postnummer(postalCode), city.value, Virksomhetsnummer(orgnr))
+            }
+        }
 
     private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
         time = Date()

@@ -20,7 +20,7 @@ class TestStuff {
         val kontor = BehandlerKontor(
             navn = "Et egekontor",
             orgnummer = Virksomhetsnummer(123456789),
-            postnummer = "1234",
+            postnummer = Postnummer(1234),
             poststed = "Oslo",
             adresse = "Fyrstikkalleen 1",
             herId = 12345678)
@@ -48,6 +48,6 @@ class TestStuff {
             mellomnavn = "Mellomnavn",
             etternavn = "Olsen")
         val m  = DialogmeldingMapper(adresse).xmlFra(b, arbeidstaker)
-       println(m.message)
+       println(m)
     }
 }

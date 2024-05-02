@@ -27,7 +27,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
             is OAuth2AuthenticationToken -> {
                 mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
                     behandler(navn, fastlege.herId(pasient), hprNumber, fnr, fastlege.kontor(pasient))
-            }), arbeidstaker(pasient)).message
+            }), arbeidstaker(pasient))
         }
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Uventet type", "${auth::class.java}").also {
                 log.error("Uventet token type {}, refresh Swagger om det er der du ser dette", auth::class.java)
@@ -45,8 +45,9 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
         )
 
     private fun behandler(navn: Navn, herID: Int,hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
-        Behandler(randomUUID(), fnr,
-            navn.fornavn, navn.mellomnavn, navn.etternavn,
-            herID, hpr, "12345678", kontor) // TODO
-
+        with(navn) {
+            Behandler(randomUUID(), fnr,
+                fornavn, mellomnavn, etternavn,
+                herID, hpr, "12345678", kontor) // TODO
+        }
 }

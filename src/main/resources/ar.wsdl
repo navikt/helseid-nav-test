@@ -35,8 +35,8 @@
     </wsp:Policy>
     <wsp:Policy wsu:Id="WSHttpBinding_ICommunicationPartyService_policy">
         <wsp:ExactlyOne>
-            <wsp:All>
-                <http:BasicAuthentication xmlns:http="http://schemas.microsoft.com/ws/06/2004/policy/http"/>
+                <wsp:All>
+                    <http:BasicAuthentication xmlns:http="http://schemas.microsoft.com/ws/06/2004/policy/http"/>
                 <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:TransportToken>
