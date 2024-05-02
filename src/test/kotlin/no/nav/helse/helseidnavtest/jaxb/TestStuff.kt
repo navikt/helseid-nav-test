@@ -16,7 +16,7 @@ class TestStuff {
     lateinit var adresse: AdresseWSAdapter
     //@Test
     fun stuff() {
-        whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(12345678)
+        whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(HerId(12345678))
         val kontor = BehandlerKontor(
             navn = "Et legekontor",
             orgnummer = Virksomhetsnummer(123456789),
@@ -27,7 +27,7 @@ class TestStuff {
 
         val behandler =  Behandler(UUID.randomUUID(),
             Fødselsnummer("26900799232"), "Ole", "Mellomnavn", "Olsen",
-            123456789, 987654321, "12345678", kontor)
+            HerId(123456789), HprId(987654321), "12345678", kontor)
 
         val b = Dialogmelding(uuid = UUID.randomUUID(),
             behandler = behandler,

@@ -56,8 +56,8 @@ data class Behandler(
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val herId: Int?,
-    val hprId: Int?,
+    val herId: HerId,
+    val hprId: HprId,
     val telefon: String?,
     val kontor: BehandlerKontor,
     val kategori: BehandlerKategori =  LEGE,
@@ -122,6 +122,12 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
 }
 
 
+data class HerId(val verdi : String)  {
+    constructor(verdi: Int) : this("$verdi")
+}
+data class HprId(val verdi : String)  {
+    constructor(verdi: Int) : this("$verdi")
+}
 
 data class Postnummer(private val raw : Int) {
     val verdi = format("%04d",raw)

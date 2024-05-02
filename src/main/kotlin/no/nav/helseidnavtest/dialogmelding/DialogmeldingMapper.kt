@@ -20,12 +20,11 @@ import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.UUID.randomUUID
 import java.util.function.Function
 import javax.xml.transform.stream.StreamResult
-import kotlin.math.E
 
 @Component
 class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
 
-    fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall).message
+    fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall).xml
 
     private fun marshall(element: Any?) =
         run {
@@ -148,7 +147,7 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
     private fun ident(fnr: Fødselsnummer) =
         HMOF.createXMLIdent().apply {
             id = fnr.value
-            typeId = HMOF.type(HER_OID, fnr.type.name, fnr.type.verdi)
+            typeId = type(HER_OID, fnr.type.name, fnr.type.verdi)
         }
 
     private fun avsenderNAV() =
@@ -157,12 +156,9 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                 organisationName = "NAV"
                 ident.add(HMOF.createXMLIdent().apply {
                     id = NAV_ORGNR.verdi
-                    typeId = HMOF.type(NAV_OID, ENH, ENHET_DESC)
+                    typeId = type(NAV_OID, ENH, ENHET_DESC)
                 })
-                ident.add(HMOF.createXMLIdent().apply {
-                    id = adresseWSAdapter.herIdForVirksomhet(NAV_ORGNR).toString()   //"79768"
-                    typeId = HMOF.type(NAV_OID, HER, HER_DESC)
-                })
+                ident.add(idFra(adresseWSAdapter.herIdForVirksomhet(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
             }
         }
 
@@ -183,12 +179,12 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                     organisationName = kontor.navn
                     ident.add(HMOF.createXMLIdent().apply {
                         id = "${kontor.herId}"
-                        typeId = HMOF.type(NAV_OID, HER, HER_DESC)
+                        typeId = type(NAV_OID, HER, HER_DESC)
                     })
                     kontor.orgnummer.let { orgnummer ->
                         ident.add(HMOF.createXMLIdent().apply {
                             id = orgnummer.verdi
-                            typeId = HMOF.type(NAV_OID, ENH, ENHET_DESC)
+                            typeId = type(NAV_OID, ENH, ENHET_DESC)
                         })
                     }
                     address = HMOF.createXMLAddress().apply {
@@ -212,13 +208,13 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                         hprId?.let {
                             ident.add(HMOF.createXMLIdent().apply {
                                 id = "$it"
-                                typeId = HMOF.type(HER_OID, HPR,  "HPR-nummer")
+                                typeId = type(HER_OID, HPR, "HPR-nummer")
                             })
                         }
                         herId?.let {
                             ident.add(HMOF.createXMLIdent().apply {
                                 id = "$it"
-                                typeId = HMOF.type(HER_OID, HER,  HER_DESC)
+                                typeId = type(HER_OID, HER, HER_DESC)
                             })
                         }
                     }
@@ -237,7 +233,7 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
         private const val HPR = "HPR"
     }
     private  data class Fellesformat(private val fellesformat: XMLEIFellesformat, private val marshaller: Function<XMLEIFellesformat, String>)  {
-        val message = marshaller.apply(fellesformat)
+        val xml = marshaller.apply(fellesformat)
     }
 
 

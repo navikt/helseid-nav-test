@@ -26,7 +26,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
                 mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
-                    behandler(navn, fastlege.herId(pasient), hprNumber, fnr, fastlege.kontor(pasient))
+                    behandler(navn, fastlege.herId(pasient), HprId(hprNumber), fnr, fastlege.kontor(pasient))
             }), arbeidstaker(pasient))
         }
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Uventet type", "${auth::class.java}").also {
@@ -44,10 +44,10 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
             randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
-    private fun behandler(navn: Navn, herID: Int,hpr: Int, fnr: Fødselsnummer, kontor: BehandlerKontor) =
+    private fun behandler(navn: Navn, herId: HerId,hprId: HprId, fnr: Fødselsnummer, kontor: BehandlerKontor) =
         with(navn) {
             Behandler(randomUUID(), fnr,
                 fornavn, mellomnavn, etternavn,
-                herID, hpr, "12345678", kontor) // TODO
+                herId, hprId, "12345678", kontor) // TODO
         }
 }

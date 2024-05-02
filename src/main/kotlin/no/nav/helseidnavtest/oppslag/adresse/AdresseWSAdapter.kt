@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Virksomhetsnummer
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
@@ -27,7 +28,7 @@ class AdresseWSAdapter(private val cfg: AdresseConfig) : Pingable {
 
     fun herIdForHpr(hpr: Int) = searchById(hpr.toString())
 
-    fun herIdForVirksomhet(nummer: Virksomhetsnummer) = searchById(nummer.verdi)
+    fun herIdForVirksomhet(nummer: Virksomhetsnummer) = HerId(searchById(nummer.verdi))
 
     private fun searchById(id: String): Int = runCatching {
 
