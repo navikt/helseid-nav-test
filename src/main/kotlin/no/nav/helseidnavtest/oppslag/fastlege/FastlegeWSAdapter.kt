@@ -23,7 +23,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
         HerId(client.getPatientGPDetails(pasient).gpHerId.value)
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(uri = cfg.url,detail = it.cause?.message?: "Fant ikke fastlege for pasient $pasient" ,cause = it)
+            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message,uri = cfg.url,detail = "Fant ikke fastlege for pasient $pasient" ,cause = it)
             else -> throw it
         }
     }
