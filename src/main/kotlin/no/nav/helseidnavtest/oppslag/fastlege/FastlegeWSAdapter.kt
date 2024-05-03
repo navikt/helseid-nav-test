@@ -7,7 +7,6 @@ import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
 import no.nav.helseidnavtest.ws.flr.WSGPOffice
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import java.util.*
 import javax.xml.datatype.DatatypeFactory.*
@@ -15,11 +14,10 @@ import javax.xml.datatype.DatatypeFactory.*
 @Component
 class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
-    private val log = getLogger(javaClass)
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun herId(pasient: String) = kotlin.runCatching {
+    fun herId(pasient: String) = runCatching {
         HerId(client.getPatientGPDetails(pasient).gpHerId.value)
     }.getOrElse {
         when (it) {
@@ -28,12 +26,17 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
         }
     }
 
-    fun bekreftFastlege(hpr: Int, pasient: Fødselsnummer) = client.confirmGP(pasient.value, hpr, now())
-
     fun kontor(pasient: Fødselsnummer) =
-        with(client.getPatientGPDetails(pasient.value)) {
-            with(gpContract.value) {
-              kontor(gpOffice.value, gpOfficeOrganizationNumber)
+        runCatching {
+            with(client.getPatientGPDetails(pasient.value)) {
+                with(gpContract.value) {
+                    kontor(gpOffice.value, gpOfficeOrganizationNumber)
+                }
+            }
+        }.getOrElse {
+            when (it) {
+                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message,uri = cfg.url,detail = "Fant ikke detaljer for pasient $pasient" ,cause = it)
+                else -> throw it
             }
         }
 
@@ -44,10 +47,6 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
                    Postnummer(postalCode), city.value, Virksomhetsnummer(orgnr))
             }
         }
-
-    private fun now() = newInstance().newXMLGregorianCalendar(GregorianCalendar().apply {
-        time = Date()
-    })
     override fun ping() = emptyMap<String,String>()
     override fun pingEndpoint() = "${cfg.url}"
 }

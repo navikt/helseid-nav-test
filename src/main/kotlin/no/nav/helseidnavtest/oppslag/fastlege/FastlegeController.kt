@@ -7,11 +7,8 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController("/fastlege")
-class FastlegeController(private val adapter: FastlegeWSAdapter) {
+class FastlegeController(private val client: FastlegeClient) {
 
     @GetMapping("/kontor")
-    fun kontor(@RequestParam fnr: Fødselsnummer) = adapter.kontor(fnr)
-
-    @GetMapping("/bekreft")
-    fun bekreftFastlege(@RequestParam hprId: Int, @RequestParam fnr: Fødselsnummer) = adapter.bekreftFastlege(hprId, fnr)
-}
+    fun kontor(@RequestParam fnr: Fødselsnummer) = client.kontor(fnr)
+  }
