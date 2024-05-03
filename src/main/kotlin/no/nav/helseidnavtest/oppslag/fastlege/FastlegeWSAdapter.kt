@@ -17,7 +17,12 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun herId(pasient: String) = HerId(client.getPatientGPDetails(pasient).gpHerId.value)
+    fun herId(pasient: String) = kotlin.runCatching {
+        HerId(client.getPatientGPDetails(pasient).gpHerId.value)
+    }.getOrElse {
+        log.error("Fant ikke fastlege for pasient $pasient", it)
+        throw it
+    }
 
     fun bekreftFastlege(hpr: Int, pasient: Fødselsnummer) = client.confirmGP(pasient.value, hpr, now())
 
