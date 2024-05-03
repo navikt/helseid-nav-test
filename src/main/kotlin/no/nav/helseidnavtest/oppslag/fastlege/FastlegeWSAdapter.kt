@@ -1,9 +1,11 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
 import no.nav.helseidnavtest.dialogmelding.*
+import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
+import no.nav.helseidnavtest.ws.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
 import no.nav.helseidnavtest.ws.flr.WSGPOffice
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -20,8 +22,10 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
     fun herId(pasient: String) = kotlin.runCatching {
         HerId(client.getPatientGPDetails(pasient).gpHerId.value)
     }.getOrElse {
-        log.error("Fant ikke fastlege for pasient $pasient", it)
-        throw it
+        when (it) {
+            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(uri = cfg.url,detail = it.cause?.message?: "Fant ikke fastlege for pasient $pasient" ,cause = it)
+            else -> throw it
+        }
     }
 
     fun bekreftFastlege(hpr: Int, pasient: Fødselsnummer) = client.confirmGP(pasient.value, hpr, now())
