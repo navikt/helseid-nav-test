@@ -15,7 +15,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                -   host: b27apvl220.preprod.local
+                -   host: mqls02.preprod.local
                     ports:
                         -  port: 1413
                 -   host: {{wshost}}

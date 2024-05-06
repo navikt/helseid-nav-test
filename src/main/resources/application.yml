@@ -91,6 +91,6 @@ ibm:
     password: ${helseid.emottak.password}
     queue-manager: MQLS02
     application-name: ${application.name}
-    conn-name: b27apvl220.preprod.local(1413)
+    conn-name: mqls02.preprod.local(1413)
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
