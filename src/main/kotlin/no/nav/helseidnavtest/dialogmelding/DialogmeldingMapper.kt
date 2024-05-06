@@ -17,7 +17,6 @@ import java.math.BigInteger.ZERO
 import java.time.LocalDate
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter.ISO_DATE
-import java.util.UUID.randomUUID
 import java.util.function.Function
 import javax.xml.transform.stream.StreamResult
 
