@@ -14,7 +14,9 @@ spec:
             enabled: true
     accessPolicy:
         outbound:
+
             external:
+                -   host: b27apvl220.preprod.local
                 -   host: {{wshost}}
                 -   host: {{stshost}}
                 -   host: youtube.com
