@@ -1,5 +1,3 @@
-ibm.mq:
-
 management:
    health:
     ping:
@@ -86,6 +84,7 @@ authserver:
     url: https://${stshost}
 ibm:
   mq:
+    channel: Q1_HELSEID
     user: srvhelseid
     password: ${helseid.emottak.password}
     queue-manager: MQLS02
