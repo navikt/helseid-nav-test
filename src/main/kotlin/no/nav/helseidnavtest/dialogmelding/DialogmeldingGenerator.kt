@@ -19,7 +19,6 @@ import java.util.UUID.*
 @Component
 class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient, private val adresseAdapter: AdresseWSAdapter) {
 
-    private val log = getLogger(DialogmeldingGenerator::class.java)
 
     @Retryable(retryFor = [RecoverableException::class])
     fun genererDialogmelding(pasient: Fødselsnummer) =
