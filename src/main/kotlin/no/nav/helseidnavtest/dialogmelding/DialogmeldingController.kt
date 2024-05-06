@@ -8,5 +8,5 @@ class DialogmeldingController(private val sender: DialogmeldingSender, val gener
 
 
     @GetMapping(value = ["/melding"])
-    fun send(@RequestParam pasient: Fødselsnummer) = sender.sendDialogmelding(generator.genererDialogmelding(pasient))
+    fun send(@RequestParam pasient: Fødselsnummer) = sender.send(generator.genererDialogmelding(pasient))
 }
