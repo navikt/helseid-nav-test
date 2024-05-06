@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component
 class DialogmeldingSender(private val template: JmsTemplate) {
 
     fun send(dialogmelding: String) {
-        template.convertAndSend("QA.Q1_HELSEID.IU03_UTSENDING", dialogmelding)
+        template.convertAndSend("QA.Q414.IU03_UTSENDING", dialogmelding)
     }
 }
