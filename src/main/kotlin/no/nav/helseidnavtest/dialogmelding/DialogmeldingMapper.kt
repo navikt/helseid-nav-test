@@ -140,7 +140,6 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                         dn = "Melding fra NAV"
                     }
                     tekstNotatInnhold = tekst
-                    dokIdNotat = "${randomUUID()}"
                 })
             }
         }
@@ -178,15 +177,15 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                 organisation = HMOF.createXMLOrganisation().apply {
                     organisationName = kontor.navn
                     ident.add(HMOF.createXMLIdent().apply {
-                        id = "${kontor.herId}"
+                        id = kontor.herId?.verdi ?: throw IllegalArgumentException("Mangler HER-id")
                         typeId = type(NAV_OID, HER, HER_DESC)
                     })
-                    kontor.orgnummer.let { orgnummer ->
-                        ident.add(HMOF.createXMLIdent().apply {
-                            id = orgnummer.verdi
-                            typeId = type(NAV_OID, ENH, ENHET_DESC)
-                        })
-                    }
+
+                    ident.add(HMOF.createXMLIdent().apply {
+                        id =  kontor.orgnummer.verdi
+                        typeId = type(NAV_OID, ENH, ENHET_DESC)
+                    })
+
                     address = HMOF.createXMLAddress().apply {
                         type = HMOF.createXMLCS().apply {
                             dn = "Besøksadresse"
@@ -205,18 +204,16 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                         personident?.let {
                             ident.add(ident(it))
                         }
-                        hprId?.let {
-                            ident.add(HMOF.createXMLIdent().apply {
-                                id = "$it"
-                                typeId = type(HER_OID, HPR, "HPR-nummer")
-                            })
-                        }
-                        herId?.let {
-                            ident.add(HMOF.createXMLIdent().apply {
-                                id = "$it"
-                                typeId = type(HER_OID, HER, HER_DESC)
-                            })
-                        }
+                        ident.add(HMOF.createXMLIdent().apply {
+                            id = hprId.verdi
+                            typeId = type(HER_OID, HPR, "HPR-nummer")
+                        })
+
+                        ident.add(HMOF.createXMLIdent().apply {
+                            id = herId.verdi
+                            typeId = type(HER_OID, HER, HER_DESC)
+                        })
+
                     }
                 }
             }
