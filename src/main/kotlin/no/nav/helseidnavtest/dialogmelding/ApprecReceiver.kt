@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 internal class ApprecReceiver {
     private val log = getLogger(ApprecReceiver::class.java)
-    @JmsListener(destination = "mailbox")
+    @JmsListener(destination = "QA.Q1_HELSEID.IU03_UTSENDING_REPLY")
     fun receiveMessage(apprec: XMLAppRec) {
         log.info("Received <$apprec>")
     }
