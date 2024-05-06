@@ -93,4 +93,5 @@ ibm:
     application-name: ${spring.application.name}
     conn-name: mqls02.preprod.local(1413)
 pdl:
+  
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
