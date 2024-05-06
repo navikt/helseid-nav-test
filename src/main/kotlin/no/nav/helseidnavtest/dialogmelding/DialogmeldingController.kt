@@ -4,9 +4,9 @@ import java.util.*
 
 @RestController
 @RequestMapping("/xml")
-class DialogmeldingController(private val generator: DialogmeldingGenerator) {
+class DialogmeldingController(private val sender: DialogmeldingSender, val generator: DialogmeldingGenerator) {
 
 
     @GetMapping(value = ["/melding"])
-    fun xml(@RequestParam pasient: Fødselsnummer) = generator.genererDialogmelding(pasient)
+    fun send(@RequestParam pasient: Fødselsnummer) = sender.sendDialogmelding(generator.genererDialogmelding(pasient))
 }
