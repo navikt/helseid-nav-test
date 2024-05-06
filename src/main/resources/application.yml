@@ -17,6 +17,8 @@ management:
        exposure:
         include: '*'
 spring:
+  application:
+    name: helseid-nav-test
   security:
     oauth2:
       resourceserver:
