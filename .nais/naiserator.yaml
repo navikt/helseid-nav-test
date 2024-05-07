@@ -69,3 +69,4 @@ spec:
     envFrom:
         -   secret: helseid
         -   secret: fastlege
+        -   secret: dialogmelding
