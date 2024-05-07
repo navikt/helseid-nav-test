@@ -6,7 +6,7 @@
     </appender>
     <springProfile name="dev">
         <logger name="com.ibm.mq" level="trace"/>
-        <logger name="org.springframework.jms" level="trace"/>
+        <logger name="org.springframework.jms" level="info"/>
         <logger name="org.springframework.security" level="info"/>
         <logger name="reactor.netty.http.client.HttpClient" level="trace"/>
         <logger name="no.nav.helse" level="trace"/>
