@@ -87,7 +87,7 @@ authserver:
 ibm:
   mq:
     channel: ${dialogmelding.channel}
-    user: ${dialogmelding.username}
+    user: srvhelseid
     password: j28uqTrxOpUeYCAcwv1IAn
     queue-manager: ${dialogmelding.qm}
     application-name: ${spring.application.name}
