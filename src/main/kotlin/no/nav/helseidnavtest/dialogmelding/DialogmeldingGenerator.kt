@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
+import java.util.UUID
 import java.util.UUID.*
 
 @Component
@@ -20,12 +21,12 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
 
 
     @Retryable(retryFor = [RecoverableException::class])
-    fun genererDialogmelding(pasient: Fødselsnummer) =
+    fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
                 mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
                     behandler(navn, fastlege.herId(pasient), HprId(hprNumber), fnr, fastlege.kontor(pasient))
-            }), arbeidstaker(pasient))
+            },uuid), arbeidstaker(pasient))
         }
             else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
         }
@@ -33,9 +34,9 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
     private fun arbeidstaker(pasient: Fødselsnummer) = Arbeidstaker(pasient, pdl.navn(pasient))
 
 
-    private fun dialogmelding(behandler: Behandler) =
-        Dialogmelding(randomUUID(), behandler, Fødselsnummer("26900799232"),
-            randomUUID(), "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
+    private fun dialogmelding(behandler: Behandler, uuid: UUID) =
+        Dialogmelding(uuid, behandler, Fødselsnummer("26900799232"),
+            uuid, "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
     private fun behandler(navn: Navn, herId: HerId,hprId: HprId, fnr: Fødselsnummer, kontor: BehandlerKontor) =
