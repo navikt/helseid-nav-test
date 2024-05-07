@@ -88,7 +88,7 @@ ibm:
   mq:
     channel: ${dialogmelding.channel}
     user: ${dialogmelding.username}
-    password: j28uqTrxOpUeYCAcwv1IAn
+    password: ${dialogmelding.password}
     queue-manager: ${dialogmelding.qm}
     application-name: ${spring.application.name}
     conn-name: ${dialogmelding.host}(${dialogmelding.port})
