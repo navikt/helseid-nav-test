@@ -86,15 +86,17 @@ authserver:
     url: https://${stshost}
 ibm:
   mq:
-    channel: Q1_HELSEID
+    channel: ${dialogmelding.channel}
     user: srvhelseid
     password: j28uqTrxOpUeYCAcwv1IAn
-    queue-manager: MQLS02
+    queue-manager: ${dialogmelding.qm}
     application-name: ${spring.application.name}
-    conn-name: ${dialogmelding.host}(1413)
+    conn-name: ${dialogmelding.host}(${dialogmelding.port})
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
 
 dialogmelding:
+    qm: MQLS02
+    channel: Q1_HELSEID
     request: QA.Q414.IU03_UTSENDING
-    response: QA.Q1_HELSEID.IU03_UTSENDING_REPLY
+    reply: QA.Q1_HELSEID.IU03_UTSENDING_REPLY

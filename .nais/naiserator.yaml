@@ -17,7 +17,7 @@ spec:
             external:
                 -   host: {{dialogmelding.host}}
                     ports:
-                        -  port: 1413
+                        -  port: {{dialogmelding.port}}
                 -   host: {{wshost}}
                 -   host: {{stshost}}
                 -   host: youtube.com
@@ -54,6 +54,8 @@ spec:
             value: {{stshost}}
         -   name: dialogmelding_host
             value: {{dialogmelding.host}}
+        -   name: dialogmelding_port
+            value: {{dialogmelding.port}}
         -   name:   wshost
             value: {{wshost}}
         -   name: env
