@@ -5,4 +5,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties("adresse")
-class AdresseConfig(url: String, username: String, password: String) : WSConfig(URI.create(url),username,password)
+class AdresseRegisterConfig(url: String, username: String, password: String) : WSConfig(URI.create(url),username,password)

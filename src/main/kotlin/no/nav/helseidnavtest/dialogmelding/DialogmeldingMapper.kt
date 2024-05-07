@@ -7,7 +7,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.FFOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
-import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
@@ -21,7 +21,7 @@ import java.util.function.Function
 import javax.xml.transform.stream.StreamResult
 
 @Component
-class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
+class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
 
     fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall).xml
 
@@ -156,7 +156,7 @@ class DialogmeldingMapper(private val adresseWSAdapter: AdresseWSAdapter) {
                     id = NAV_ORGNR.verdi
                     typeId = type(NAV_OID, ENH, ENHET_DESC)
                 })
-                ident.add(idFra(adresseWSAdapter.herIdForVirksomhet(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
+                ident.add(idFra(adresse.herIdForVirksomhet(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
             }
         }
 

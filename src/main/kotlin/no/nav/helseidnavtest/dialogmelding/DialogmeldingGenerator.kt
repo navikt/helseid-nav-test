@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.dialogmelding
 
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
-import no.nav.helseidnavtest.oppslag.adresse.AdresseWSAdapter
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterWSAdapter
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 import java.util.UUID.*
 
 @Component
-class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient, private val adresseAdapter: AdresseWSAdapter) {
+class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient, private val adresseAdapter: AdresseRegisterWSAdapter) {
 
 
     @Retryable(retryFor = [RecoverableException::class])
