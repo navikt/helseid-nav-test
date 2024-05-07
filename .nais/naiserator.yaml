@@ -15,7 +15,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                -   host: mqls02.preprod.local
+                -   host: {{dialogmelding.host}}
                     ports:
                         -  port: 1413
                 -   host: {{wshost}}
@@ -52,6 +52,8 @@ spec:
     env:
         -   name: stshost
             value: {{stshost}}
+        -   name: dialogmelding_host
+            value: {{dialogmelding.host}}
         -   name:   wshost
             value: {{wshost}}
         -   name: env

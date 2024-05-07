@@ -9,12 +9,9 @@ import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Component
 
 @Component
-internal class ApprecReceiver(@Value("\${helseid.emottak.password}") private val pw: String) {
+class ApprecReceiver {
     private val log = getLogger(ApprecReceiver::class.java)
-    init {
-        log.info("password: $pw")
-    }
-    @JmsListener(destination = "QA.Q1_HELSEID.IU03_UTSENDING_REPLY")
+    @JmsListener(destination = "#{'\${dialogmelding.reply}'}")
     fun receiveMessage(apprec: XMLAppRec) {
         log.info("Received <$apprec>")
     }

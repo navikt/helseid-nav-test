@@ -91,7 +91,10 @@ ibm:
     password: j28uqTrxOpUeYCAcwv1IAn
     queue-manager: MQLS02
     application-name: ${spring.application.name}
-    conn-name: mqls02.preprod.local(1413)
+    conn-name: ${dialogmelding.host}(1413)
 pdl:
-
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
+
+dialogmelding:
+    request: QA.Q414.IU03_UTSENDING
+    response: QA.Q1_HELSEID.IU03_UTSENDING_REPLY
