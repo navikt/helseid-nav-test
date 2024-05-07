@@ -1,6 +1,7 @@
 package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterWSAdapter
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.mockito.ArgumentMatchers.*
@@ -14,7 +15,7 @@ import org.mockito.kotlin.whenever
 // @ExtendWith(MockitoExtension::class)
 class TestStuff {
     @Mock
-    lateinit var adresse: AdresseRegisterWSAdapter
+    lateinit var adresse: AdresseRegisterClient
     //@Test
     fun stuff() {
         whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(HerId(12345678))
