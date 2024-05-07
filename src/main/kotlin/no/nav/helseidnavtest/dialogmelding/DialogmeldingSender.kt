@@ -10,7 +10,7 @@ class DialogmeldingSender(private val template: JmsTemplate,val generator: Dialo
     private val log = getLogger(DialogmeldingSender::class.java)
 
     fun send(fnr: Fødselsnummer) {
-        log.info("Sending dialogmelding for $fnr på ${cfg.request}")
+        log.info("Sending dialogmelding for $fnr for $cfg")
         template.convertAndSend(cfg.request, generator.genererDialogmelding(fnr))
     }
 }
