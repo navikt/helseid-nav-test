@@ -55,7 +55,7 @@ spec:
         -   name: dialogmelding_host
             value: {{dialogmelding.host}}
         -   name: dialogmelding_port
-            value: {{dialogmelding.port}}
+            value: "{{dialogmelding.port}}"
         -   name:   wshost
             value: {{wshost}}
         -   name: env
