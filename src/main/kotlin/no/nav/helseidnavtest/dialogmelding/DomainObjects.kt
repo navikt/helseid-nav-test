@@ -83,26 +83,31 @@ data class PartnerId(val value: Int) {
     override fun toString() =  value.toString()
 }
 
-data class Fødselsnummer(@get:JsonValue val value : String) {
+data class Fødselsnummer(@get:JsonValue val verdi : String) {
     private  val log : Logger = getLogger(javaClass)
     init {
-        require(value.length == 11) { "Fødselsnummer $value er ikke 11 siffer" }
+        require(verdi.length == 11) { "Fødselsnummer $verdi er ikke 11 siffer" }
         if (currentCluster() == PROD_GCP) {
-            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), value)
-            require(mod11(W1, value) == value[9] - '0') { "Første kontrollsiffer $value[9] ikke validert" }
-            require(mod11(W2, value) == value[10] - '0') { "Andre kontrollsiffer $value[10] ikke validert" }
+            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), verdi)
+            require(mod11(W1, verdi) == verdi[9] - '0') { "Første kontrollsiffer $verdi[9] ikke validert" }
+            require(mod11(W2, verdi) == verdi[10] - '0') { "Andre kontrollsiffer $verdi[10] ikke validert" }
         }
         else {
-            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), value)
+            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), verdi)
         }
     }
-    val type  = if (value[0].digitToInt() > 3) DNR else FNR
+    val type  = if (verdi[0].digitToInt() > 3) DNR else FNR
 
     enum class Type(val verdi: String) {
         DNR("D-nummer"), FNR("Fødselsnummer")
     }
 
     companion object {
+
+        private fun String.partialMask(mask : Char = '*') : String {
+            val start = length.div(2)
+            return replaceRange(start + 1, length, mask.toString().repeat(length - start - 1))
+        }
 
         private val W1 = intArrayOf(2, 5, 4, 9, 8, 1, 6, 7, 3)
         private val W2 = intArrayOf(2, 3, 4, 5, 6, 7, 2, 3, 4, 5)
@@ -116,6 +121,8 @@ data class Fødselsnummer(@get:JsonValue val value : String) {
                 }
             }
     }
+    override fun toString() = "${javaClass.simpleName} [fnr=${verdi.partialMask()}]"
+
 }
 
 

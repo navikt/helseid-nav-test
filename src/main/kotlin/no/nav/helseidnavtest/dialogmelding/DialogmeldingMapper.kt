@@ -144,7 +144,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         }
     private fun ident(fnr: Fødselsnummer) =
         HMOF.createXMLIdent().apply {
-            id = fnr.value
+            id = fnr.verdi
             typeId = type(HER_OID, fnr.type.name, fnr.type.verdi)
         }
 

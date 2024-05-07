@@ -31,7 +31,7 @@ class PDLWebClientAdapter(@Qualifier(PDL)  private val graphQlClient : GraphQlCl
 
     fun person(fnr: Fødselsnummer) =
         with(fnr) {
-            query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to this.value))?.active?.let {
+            query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to this.verdi))?.active?.let {
                 pdlPersonTilPerson(it, this)
             } ?: throw NotFoundException("Ikke funnet", "Fant ikke $fnr", cfg.baseUri)
         }

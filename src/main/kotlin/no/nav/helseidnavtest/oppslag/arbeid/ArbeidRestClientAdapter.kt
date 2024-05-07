@@ -18,11 +18,11 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
             restClient
                 .get()
                 .uri(cf::arbeidsforholdURI)
-                .header(NAV_PERSONIDENT_HEADER, fnr.value)
+                .header(NAV_PERSONIDENT_HEADER, fnr.verdi)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
-                   handleErrors(req, res, fnr.value)
+                   handleErrors(req, res, fnr.verdi)
                 }
                 .body<List<ArbeidsforholdDTO>>().also {
                     log.trace("Arbeidsforhold response {}", it)

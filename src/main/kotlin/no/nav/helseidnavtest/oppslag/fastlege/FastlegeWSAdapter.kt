@@ -8,8 +8,6 @@ import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
 import no.nav.helseidnavtest.ws.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
 import no.nav.helseidnavtest.ws.flr.WSGPOffice
 import org.springframework.stereotype.Component
-import java.util.*
-import javax.xml.datatype.DatatypeFactory.*
 
 @Component
 class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
@@ -28,7 +26,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     fun kontor(pasient: Fødselsnummer) =
         runCatching {
-            with(client.getPatientGPDetails(pasient.value)) {
+            with(client.getPatientGPDetails(pasient.verdi)) {
                 with(gpContract.value) {
                     kontor(gpOffice.value, gpOfficeOrganizationNumber)
                 }
