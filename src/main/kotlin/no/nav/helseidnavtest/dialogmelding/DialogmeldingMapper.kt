@@ -37,7 +37,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             with(any) {
                 val hm = hodemelding(melding, arbeidstaker)
                 add(hm)
-                add(mottakenhetBlokk(melding,hm.msgInfo.receiver.organisation.ident.find { it.typeId.v == "HER" }!!.id))
+                add(mottakenhetBlokk(melding,hm.msgInfo.receiver.organisation.ident.find { it.typeId.v == HER }!!.id))
                 add(sporinformasjonBlokk())
             }
         }
@@ -55,16 +55,16 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                 throw IllegalArgumentException("Ugyldig melding/type kombinasjon $type/$kodeverk")
             }
             FFOF.createXMLMottakenhetBlokk().apply {
-                ebRole = "Saksbehandler"
+                ebRole = EBROLE
                 herIdentifikator = herId
-                ebService =  "HenvendelseFraSaksbehandler"
-                ebAction = "Henvendelse"
+                ebService =  EBSERVICE
+                ebAction = EBACTION
             }
         }
 
     private fun sporinformasjonBlokk() =
         FFOF.createSporinformasjonBlokk(FFOF.createXMLSporinformasjonBlokkType().apply {
-            programID = "Helseopplysninger webapp"
+            programID = "Helseopplysninger Webapp"
             programVersjonID = "1.0"
             programResultatKoder = ZERO
             tidsstempel = now()
@@ -75,7 +75,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             type = HMOF.createXMLCS().apply {
                 dn = "Notat"
                 v = DIALOG_NOTAT.name
-                miGversion = "v1.2 2006-05-24"
+                miGversion = VERSION
                 genDate = now()
                 msgId = "${melding.uuid}"
             }
@@ -87,7 +87,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
     private fun vedleggDocument(melding: Dialogmelding) =
         HMOF.createXMLDocument().apply {
             documentConnection = HMOF.createXMLCS().apply {
-                dn = "Vedlegg"
+                dn = VEDLEGG
                 v = "V"
             }
             refDoc = HMOF.createXMLRefDoc().apply {
@@ -95,7 +95,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                     v = LocalDate.now().format(ISO_DATE)
                 }
                 msgType = HMOF.createXMLCS().apply {
-                    dn = "Vedlegg"
+                    dn = VEDLEGG
                     v = "A"
                 }
                 mimeType = APPLICATION_PDF_VALUE
@@ -219,6 +219,11 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         }
 
     companion object {
+        private const val VEDLEGG = "Vedlegg"
+        private const val VERSION = "v1.2 2006-05-24"
+        private const val EBROLE = "Saksbehandler"
+        private const val EBSERVICE = "HenvendelseFraSaksbehandler"
+        private const val EBACTION = "Henvendelse"
         private const val ENHET_DESC = "Organisasjonsnummeret i Enhetsregisteret"
         private const val HER_DESC = "Identifikator fra Helsetjenesteenhetsregisteret"
         private val NAV_ORGNR  = Virksomhetsnummer(889640782)
