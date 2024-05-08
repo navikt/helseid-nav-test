@@ -15,9 +15,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                - host: b27wasl00839.preprod.local
-                  ports:
-                    - port: 9445
+                -   host: wasapp-q1.adeo.no
                 -   host: {{dialogmelding.host}}
                     ports:
                     -  port: {{dialogmelding.port}}
