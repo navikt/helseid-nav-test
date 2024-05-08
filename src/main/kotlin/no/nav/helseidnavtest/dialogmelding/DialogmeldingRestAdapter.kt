@@ -1,6 +1,9 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGMELDING
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBACTION
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBROLE
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBSERVICE
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.handleErrors
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
@@ -17,7 +20,11 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
         if (cf.isEnabled) {
             restClient
                 .get()
-                .uri(cf::query)
+                .uri {
+                    it.queryParam("service", EBSERVICE)
+                        .queryParam("role", EBROLE)
+                        .queryParam("action", EBACTION).build(herId)
+                }
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
