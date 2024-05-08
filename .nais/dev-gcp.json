@@ -5,7 +5,7 @@
   "wshost": "ws-at.test.nhn.no",
   "clientid": "d33dd479-12d2-493f-a8a2-f440ee9e5219",
   "dialogmelding" :{
-      "uri"  : "http://www.emottakTODO.com",
+      "uri"  : "https://b27wasl00839.preprod.local:9445/emottak-partnerweb/partnerService/",
       "host" : "mqls02.preprod.local",
       "port" : "1413",
       "channel" : "Q1_HELSEID",
