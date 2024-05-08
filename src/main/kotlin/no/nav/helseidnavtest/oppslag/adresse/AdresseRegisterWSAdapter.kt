@@ -15,7 +15,7 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
     private val log = getLogger(AdresseRegisterWSAdapter::class.java)
 
     private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
-        proxy {}
+       // proxy {}
         port {
             if (cfg.username != null && cfg.password != null) {
                 withBasicAuth(cfg.username, cfg.password)
@@ -30,6 +30,8 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
     }.getOrElse {
             when (it) {
                 is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Ukjent herId", it.message ?: "Fant ikke noe for $id", cfg.url,it)
+                is NoSuchElementException -> throw NotFoundException("Ukjent herId", "Fant ikke noe for $id", cfg.url,it)
+                is IllegalStateException -> throw it
                 else -> throw RecoverableException(BAD_REQUEST, "${it.message}", cfg.url, it)
             }
         }

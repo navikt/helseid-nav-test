@@ -21,7 +21,6 @@ spec:
                     -  port: {{dialogmelding.port}}
                 -   host: {{wshost}}
                 -   host: {{stshost}}
-                -   host: youtube.com
                 -   host: {{aareg}}
                 -   host: {{ereg}}
     observability:
