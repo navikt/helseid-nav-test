@@ -56,6 +56,16 @@ spec:
             value: {{dialogmelding.host}}
         -   name: dialogmelding_port
             value: "{{dialogmelding.port}}"
+        -   name: dialogmelding_qm
+            value: {{dialogmelding.qm}}
+        -   name: dialogmelding_request
+            value: {{dialogmelding.request}}
+        -   name: dialogmelding_reply
+            value: {{dialogmelding.reply}}
+        -   name: dialogmelding_channel
+            value: {{dialogmelding.channel}}
+        -   name: dialogmelding_uri
+            value: {{dialogmelding.uri}}
         -   name:   wshost
             value: {{wshost}}
         -   name: env

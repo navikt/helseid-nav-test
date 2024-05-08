@@ -94,10 +94,3 @@ ibm:
     conn-name: ${dialogmelding.host}(${dialogmelding.port})
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
-
-dialogmelding:
-    uri: http://www.emottak.no
-    qm: MQLS02
-    channel: Q1_HELSEID
-    request: QA.Q414.IU03_UTSENDING
-    reply: QA.Q1_HELSEID.IU03_UTSENDING_REPLY
