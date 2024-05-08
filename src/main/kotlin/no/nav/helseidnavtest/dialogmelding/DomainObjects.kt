@@ -68,7 +68,7 @@ data class BehandlerKontor(
     val adresse: String?,
     val postnummer: Postnummer,
     val poststed: String?,
-    val orgnummer: Virksomhetsnummer,
+    val orgnummer: Orgnummer,
     var herId: HerId? = null,
     val mottatt: LocalDateTime = LocalDateTime.now(),
     val system: String = "Helseopplysninger",
@@ -137,7 +137,7 @@ data class Postnummer(private val raw : Int) {
     val verdi = format("%04d",raw)
 }
 
-data class Virksomhetsnummer(@get:JsonValue val verdi : String) {
+data class Orgnummer(@get:JsonValue val verdi : String) {
 
     constructor(orgnr : Int) : this(orgnr.toString())
 

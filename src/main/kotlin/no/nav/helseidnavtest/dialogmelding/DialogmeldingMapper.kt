@@ -226,7 +226,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         private const val EBACTION = "Henvendelse"
         private const val ENHET_DESC = "Organisasjonsnummeret i Enhetsregisteret"
         private const val HER_DESC = "Identifikator fra Helsetjenesteenhetsregisteret"
-        private val NAV_ORGNR  = Virksomhetsnummer(889640782)
+        private val NAV_ORGNR  = Orgnummer(889640782)
         private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
         private const val HER_OID ="2.16.578.1.12.4.1.1.8116"
         private const val ENH = "ENH"

@@ -42,7 +42,7 @@ class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
         with(kontor) {
             with(physicalAddresses.value.physicalAddress.first()) {
                 BehandlerKontor(name.value, streetAddress.value,
-                   Postnummer(postalCode), city.value, Virksomhetsnummer(orgnr))
+                   Postnummer(postalCode), city.value, Orgnummer(orgnr))
             }
         }
     override fun ping() = emptyMap<String,String>()

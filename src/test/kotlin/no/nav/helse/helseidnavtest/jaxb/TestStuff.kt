@@ -2,7 +2,6 @@ package no.nav.helse.helseidnavtest.jaxb
 
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
-import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterWSAdapter
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
@@ -18,9 +17,9 @@ class TestStuff {
     lateinit var adresse: AdresseRegisterClient
     //@Test
     fun stuff() {
-        whenever(adresse.herIdForVirksomhet(any(Virksomhetsnummer::class.java))).thenReturn(HerId(12345678))
+        whenever(adresse.herIdForVirksomhet(any(Orgnummer::class.java))).thenReturn(HerId(12345678))
         val kontor = BehandlerKontor("Et legekontor", "Fyrstikkalleen 1", Postnummer(1234),
-             "Oslo", Virksomhetsnummer(123456789), HerId(12345678))
+             "Oslo", Orgnummer(123456789), HerId(12345678))
 
         val behandler =  Behandler(UUID.randomUUID(),
             Fødselsnummer("26900799232"), Navn("Ole", "Mellomnavn", "Olsen"),
