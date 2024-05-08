@@ -15,9 +15,12 @@ spec:
     accessPolicy:
         outbound:
             external:
+                - host: b27wasl00839.preprod.local
+                  ports:
+                    - port: 9445
                 -   host: {{dialogmelding.host}}
                     ports:
-                        -  port: {{dialogmelding.port}}
+                    -  port: {{dialogmelding.port}}
                 -   host: {{wshost}}
                 -   host: {{stshost}}
                 -   host: youtube.com
