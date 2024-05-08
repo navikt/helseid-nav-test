@@ -17,8 +17,8 @@ class EmottakWSAdapter(cfg: DialogmeldingConfig) : Pingable {
         port{}
     }
 
-    fun partnerRef(orgnr: Orgnummer, herId: HerId) = client.hentPartnerIDViaOrgnummer(HentPartnerIDViaOrgnummerRequest().apply {
-        setOrgnr(orgnr.verdi)
+    fun partnerRef(orgnr: String, herId: HerId) = client.hentPartnerIDViaOrgnummer(HentPartnerIDViaOrgnummerRequest().apply {
+        setOrgnr(orgnr)
     }).partnerInformasjon.forEach { log.info("${it.partnerID} for ${it.heRid}") }
 
 
