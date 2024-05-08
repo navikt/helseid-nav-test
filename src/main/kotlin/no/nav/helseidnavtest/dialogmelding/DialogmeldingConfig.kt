@@ -11,7 +11,7 @@ import org.springframework.web.util.UriBuilder
 import java.net.URI
 
 @ConfigurationProperties(DIALOGMELDING)
-data class DialogmeldingConfig(val uri: URI, val enabled: Boolean = true, val pingPath: String = PINGPATH,
+ data class DialogmeldingConfig(val uri: URI, val enabled: Boolean = true, val pingPath: String = PINGPATH,
                                val request: String, val reply: String) : AbstractRestConfig(uri, pingPath, DIALOGMELDING, enabled) {
 
     fun query(b: UriBuilder) =

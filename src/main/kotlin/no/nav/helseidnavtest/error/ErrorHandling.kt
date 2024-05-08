@@ -18,7 +18,7 @@ class NotFoundException(title: String? = "Ikke funnet", detail: String, uri: URI
 open class IrrecoverableException(status: HttpStatus, title: String? = null, detail: String, uri: URI? = null, cause: Throwable? = null) : ErrorResponseException(status, problemDetail(status, title, detail, uri),  cause)
 open class RecoverableException(status: HttpStatus, detail: String, uri: URI? = null, cause: Throwable? = null): ErrorResponseException(status,problemDetail(status, "title", detail,uri), cause)
 
-private fun problemDetail(status: HttpStatus, title: String?, detail: String, uri: URI?) =
+private fun problemDetail(status: HttpStatus, title: String?, detail: String?="", uri: URI?) =
     forStatusAndDetail(status, detail).apply {
         this.title = title
         properties = mapOf("uri" to "$uri")

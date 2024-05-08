@@ -13,7 +13,7 @@ class DialogmeldingWSAdapter(cfg: DialogmeldingConfig) : Pingable {
     private val log = getLogger(DialogmeldingWSAdapter::class.java)
 
 
-    private val client = createPort<PartnerResource>("${cfg.uri}") {
+    private val client = createPort<PartnerResource>("${cfg.baseUri}") {
        // proxy {}
         port {}
     }
