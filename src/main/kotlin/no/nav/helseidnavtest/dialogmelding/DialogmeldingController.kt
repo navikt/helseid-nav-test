@@ -12,5 +12,5 @@ class DialogmeldingController(private val sender: DialogmeldingSender, private v
     fun send(@RequestParam pasient: Fødselsnummer) = sender.send(pasient)
 
     @GetMapping(value = ["/partner"])
-    fun partner(@RequestParam orgnr: Orgnummer, @RequestParam herId: String) = emottak.partnerRef(orgnr, herId)
+    fun partner(@RequestParam orgnr: String, @RequestParam herId: String) = emottak.partnerRef(orgnr, herId)
 }
