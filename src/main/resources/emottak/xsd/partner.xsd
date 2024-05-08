@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tr="http://www.nav.no/emottak/schemas" targetNamespace="http://www.nav.no/emottak/schemas">
+    <xsd:element name="TjenesteRequest">
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element name="AdressatInfo" type="tr:AdressatInfoType"/>
+                <xsd:element name="OpprettAktiver" type="tr:OpprettAktiverType"/>
+                <xsd:element name="Deaktiver" type="tr:DeaktiverType"/>
+                <xsd:element name="Oppdater" type="tr:OppdaterType"/>
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="AdressatInfoType">
+        <xsd:all>
+            <xsd:element name="tjeneste" type="tr:tjenesteType"/>
+            <xsd:element name="key" type="tr:keyType"/>
+        </xsd:all>
+    </xsd:complexType>
+    <xsd:complexType name="OpprettAktiverType">
+        <xsd:all>
+            <xsd:element name="tjeneste" type="tr:tjenesteType"/>
+            <xsd:element name="key" type="tr:keyType"/>
+            <xsd:element name="data" type="tr:dataType" minOccurs="0"/>
+            <xsd:element name="ediloggid" type="tr:ediloggidType"/>
+            <xsd:element name="sluttDato" type="tr:datoType" minOccurs="0"/>
+        </xsd:all>
+    </xsd:complexType>
+    <xsd:complexType name="DeaktiverType">
+        <xsd:all>
+            <xsd:element name="tjeneste" type="tr:tjenesteType"/>
+            <xsd:element name="key" type="tr:keyType"/>
+        </xsd:all>
+    </xsd:complexType>
+    <xsd:complexType name="OppdaterType">
+        <xsd:all>
+            <xsd:element name="tjeneste" type="tr:tjenesteType"/>
+            <xsd:element name="key" type="tr:keyType"/>
+            <xsd:element name="data" type="tr:dataType"/>
+        </xsd:all>
+    </xsd:complexType>
+    <xsd:element name="TjenesteResponse">
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element name="Kvittering" type="tr:KvitteringType"/>
+            </xsd:choice>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="KvitteringType">
+        <xsd:all>
+            <xsd:element name="tjeneste" type="tr:tjenesteType"/>
+            <xsd:element name="key" type="tr:keyType"/>
+            <xsd:element name="status" type="tr:statusType"/>
+            <xsd:element name="sistEndret" type="tr:datoType" minOccurs="0"/>
+            <xsd:element name="sluttDato" type="tr:datoType" minOccurs="0"/>
+            <xsd:element name="beskrivelse" type="tr:beskrivelseType" minOccurs="0"/>
+            <xsd:element name="data" type="tr:dataType" minOccurs="0"/>
+            <xsd:element name="mottakenhetBlokk" type="tr:mottakenhetBlokkType" minOccurs="0"/>
+        </xsd:all>
+    </xsd:complexType>
+    <xsd:complexType name="PartnerInformasjon">
+        <xsd:sequence>
+            <xsd:element name="PartnerID" type="xsd:string"/>
+            <xsd:element name="HERid" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="tjenesteType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="keyType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="dataType">
+        <xsd:restriction base="xsd:base64Binary"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="ediloggidType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="statusType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="mottakenhetBlokkType">
+        <xsd:restriction base="xsd:base64Binary"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="beskrivelseType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="datoType">
+        <xsd:restriction base="xsd:dateTime"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="partneridType">
+        <xsd:restriction base="xsd:int"/>
+    </xsd:simpleType>
+    <xsd:element name="OpprettEbrevAbonnementRequest">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="key" type="tr:keyType"/>
+                <xsd:element name="data" type="tr:dataType" minOccurs="0"/>
+                <xsd:element name="ediloggid" type="tr:ediloggidType"/>
+                <xsd:element name="partnerid" type="tr:partneridType"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="HentPartnerIDViaOrgnummerRequest">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="orgnr" type="xsd:string"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="HentPartnerIDViaOrgnummerResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="PartnerInformasjon" type="tr:PartnerInformasjon" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="EbrevAbonnementResponse">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="key" type="tr:keyType"/>
+                <xsd:element name="status" type="tr:statusType"/>
+                <xsd:element name="beskrivelse" type="tr:beskrivelseType" minOccurs="0"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

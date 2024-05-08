@@ -96,6 +96,7 @@ pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
 
 dialogmelding:
+    uri: http;://www.emottak.no
     qm: MQLS02
     channel: Q1_HELSEID
     request: QA.Q414.IU03_UTSENDING

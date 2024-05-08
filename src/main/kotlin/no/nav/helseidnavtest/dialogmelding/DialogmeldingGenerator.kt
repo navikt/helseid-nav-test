@@ -21,7 +21,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
 
 
     @Retryable(retryFor = [RecoverableException::class])
-    fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
+    fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID = randomUUID()) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
                 mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {

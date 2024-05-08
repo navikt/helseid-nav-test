@@ -8,7 +8,11 @@ import java.net.URI
 inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>("${cfg.url}") {
     proxy {}
     port {
-        withBasicAuth(cfg.username, cfg.password)
+        with(cfg) {
+            if (username != null && password != null) {
+                withBasicAuth(username, password)
+            }
+        }
     }
 }
 inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConfigurator<T>.() -> Unit = {}): T = PortConfigurator<T>().let {
@@ -45,4 +49,4 @@ class PortConfigurator<T> {
     }
 }
 
-abstract class WSConfig(val url: URI, val username: String, val password: String)
+abstract class WSConfig(val url: URI, val username: String? = null, val password:  String? = null)

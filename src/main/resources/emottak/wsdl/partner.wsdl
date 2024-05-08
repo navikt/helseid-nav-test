@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:sch="http://www.nav.no/emottak/schemas" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.nav.no/emottak/schemas" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.nav.no/emottak/schemas">
+    <wsdl:types>
+        <xsd:schema xmlns:tr="http://www.nav.no/emottak/schemas" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.nav.no/emottak/schemas">
+            <xsd:element name="TjenesteRequest">
+                <xsd:complexType>
+                    <xsd:choice>
+                        <xsd:element name="AdressatInfo" type="tr:AdressatInfoType"/>
+                        <xsd:element name="OpprettAktiver" type="tr:OpprettAktiverType"/>
+                        <xsd:element name="Deaktiver" type="tr:DeaktiverType"/>
+                        <xsd:element name="Oppdater" type="tr:OppdaterType"/>
+                    </xsd:choice>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="AdressatInfoType">
+                <xsd:all>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="tjeneste" type="tr:tjenesteType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:complexType name="OpprettAktiverType">
+                <xsd:all>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="tjeneste" type="tr:tjenesteType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="data" type="tr:dataType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="ediloggid" type="tr:ediloggidType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="sluttDato" type="tr:datoType"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:complexType name="DeaktiverType">
+                <xsd:all>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="tjeneste" type="tr:tjenesteType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:complexType name="OppdaterType">
+                <xsd:all>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="tjeneste" type="tr:tjenesteType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="data" type="tr:dataType"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:element name="TjenesteResponse">
+                <xsd:complexType>
+                    <xsd:choice>
+                        <xsd:element name="Kvittering" type="tr:KvitteringType"/>
+                    </xsd:choice>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="KvitteringType">
+                <xsd:all>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="tjeneste" type="tr:tjenesteType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                    <xsd:element maxOccurs="1" minOccurs="1" name="status" type="tr:statusType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="sistEndret" type="tr:datoType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="sluttDato" type="tr:datoType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="beskrivelse" type="tr:beskrivelseType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="data" type="tr:dataType"/>
+                    <xsd:element maxOccurs="1" minOccurs="0" name="mottakenhetBlokk" type="tr:mottakenhetBlokkType"/>
+                </xsd:all>
+            </xsd:complexType>
+            <xsd:simpleType name="tjenesteType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="keyType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="dataType">
+                <xsd:restriction base="xsd:base64Binary"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="ediloggidType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="statusType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="mottakenhetBlokkType">
+                <xsd:restriction base="xsd:base64Binary"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="beskrivelseType">
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="datoType">
+                <xsd:restriction base="xsd:dateTime"/>
+            </xsd:simpleType>
+            <xsd:simpleType name="partneridType">
+                <xsd:restriction base="xsd:int"/>
+            </xsd:simpleType>
+            <xsd:element name="OpprettEbrevAbonnementRequest">
+                <xsd:complexType>
+                    <xsd:all>
+                        <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                        <xsd:element maxOccurs="1" minOccurs="0" name="data" type="tr:dataType"/>
+                        <xsd:element maxOccurs="1" minOccurs="1" name="ediloggid" type="tr:ediloggidType"/>
+                        <xsd:element maxOccurs="1" minOccurs="1" name="partnerid" type="tr:partneridType"/>
+                    </xsd:all>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="EbrevAbonnementResponse">
+                <xsd:complexType>
+                    <xsd:all>
+                        <xsd:element maxOccurs="1" minOccurs="1" name="key" type="tr:keyType"/>
+                        <xsd:element maxOccurs="1" minOccurs="1" name="status" type="tr:statusType"/>
+                        <xsd:element maxOccurs="1" minOccurs="0" name="beskrivelse" type="tr:beskrivelseType"/>
+                    </xsd:all>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="HentPartnerIDViaOrgnummerRequest">
+                <xsd:complexType>
+                    <xsd:all>
+                        <xsd:element name="orgnr" type="xsd:string"/>
+                    </xsd:all>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="HentPartnerIDViaOrgnummerResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="PartnerInformasjon" type="tr:PartnerInformasjon" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:complexType name="PartnerInformasjon">
+                <xsd:sequence>
+                    <xsd:element name="PartnerID" type="xsd:string"/>
+                    <xsd:element name="HERid" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="TjenesteRequest">
+        <wsdl:part name="TjenesteRequest" element="sch:TjenesteRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="TjenesteResponse">
+        <wsdl:part name="TjenesteResponse" element="sch:TjenesteResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="OpprettEbrevAbonnementRequest">
+        <wsdl:part name="OpprettEbrevAbonnementRequest" element="sch:OpprettEbrevAbonnementRequest"/>
+    </wsdl:message>
+    <wsdl:message name="EbrevAbonnementResponse">
+        <wsdl:part name="EbrevAbonnementResponse" element="sch:EbrevAbonnementResponse"/>
+    </wsdl:message>
+    <wsdl:message name="HentPartnerIDViaOrgnummerRequest">
+        <wsdl:part name="HentPartnerIDViaOrgnummerRequest" element="sch:HentPartnerIDViaOrgnummerRequest"/>
+    </wsdl:message>
+    <wsdl:message name="HentPartnerIDViaOrgnummerResponse">
+        <wsdl:part name="HentPartnerIDViaOrgnummerResponse" element="sch:HentPartnerIDViaOrgnummerResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="PartnerResource">
+        <wsdl:operation name="Tjeneste">
+            <wsdl:input name="TjenesteRequest" message="sch:TjenesteRequest">
+            </wsdl:input>
+            <wsdl:output name="TjenesteResponse" message="sch:TjenesteResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="HentPartnerIDViaOrgnummer">
+            <wsdl:input name="HentPartnerIDViaOrgnummerRequest" message="sch:HentPartnerIDViaOrgnummerRequest"/>
+            <wsdl:output name="HentPartnerIDViaOrgnummerResponse" message="sch:HentPartnerIDViaOrgnummerResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="OpprettEbrevAbonnement">
+            <wsdl:input name="OpprettEbrevAbonnementRequest" message="sch:OpprettEbrevAbonnementRequest"/>
+            <wsdl:output name="EbrevAbonnementResponse" message="sch:EbrevAbonnementResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PartnerResourceSoap11" type="sch:PartnerResource">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="Tjeneste">
+            <soap:operation/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="HentPartnerIDViaOrgnummer">
+            <soap:operation/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="OpprettEbrevAbonnement">
+            <soap:operation/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PartnerResourceService">
+        <wsdl:port name="PartnerResourceSoap11" binding="sch:PartnerResourceSoap11">
+            <soap:address location="http://localhost/emottak-partnerweb/partnerService/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -16,7 +16,11 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
 
     private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
         proxy {}
-        port { withBasicAuth(cfg.username, cfg.password) }
+        port {
+            if (cfg.username != null && cfg.password != null) {
+                withBasicAuth(cfg.username, cfg.password)
+            }
+        }
     }
 
     fun herIdForId(id: String): Int = runCatching {
