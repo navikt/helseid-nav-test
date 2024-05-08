@@ -21,9 +21,11 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
             restClient
                 .get()
                 .uri {
-                    it.queryParam("service", EBSERVICE)
+                    it.path(cf.path)
+                        .queryParam("service", EBSERVICE)
                         .queryParam("role", EBROLE)
-                        .queryParam("action", EBACTION).build(herId)
+                        .queryParam("action", EBACTION)
+                        .build(herId)
                 }
                 .accept(APPLICATION_JSON)
                 .retrieve()
