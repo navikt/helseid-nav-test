@@ -5,7 +5,7 @@ import no.nav.helseidnavtest.oppslag.WSConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
-@ConfigurationProperties(DIALOGMELDING, ignoreInvalidFields = true)
+@ConfigurationProperties(prefix = DIALOGMELDING, ignoreInvalidFields = true)
 data class DialogmeldingConfig(val uri: URI, val request: String, val reply: String) : WSConfig(uri) {
 
     companion object {
