@@ -15,7 +15,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                -   host: wasapp-q1.adeo.no
+                -   host: cpa-repo-fss.intern.dev.nav.no
                 -   host: {{dialogmelding.host}}
                     ports:
                     -  port: {{dialogmelding.port}}

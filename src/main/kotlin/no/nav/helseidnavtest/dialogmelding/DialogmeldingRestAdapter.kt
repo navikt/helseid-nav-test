@@ -27,9 +27,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
                 }
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .onStatus({ it.isError }) { req, res ->
-                    handleErrors(req, res, herId)
-                }
+                .onStatus({ it.isError }) { req, res -> handleErrors(req, res, herId) }
                 .body<String>().also {
                     log.trace("Dialogmelding partner response {}", it)
                 } ?: throw NotFoundException("Fant ikke partnerId for herId $herId","",cf.baseUri)
