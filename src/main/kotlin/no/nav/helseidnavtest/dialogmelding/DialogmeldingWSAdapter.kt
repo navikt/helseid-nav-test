@@ -14,7 +14,8 @@ class DialogmeldingWSAdapter(cfg: DialogmeldingConfig) : Pingable {
 
 
     private val client = createPort<PartnerResource>("${cfg.uri}") {
-        proxy {}
+       // proxy {}
+        port {}
     }
 
     fun partnerRef(orgnr: String, herId: String) = client.hentPartnerIDViaOrgnummer(HentPartnerIDViaOrgnummerRequest().apply {

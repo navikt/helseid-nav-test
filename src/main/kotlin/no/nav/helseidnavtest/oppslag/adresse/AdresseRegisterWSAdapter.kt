@@ -15,7 +15,7 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
     private val log = getLogger(AdresseRegisterWSAdapter::class.java)
 
     private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
-       // proxy {}
+        proxy {}
         port {
             if (cfg.username != null && cfg.password != null) {
                 withBasicAuth(cfg.username, cfg.password)
