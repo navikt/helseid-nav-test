@@ -9,9 +9,7 @@ inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>("${cfg.url}") {
     proxy {}
     port {
         with(cfg) {
-            if (username != null && password != null) {
-                withBasicAuth(username, password)
-            }
+            withBasicAuth(username, password)
         }
     }
 }
@@ -49,4 +47,4 @@ class PortConfigurator<T> {
     }
 }
 
-abstract class WSConfig(val url: URI, val username: String? = null, val password:  String? = null)
+abstract class WSConfig(val url: URI, val username: String, val password:  String)
