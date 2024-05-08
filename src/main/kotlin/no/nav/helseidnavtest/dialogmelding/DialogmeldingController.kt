@@ -3,7 +3,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/xml")
-class DialogmeldingController(private val sender: DialogmeldingSender, private val generator: DialogmeldingGenerator, private val emottak: EmottakWSAdapter) {
+class DialogmeldingController(private val sender: DialogmeldingSender, private val generator: DialogmeldingGenerator, private val emottak: DialogmeldingWSAdapter) {
 
     @GetMapping(value = ["/generer"])
     fun generer(@RequestParam pasient: Fødselsnummer) = generator.genererDialogmelding(pasient)

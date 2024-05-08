@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class EmottakWSAdapter(cfg: DialogmeldingConfig) : Pingable {
+class DialogmeldingWSAdapter(cfg: DialogmeldingConfig) : Pingable {
 
-    private val log = getLogger(EmottakWSAdapter::class.java)
+    private val log = getLogger(DialogmeldingWSAdapter::class.java)
 
 
     private val client = createPort<PartnerResource>("${cfg.uri}") {
-        port{}
+        proxy {}
     }
 
     fun partnerRef(orgnr: String, herId: String) = client.hentPartnerIDViaOrgnummer(HentPartnerIDViaOrgnummerRequest().apply {
