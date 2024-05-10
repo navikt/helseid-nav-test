@@ -15,7 +15,7 @@ spec:
     accessPolicy:
         outbound:
             external:
-                -   host: cpa-repo-fss.intern.dev.nav.no
+                -   host: {{dialogmelding.partnerhost}}
                 -   host: {{dialogmelding.host}}
                     ports:
                     -  port: {{dialogmelding.port}}
@@ -52,6 +52,8 @@ spec:
     env:
         -   name: stshost
             value: {{stshost}}
+        -   name: dialogmelding_partnerhost
+            value: {{dialogmelding.partnerhpst}}
         -   name: dialogmelding_host
             value: {{dialogmelding.host}}
         -   name: dialogmelding_port

@@ -221,7 +221,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
     companion object {
         private const val VEDLEGG = "Vedlegg"
         private const val VERSION = "v1.2 2006-05-24"
-        const val EBROLE = "Saksbehandler"
+        const val EBROLE = "Sykmelder"
         const val EBSERVICE = "HenvendelseFraSaksbehandler"
         const val EBACTION = "Henvendelse"
         private const val ENHET_DESC = "Organisasjonsnummeret i Enhetsregisteret"

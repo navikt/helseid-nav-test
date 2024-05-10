@@ -26,7 +26,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
                         .queryParam("role", EBROLE)
                         .queryParam("action", EBACTION)
                         .build(herId).also {
-                            log.info("Dialogmelding partner request URL {}", it)
+                            log.trace("Dialogmelding partner request URL {}", it)
                         }
                 }
                 .accept(APPLICATION_JSON)

@@ -11,8 +11,8 @@ import java.net.URI
                                val request: String, val reply: String) : AbstractRestConfig(uri, pingPath, DIALOGMELDING, enabled) {
 
     companion object {
-        const val PATH = "{herid}"
-        private  const val PINGPATH = "internal/isAlive"
+        const val PATH = "/partner/her/{herid}"
+        private  const val PINGPATH = "/internal/health/liveness"
         const val DIALOGMELDING = "dialogmelding"
    }
 }

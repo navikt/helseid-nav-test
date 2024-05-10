@@ -84,6 +84,9 @@ fastlege:
 
 authserver:
     url: https://${stshost}
+
+dialogmelding:
+  uri: https://${dialogmelding.partnerhost}
 ibm:
   mq:
     channel: ${dialogmelding.channel}
