@@ -53,7 +53,7 @@ spec:
         -   name: stshost
             value: {{stshost}}
         -   name: dialogmelding_partnerhost
-            value: {{dialogmelding.partnerhpst}}
+            value: {{dialogmelding.partnerhost}}
         -   name: dialogmelding_host
             value: {{dialogmelding.host}}
         -   name: dialogmelding_port
