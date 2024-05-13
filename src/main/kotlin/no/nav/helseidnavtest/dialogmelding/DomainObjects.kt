@@ -13,6 +13,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
 import java.lang.String.format
 import java.time.LocalDateTime
+import java.time.LocalDateTime.*
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -58,9 +59,7 @@ data class Behandler(
     val telefon: String?,
     val kontor: BehandlerKontor,
     val kategori: BehandlerKategori =  LEGE,
-    val mottatt: LocalDateTime = LocalDateTime.now(),
-    val invalidated: LocalDateTime? = null,
-    val suspendert: Boolean = false,
+    val mottatt: LocalDateTime = now()
 )
 
 data class BehandlerKontor(
@@ -70,18 +69,14 @@ data class BehandlerKontor(
     val poststed: String?,
     val orgnummer: Orgnummer,
     var herId: HerId? = null,
-    val mottatt: LocalDateTime = LocalDateTime.now(),
-    val system: String = "Helseopplysninger",
-    val dialogmeldingEnabled: Boolean = true,
-    val dialogmeldingEnabledLocked: Boolean = false,
+    val mottatt: LocalDateTime = now(),
+    val system: String = "Helseopplysninger"
 )
 
-enum class BehandlerKategori(val kategoriKode: String ) {
+enum class BehandlerKategori(val kode: String ) {
     LEGE("LE")
 }
-data class PartnerId(val value: Int) {
-    override fun toString() =  value.toString()
-}
+
 
 data class Fødselsnummer(@get:JsonValue val verdi : String) {
     private  val log : Logger = getLogger(javaClass)
@@ -125,16 +120,23 @@ data class Fødselsnummer(@get:JsonValue val verdi : String) {
 
 }
 
-
-data class HerId(val verdi : String)  {
-    constructor(verdi: Int) : this("$verdi")
-}
-data class HprId(val verdi : String)  {
-    constructor(verdi: Int) : this("$verdi")
+@JvmInline
+value class PartnerId(val value: Int) {
+    constructor(verdi: String) : this(verdi.toInt())
 }
 
-data class Postnummer(private val raw : Int) {
-    val verdi = format("%04d",raw)
+@JvmInline
+value class HerId(val verdi : String)  {
+    constructor(verdi: Int) : this("$verdi")
+}
+@JvmInline
+value class HprId(val verdi : String)  {
+    constructor(verdi: Int) : this("$verdi")
+}
+
+@JvmInline
+value class Postnummer(private val raw : Int) {
+    val verdi get() = format("%04d",raw)
 }
 
 data class Orgnummer(@get:JsonValue val verdi : String) {
