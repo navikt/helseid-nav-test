@@ -19,7 +19,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         HerId(client.getPatientGPDetails(pasient).gpHerId.value)
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message,uri = cfg.url,detail = "Fant ikke fastlege for pasient $pasient" ,cause = it)
+            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",detail = it.message,uri = cfg.url, cause = it)
             else -> throw it
         }
     }
@@ -33,7 +33,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             }
         }.getOrElse {
             when (it) {
-                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(it.message,uri = cfg.url,detail = "Fant ikke detaljer for pasient $pasient" ,cause = it)
+                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke detaljer for pasient $pasient",uri = cfg.url,detail = it.message ,cause = it)
                 else -> throw it
             }
         }
