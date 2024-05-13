@@ -169,11 +169,38 @@
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>4.0.1</version>
+                <executions>
+                    <execution>
+                        <id>basecontainer</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                        <configuration>
+                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/basecontainer/xsd/kith-base64.xsd</xsd>
+                                    <bindingFiles>
+                                        <bindingFile>${basedir}/src/main/resources/basecontainer/xjb/binding.xml</bindingFile>
+                                    </bindingFiles>
+                                    <packagename>no.nav.helseopplysninger.basecontainer</packagename>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <execution>
+                   <!-- <execution>
                         <id>basecontainer</id>
                         <goals><goal>xjc</goal>
                         </goals>
@@ -187,7 +214,7 @@
                                 <source>src/main/resources/basecontainer/xsd</source>
                             </sources>
                         </configuration>
-                    </execution>
+                    </execution> -->
                     <execution>
                         <id>fellesformat1</id>
                         <goals>
