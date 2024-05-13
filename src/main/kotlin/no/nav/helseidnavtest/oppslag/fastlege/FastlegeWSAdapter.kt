@@ -10,7 +10,7 @@ import no.nav.helseidnavtest.ws.flr.WSGPOffice
 import org.springframework.stereotype.Component
 
 @Component
-class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
+class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
 
 
     private val client = createPort<IFlrReadOperations>(cfg)

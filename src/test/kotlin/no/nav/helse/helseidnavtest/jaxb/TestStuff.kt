@@ -19,7 +19,7 @@ class TestStuff {
     fun stuff() {
         whenever(adresse.herIdForVirksomhet(any(Orgnummer::class.java))).thenReturn(HerId(12345678))
         val kontor = BehandlerKontor("Et legekontor", "Fyrstikkalleen 1", Postnummer(1234),
-             "Oslo", Orgnummer(123456789), HerId(12345678))
+             "Oslo", Orgnummer(123456789), PartnerId(42),HerId(12345678))
 
         val behandler =  Behandler(UUID.randomUUID(),
             Fødselsnummer("26900799232"), Navn("Ole", "Mellomnavn", "Olsen"),

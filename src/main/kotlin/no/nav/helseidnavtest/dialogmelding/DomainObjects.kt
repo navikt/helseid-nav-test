@@ -68,6 +68,7 @@ data class BehandlerKontor(
     val postnummer: Postnummer,
     val poststed: String?,
     val orgnummer: Orgnummer,
+    var partnerId: PartnerId? = null,
     var herId: HerId? = null,
     val mottatt: LocalDateTime = now(),
     val system: String = "Helseopplysninger"
@@ -121,8 +122,8 @@ data class Fødselsnummer(@get:JsonValue val verdi : String) {
 }
 
 @JvmInline
-value class PartnerId(val value: Int) {
-    constructor(verdi: String) : this(verdi.toInt())
+value class PartnerId(val value: String) {
+    constructor(verdi: Int) : this("$verdi")
 }
 
 @JvmInline

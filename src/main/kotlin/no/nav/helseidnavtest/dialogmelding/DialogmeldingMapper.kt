@@ -37,7 +37,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             with(any) {
                 val hm = hodemelding(melding, arbeidstaker)
                 add(hm)
-                add(mottakenhetBlokk(melding,hm.msgInfo.receiver.organisation.ident.find { it.typeId.v == HER }!!.id))
+                add(mottakenhetBlokk(melding))
                 add(sporinformasjonBlokk())
             }
         }
@@ -49,14 +49,14 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             document.add(dialogmeldingDocument(melding))
             document.add(vedleggDocument(melding))
         }
-    private fun mottakenhetBlokk(melding: Dialogmelding, herId: String) =
+    private fun mottakenhetBlokk(melding: Dialogmelding) =
         with(melding) {
             if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk)  {
                 throw IllegalArgumentException("Ugyldig melding/type kombinasjon $type/$kodeverk")
             }
             FFOF.createXMLMottakenhetBlokk().apply {
                 ebRole = EBROLE
-                herIdentifikator = herId
+                partnerReferanse = melding.behandler.kontor.partnerId!!.value
                 ebService =  EBSERVICE
                 ebAction = EBACTION
             }

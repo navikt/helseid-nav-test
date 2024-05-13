@@ -3,4 +3,6 @@ package no.nav.helseidnavtest.dialogmelding
 import org.springframework.stereotype.Component
 
 @Component
-internal class DialogmeldingClient 
+class DialogmeldingClient(private val adapter: DialogmeldingRestAdapter) {
+    fun partnerId(herId: HerId) = PartnerId(adapter.partnerId(herId.verdi))
+}
