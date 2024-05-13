@@ -16,7 +16,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
     private val client = createPort<IFlrReadOperations>(cfg)
 
     fun herId(pasient: String) = runCatching {
-        HerId(client.getPatientGPDetails(pasient).gpHerId.value)
+        client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
             is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",detail = it.message,uri = cfg.url, cause = it)

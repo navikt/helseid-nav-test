@@ -16,7 +16,7 @@ import org.springframework.web.client.body
 @Component
 class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(DIALOGMELDING) client : RestClient) : AbstractRestClientAdapter(client, cf) {
 
-    fun partnerId(herId: String) =
+    fun partnerId(herId: String, behandlerKontor: BehandlerKontor) =
         if (cf.isEnabled) {
             restClient
                 .get()
@@ -34,7 +34,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
                 .onStatus({ it.isError }) { req, res -> handleErrors(req, res, "Fant ikke partnerId for $herId") }
                 .body<String>().also {
                     log.trace("Dialogmelding partner response {}", it)
-                } ?: throw NotFoundException(detail="Fant ikke partnerId for herId $herId",uri = baseUri)
+                } ?: throw NotFoundException(detail="Fant ikke partnerId for herId $herId for kontor ${behandlerKontor.navn}",uri = baseUri)
         }
         else {
             throw NotImplementedError("Dialogmelding oppslag er ikke aktivert")

@@ -10,7 +10,4 @@ class DialogmeldingController(private val sender: DialogmeldingSender, private v
 
     @GetMapping(value = ["/send"])
     fun send(@RequestParam pasient: Fødselsnummer) = sender.send(pasient)
-
-    @GetMapping(value = ["/partner"])
-    fun partner(@RequestParam herId: String) = emottak.partnerId(herId)
 }
