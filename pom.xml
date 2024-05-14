@@ -293,11 +293,8 @@
                                     </bindingFiles>
                                     <wsdl>${basedir}/src/main/resources/flr.wsdl</wsdl>
                                     <extraargs>
-                                        <extraarg>-client</extraarg>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>
-                                    <packagenames>
-                                    </packagenames>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -314,7 +311,6 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/ar.wsdl</wsdl>
                                     <extraargs>
-                                        <extraarg>-client</extraarg>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>
                                     <packagenames>
