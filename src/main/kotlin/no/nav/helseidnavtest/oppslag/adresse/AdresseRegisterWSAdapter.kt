@@ -24,13 +24,13 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
 
     fun herIdForId(id: String): Int = runCatching {
         client.searchById(id).communicationParty.single().herId.also {
-            log.info("Returnerer kommunikasjonspart $it")
+            log.info("Returnerer kommunikasjonspart $it for $id")
         }
     }.getOrElse {
             when (it) {
                 is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url,it)
                 is NoSuchElementException -> throw NotFoundException(detail = "Fant ikke kommunikasjonspart for $id", uri = cfg.url, cause = it)
-                is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "For mange kommunikasjonsparter", it.message,cfg.url,it)
+                is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "For mange kommunikasjonsparter for $id", it.message,cfg.url,it)
                 else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
             }
         }

@@ -27,13 +27,13 @@ class OrganisasjonRestClientAdapter(@Qualifier(ORGANISASJON) val client: RestCli
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ !it.is2xxSuccessful }) { req, res ->
-                    handleErrors(req, res, orgnr.orgnr)
+                    handleErrors(req, res, orgnr.verdi)
                 }
-                .body<OrganisasjonDTO>()?.fulltNavn ?: orgnr.orgnr
-                .also { log.trace("Organisasjon oppslag response {}", it) }
+                .body<OrganisasjonDTO>()?.fulltNavn ?: orgnr.verdi
+                .also { log.trace("Organisasjon ${orgnr.verdi} response {}", it) }
         }
         else {
-            orgnr.orgnr
+            orgnr.verdi
         }
 }
 

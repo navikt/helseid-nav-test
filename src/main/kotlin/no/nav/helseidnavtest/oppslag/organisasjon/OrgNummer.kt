@@ -5,20 +5,20 @@ import no.nav.boot.conditionals.Cluster.Companion.currentCluster
 import no.nav.boot.conditionals.Cluster.PROD_GCP
 import org.slf4j.LoggerFactory.getLogger
 
-data class OrgNummer(@get:JsonValue val orgnr : String) {
+data class OrgNummer(@get:JsonValue val verdi : String) {
 
     private val log = getLogger(javaClass)
 
     init {
         if (currentCluster() == PROD_GCP) {
-            with(orgnr)  {
-                require(length == WEIGHTS.size + 1) { "Orgnr må ha lengde ${WEIGHTS.size + 1}, $orgnr har lengde ${orgnr.length} " }
+            with(verdi)  {
+                require(length == WEIGHTS.size + 1) { "Orgnr må ha lengde ${WEIGHTS.size + 1}, $verdi har lengde ${verdi.length} " }
                 require(startsWith("8") || startsWith("9")) { "Orgnr må begynne med 8 eller 9" }
                 require(this[8].code - 48 == mod11(substring(0, 8))) { "${this[8]} feilet mod11 validering" }
             }
            }
         else {
-            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), orgnr)
+            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), verdi)
         }
     }
 

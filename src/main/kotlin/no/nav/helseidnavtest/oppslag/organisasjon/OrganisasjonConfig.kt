@@ -13,7 +13,7 @@ class OrganisasjonConfig(baseUri: URI, private val organisasjonPath: String = V1
                          @DefaultValue("true") enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath(organisasjonPath), ORGANISASJON, enabled) {
 
-    fun organisasjonURI(b: UriBuilder, orgnr: OrgNummer) = b.path(organisasjonPath).build(orgnr.orgnr)
+    fun organisasjonURI(b: UriBuilder, orgnr: OrgNummer) = b.path(organisasjonPath).build(orgnr.verdi)
 
     companion object {
         const val ORGANISASJON = "organisasjon"

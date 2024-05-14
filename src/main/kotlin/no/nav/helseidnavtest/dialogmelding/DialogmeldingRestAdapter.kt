@@ -34,7 +34,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
                 .onStatus({ it.isError }) { req, res -> handleErrors(req, res, "Fant ikke partnerId for $herId (${behandlerKontor.navn})") }
                 .body<String>().also {
                     log.trace("Dialogmelding partner response {}", it)
-                } ?: throw NotFoundException(detail="Fant ikke partnerId for herId $herId for kontor ${behandlerKontor.navn}",uri = baseUri)
+                } ?: throw NotFoundException(detail="Fant ikke partnerId for herId $herId for  ${behandlerKontor.navn}",uri = baseUri)
         }
         else {
             throw NotImplementedError("Dialogmelding oppslag er ikke aktivert")

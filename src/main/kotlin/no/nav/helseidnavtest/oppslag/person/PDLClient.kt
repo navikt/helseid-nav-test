@@ -17,6 +17,6 @@ class PDLClient(private val pdl: PDLWebClientAdapter) {
     fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
     @Recover
     fun recover(ex: RecoverableException, fnr: Fødselsnummer) :Nothing= throw ex.also {
-        log.error("Recoverable exception feilet for fnr {}", fnr)
+        log.error("Recoverable exception feilet for oppslag på fnr {}", fnr,it)
     }
 }
