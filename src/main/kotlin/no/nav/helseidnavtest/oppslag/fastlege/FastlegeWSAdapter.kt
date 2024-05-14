@@ -4,9 +4,9 @@ import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
-import no.nav.helseidnavtest.ws.flr.IFlrReadOperations
-import no.nav.helseidnavtest.ws.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
-import no.nav.helseidnavtest.ws.flr.WSGPOffice
+import no.nhn.schemas.reg.flr.IFlrReadOperations
+import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
+import no.nhn.schemas.reg.flr.WSGPOffice
 import org.springframework.stereotype.Component
 
 @Component
