@@ -10,7 +10,7 @@
                   printMethod="no.nav.helseidnavtest.adapters.LocalDateTimeAdapter.marshal" />
     </globalBindings>
 
-    <bindings schemaLocation="../xsd/AppRec-v1.0.xsd">
+    <bindings schemaLocation="../xsd/apprec.xsd">
         <schemaBindings>
             <nameXmlTransform>
                 <typeName prefix="XML"/>

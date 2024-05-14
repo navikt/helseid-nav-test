@@ -226,7 +226,7 @@
                             <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/apprec/xsd/Apprec-v1.0.xsd</xsd>
+                                    <xsdDir>${basedir}/src/main/resources/apprec/xsd</xsdDir>
                                     <bindingFiles>
                                         <bindingFile>${basedir}/src/main/resources/apprec/xjb/binding-apprec.xjb</bindingFile>
                                     </bindingFiles>
