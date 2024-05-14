@@ -8,7 +8,5 @@ import org.springframework.stereotype.Service
 @Service
 class AdresseRegisterClient(private val adapter: AdresseRegisterWSAdapter) {
 
-    fun herIdForHpr(hpr: HprId) = HerId(adapter.herIdForId(hpr.verdi))
-
     fun herIdForVirksomhet(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 }
