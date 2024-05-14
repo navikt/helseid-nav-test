@@ -12,33 +12,32 @@ import org.springframework.stereotype.Component
 @Component
 class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
 
-
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun herId(pasient: String) = runCatching {
+    fun herIdForLegeViaPasient(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",detail = it.message,uri = cfg.url, cause = it)
+            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
             else -> throw it
         }
     }
 
-    fun kontor(pasient: Fødselsnummer) =
+    fun kontorViaPasient(pasient: String) =
         runCatching {
-            with(client.getPatientGPDetails(pasient.verdi)) {
+            with(client.getPatientGPDetails(pasient)) {
                 with(gpContract.value) {
-                    kontor(gpOffice.value, gpOfficeOrganizationNumber)
+                    fastlegeKontor(gpOffice.value, gpOfficeOrganizationNumber)
                 }
             }
         }.getOrElse {
             when (it) {
-                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke detaljer for pasient $pasient",uri = cfg.url,detail = it.message ,cause = it)
+                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
                 else -> throw it
             }
         }
 
-    private fun kontor(kontor: WSGPOffice, orgnr: Int) =
+    private fun fastlegeKontor(kontor: WSGPOffice, orgnr: Int) =
         with(kontor) {
             with(physicalAddresses.value.physicalAddress.first()) {
                 BehandlerKontor(name.value, streetAddress.value,

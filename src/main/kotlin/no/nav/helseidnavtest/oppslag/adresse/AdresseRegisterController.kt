@@ -6,5 +6,5 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController("adresse")
 class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
-    @GetMapping("/idforkontor") fun search(@RequestParam orgnr: Orgnummer) = adresse.herIdForVirksomhet(orgnr)
+    @GetMapping("/idForOrgNummer") fun search(@RequestParam orgnr: Orgnummer) = adresse.herIdForOrgnummer(orgnr)
 }

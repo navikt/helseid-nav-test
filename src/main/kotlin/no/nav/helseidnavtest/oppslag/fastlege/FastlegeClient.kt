@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val adresseClient: AdresseRegisterClient, private val partnerClient: DialogmeldingClient) {
-    fun kontor(fnr: Fødselsnummer) = fastlegeAdapter.kontor(fnr).apply {
-        adresseClient.herIdForVirksomhet(orgnummer).let {
+    fun kontor(pasient: Fødselsnummer) = fastlegeAdapter.kontorViaPasient(pasient.verdi).apply {
+        adresseClient.herIdForOrgnummer(orgnummer).let {
             herId = it
             partnerId = partnerClient.partnerId(it, this)
         }
     }
-    fun herId(pasient: Fødselsnummer) = HerId(fastlegeAdapter.herId(pasient.verdi))
+    fun herIdForLegeViaPasient(pasient: Fødselsnummer) = HerId(fastlegeAdapter.herIdForLegeViaPasient(pasient.verdi))
 }

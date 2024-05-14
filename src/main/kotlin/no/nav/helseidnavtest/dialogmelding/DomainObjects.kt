@@ -142,15 +142,15 @@ value class Postnummer(private val raw : Int) {
 
 data class Orgnummer(@get:JsonValue val verdi : String) {
 
-    constructor(orgnr : Int) : this(orgnr.toString())
+    constructor(orgnr : Int) : this("$orgnr")
 
     private  val log : Logger = getLogger(javaClass)
 
     init {
-        require(verdi.length == 9) { "Virksomhetsnummer må ha lengde 9, $verdi har lengde ${verdi.length} " }
+        require(verdi.length == 9) { "Orgnummer må ha lengde 9, $verdi har lengde ${verdi.length} " }
         if (currentCluster() == PROD_GCP) {
             log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), verdi)
-            require(verdi.first() in listOf('8', '9')) { "Virksomhetsnummer må begynne med 8 eller 9" }
+            require(verdi.first() in listOf('8', '9')) { "ç må begynne med 8 eller 9" }
             require(verdi[8].code - 48 == mod11(verdi.substring(0, 8))) { "Kontrollsiffer ${verdi[8]} ikke validert" }
         }
         else {
