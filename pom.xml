@@ -313,8 +313,6 @@
                                     <extraargs>
                                         <extraarg>-verbose</extraarg>
                                     </extraargs>
-                                    <packagenames>
-                                    </packagenames>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -324,50 +322,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-          <plugin>
-              <groupId>com.sun.xml.ws</groupId>
-              <artifactId>jaxws-maven-plugin</artifactId>
-              <version>4.0.2</version>
-              <executions>
-
-                  <execution>
-                      <id>flr</id>
-                      <goals>
-                          <goal>wsimport</goal>
-                      </goals>
-                      <configuration>
-                          <verbose>true</verbose>
-                          <bindingFiles>
-                              ${project.basedir}/src/main/resources/flrbindings.xml
-                          </bindingFiles>
-                          <wsdlFiles>
-                              ${project.basedir}/src/main/resources/flr.wsdl
-                          </wsdlFiles>
-                          <packageName>no.nav.helseidnavtest.ws.flr</packageName>
-                          <sourceDestDir>${sourcesDir}</sourceDestDir>
-                          <destDir>${classesDir}</destDir>
-                          <extension>true</extension>
-                      </configuration>
-                  </execution>
-                  <execution>
-                      <id>ar</id>
-                      <goals>
-                          <goal>wsimport</goal>
-                      </goals>
-                      <configuration>
-                          <extension>true</extension>
-                          <verbose>true</verbose>
-                          <wsdlFiles>
-                              ${project.basedir}/src/main/resources/ar.wsdl
-                          </wsdlFiles>
-                          <packageName>no.nav.helseidnavtest.ws.ar</packageName>
-                          <sourceDestDir>${sourcesDir}</sourceDestDir>
-                          <destDir>${classesDir}</destDir>
-                      </configuration>
-                  </execution>
-                </executions>
-            </plugin>-->
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
