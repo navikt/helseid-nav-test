@@ -15,6 +15,7 @@
     <description>helseid-nav-test</description>
     <properties>
         <cxf.version>4.0.4</cxf.version>
+        <cxf.plugin.version>4.0.1</cxf.plugin.version>
         <conditionals.version>5.1.2</conditionals.version>
         <java.version>21</java.version>
         <kotlin.version>1.9.24</kotlin.version>
@@ -171,7 +172,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
-                <version>4.0.1</version>
+                <version>${cxf.plugin.version}</version>
                 <configuration>
                     <additionalJvmArgs>-Djavax.xml.accessExternalDTD=all</additionalJvmArgs>
                 </configuration>
@@ -188,7 +189,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/basecontainer/xsd/kith-base64.xsd</xsd>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/basecontainer/xjb/binding.xml</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/basecontainer/xjb/binding.xjb</bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.basecontainer</packagename>
                                 </xsdOption>
@@ -208,7 +209,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/fellesformat2/xsd/Fellesformat2_any.xsd</xsd>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/fellesformat2/xjb/binding.xml</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/fellesformat2/xjb/binding.xjb</bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.fellesformat2</packagename>
                                 </xsdOption>
@@ -228,7 +229,7 @@
                                 <xsdOption>
                                     <xsdDir>${basedir}/src/main/resources/apprec/xsd</xsdDir>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/apprec/xjb/binding-apprec.xjb</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/apprec/xjb/binding.xjb</bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.apprec</packagename>
                                 </xsdOption>
@@ -247,7 +248,7 @@
                                 <xsdOption>
                                     <xsdDir>${basedir}/src/main/resources/dialogmelding/xsd</xsdDir>
                                      <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/dialogmelding/xjb/binding.xml</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/dialogmelding/xjb/binding.xjb</bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.dialogmelding</packagename>
                                 </xsdOption>
@@ -279,22 +280,26 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>4.0.1</version>
+                <version>${cxf.version}</version>
+                <configuration>
+                    <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
+                    <defaultOptions>
+                      <extraargs>
+                          <extraarg>-verbose</extraarg>
+                      </extraargs>
+                </defaultOptions>
+            </configuration>
                 <executions>
                     <execution>
                         <id>flr</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <bindingFiles>
                                         <bindingFile>${basedir}/src/main/resources/flrbindings.xml</bindingFile>
                                     </bindingFiles>
                                     <wsdl>${basedir}/src/main/resources/flr.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-verbose</extraarg>
-                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -306,13 +311,9 @@
                         <id>ar</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/ar.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-verbose</extraarg>
-                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

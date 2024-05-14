@@ -8,20 +8,8 @@
                 xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd">
-<!--
-    <jxb:globalBindings generateElementProperty="false">
-        <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                      adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
-    </jxb:globalBindings>
--->
-    <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://register.nhn.no/Common']">
-        <!--
-        <jxb:globalBindings generateElementProperty="false">
-            <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                          adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
 
-        </jxb:globalBindings>
-          -->
+    <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://register.nhn.no/Common']">
         <jxb:schemaBindings>
             <jxb:package name="no.nhn.register.fastlegeinformasjon.common"/>
             <jxb:nameXmlTransform>
@@ -33,24 +21,12 @@
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://schemas.microsoft.com/2003/10/Serialization/Arrays']">
-     <!--
-        <jxb:globalBindings generateElementProperty="false">
-            <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                          adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
-        </jxb:globalBindings>
-        -->
         <jxb:schemaBindings>
             <jxb:package name="com.microsoft.schemas._2003._10.serialization.arrays.unngaduplikat"/>
         </jxb:schemaBindings>
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://schemas.nhn.no/reg/Common/en']">
-      <!--
-        <jxb:globalBindings generateElementProperty="false">
-            <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                          adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
-        </jxb:globalBindings>
-        -->
         <jxb:schemaBindings>
             <jxb:nameXmlTransform>
                 <jxb:elementName prefix="WS"/>
@@ -61,12 +37,6 @@
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://register.nhn.no/Corporate']">
-       <!--
-        <jxb:globalBindings generateElementProperty="false">
-            <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                          adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
-        </jxb:globalBindings>
-        -->
         <jxb:schemaBindings>
             <jxb:nameXmlTransform>
                 <jxb:elementName prefix="WS"/>
@@ -77,12 +47,6 @@
     </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://schemas.nhn.no/reg/flr']">
-     <!--
-        <jxb:globalBindings generateElementProperty="false">
-            <xjc:javaType name="java.time.LocalDateTime" xmlType="xs:dateTime"
-                          adapter="com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter"/>
-        </jxb:globalBindings>
-        -->
         <jxb:schemaBindings>
             <jxb:nameXmlTransform>
                 <jxb:elementName prefix="WS"/>
