@@ -26,7 +26,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
 
 
     @ExceptionHandler(AccessDeniedException::class)
-    fun accessDenied(e: Exception, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
+    fun accessDenied(e: AccessDeniedException, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
 
     @ExceptionHandler(Exception::class)
     fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
@@ -38,7 +38,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             }.also { log(e, it, req, status) })
 
     private fun log(t: Throwable, problem: ProblemDetail, req: NativeWebRequest, status: HttpStatus) {
-        if(status == UNPROCESSABLE_ENTITY ||  status == UNSUPPORTED_MEDIA_TYPE){
+        if(status in listOf(UNPROCESSABLE_ENTITY,UNSUPPORTED_MEDIA_TYPE)) {
             logWarning(req, problem, status, t)
         }
         else {

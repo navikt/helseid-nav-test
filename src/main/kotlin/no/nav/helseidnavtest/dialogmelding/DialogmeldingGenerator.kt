@@ -22,7 +22,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
 
 
     @Retryable(retryFor = [RecoverableException::class])
-    @PreAuthorize("hasAuthority('LE_4')")
+    @ç("hasAuthority('LE_4')")
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID = randomUUID()) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {

@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
+import org.springframework.stereotype.Component
 
 
 @Configuration
@@ -95,9 +96,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         successHandler: LogoutSuccessHandler
     ): SecurityFilterChain {
         http {
-            exceptionHandling {
-                accessDeniedHandler = CustomAccessDeniedHandler()
-            }
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
@@ -125,6 +123,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         return http.build()
     }
 }
+@Component
 class CustomAccessDeniedHandler : AccessDeniedHandler {
     override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
         getContext().authentication?.let {
