@@ -19,6 +19,13 @@ management:
 spring:
   application:
     name: helseid-nav-test
+  datasource:
+    url: jdbc:postgresql://${db.host}:${db.port}/${db.database}
+    username: ${db.username}
+    password: ${db.password}
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 2
   security:
     oauth2:
       resourceserver:
