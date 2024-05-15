@@ -95,9 +95,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         successHandler: LogoutSuccessHandler
     ): SecurityFilterChain {
         http {
-            exceptionHandling {
-                accessDeniedHandler = CustomAccessDeniedHandler()
-            }
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
@@ -123,12 +120,5 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
             }
         }
         return http.build()
-    }
-}
-class CustomAccessDeniedHandler : AccessDeniedHandler {
-    private val log = getLogger(CustomAccessDeniedHandler::class.java)
-
-    override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
-      log.warn("Handling accessDenied",e)
     }
 }
