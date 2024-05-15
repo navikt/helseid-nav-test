@@ -297,7 +297,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/flrbindings.xml</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/flrbindings.xjb</bindingFile>
                                     </bindingFiles>
                                     <wsdl>${basedir}/src/main/resources/flr.wsdl</wsdl>
                                 </wsdlOption>
