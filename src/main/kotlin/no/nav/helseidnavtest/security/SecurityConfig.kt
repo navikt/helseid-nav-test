@@ -59,10 +59,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
 
     @Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter { reg ->
-            when (reg.registrationId) {
+        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
+            when (it.registrationId) {
                 "helse-id" -> jwk
-                else -> throw IllegalArgumentException("Unknown client: ${reg.registrationId}")
+                else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
     }
