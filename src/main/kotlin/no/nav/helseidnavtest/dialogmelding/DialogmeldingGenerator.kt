@@ -10,6 +10,7 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.retry.annotation.Retryable
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
@@ -21,11 +22,12 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
 
 
     @Retryable(retryFor = [RecoverableException::class])
+    @PreAuthorize("hasAuthority('LE_4')")
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID = randomUUID()) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
                 mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
-                    behandler(navn, fastlege.herId(pasient), HprId(hprNumber), fnr, fastlege.kontor(pasient))
+                    behandler(navn, fastlege.herIdForLegeViaPasient(pasient), HprId(hprNumber), fnr, fastlege.kontorForPasient(pasient))
             },uuid), arbeidstaker(pasient))
         }
             else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
