@@ -129,15 +129,6 @@ class CustomAccessDeniedHandler : AccessDeniedHandler {
     private val log = getLogger(CustomAccessDeniedHandler::class.java)
 
     override fun handle(req : HttpServletRequest, res : HttpServletResponse, e : AccessDeniedException) {
-        getContext().authentication?.let {
-            res.apply {
-                status = SC_FORBIDDEN
-                contentType = APPLICATION_JSON_VALUE
-                writer.write(
-                    "Error : To access this resource you need to be a GP registered in HPR, but token contained only the following profession(s): ${
-                        ClaimsExtractor((it.oidcUser().claims)).professions
-                    }")
-            }
-        } ?: log.warn("Ikke autentisert")
+      log.warn("Handling accessDenied",e)
     }
 }
