@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON
 import org.springframework.http.ResponseEntity.status
 import org.springframework.http.converter.HttpMessageConversionException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -21,18 +22,14 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
-    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
+    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    //@ExceptionHandler(ErrorResponseException::class)
-    //fun irrecoverable(e: ErrorResponseException, req: NativeWebRequest) = createProblem(e)
 
-    private fun createProblem(e: ErrorResponseException) =
-        status(e.statusCode)
-            .headers(e.headers.apply { contentType = APPLICATION_PROBLEM_JSON })
-            .body(e.body)
+    @ExceptionHandler(AccessDeniedException::class)
+    fun accessDenied(e: Exception, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
 
     @ExceptionHandler(Exception::class)
-    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST).also { log.debug(e.message,e) }
+    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
     private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
         status(status)
