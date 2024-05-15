@@ -1,4 +1,4 @@
-package no.nav.helseidnavtest.security
+package no.nav.helseidnavtest.oppslag.arbeid
 
 import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.beans.factory.annotation.Qualifier
