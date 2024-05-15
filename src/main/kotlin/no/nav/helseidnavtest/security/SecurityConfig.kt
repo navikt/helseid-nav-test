@@ -119,7 +119,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 authorize("/xml/**", permitAll)
                 authorize("/actuator/**", permitAll)
                 authorize("/hello", hasAuthority("LE_4"))
-                authorize(anyRequest, authenticated)
+                authorize(anyRequest, permitAll)
             }
         }
         return http.build()
