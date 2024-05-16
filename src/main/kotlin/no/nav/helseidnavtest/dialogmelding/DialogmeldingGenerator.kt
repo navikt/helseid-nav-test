@@ -18,10 +18,8 @@ import java.util.UUID
 import java.util.UUID.*
 
 @Component
-class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient, private val adresseAdapter: AdresseRegisterWSAdapter) {
+class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
 
-
-    @Retryable(retryFor = [RecoverableException::class])
     @PreAuthorize("hasAuthority('LE_4')")
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID = randomUUID()) =
         when (val auth = getContext().authentication) {

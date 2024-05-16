@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component
 
 
 @Component
+@Retryable(retryFor = [RecoverableException::class])
 class PDLClient(private val pdl: PDLWebClientAdapter) {
 
     private val log = getLogger(PDLClient::class.java)
 
     fun ping() = pdl.ping()
-    @Retryable(retryFor = [RecoverableException::class])
     fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
     @Recover
     fun recover(ex: RecoverableException, fnr: Fødselsnummer) :Nothing= throw ex.also {
