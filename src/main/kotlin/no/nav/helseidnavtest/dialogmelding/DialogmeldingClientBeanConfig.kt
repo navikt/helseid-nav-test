@@ -38,7 +38,7 @@ class DialogmeldingClientBeanConfig {
 
     @Bean
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
-        //setPackagesToScan("no.nav.helseopplysninger")
+        setPackagesToScan("no.nav.helseopplysninger.apprec","no.nhn","org.datacontract","com.microsoft")
         /*
         setClassesToBeBound(XMLEIFellesformat::class.java,
             XMLSporinformasjonBlokkType::class.java,
