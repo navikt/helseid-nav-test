@@ -9,6 +9,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
+import no.nav.helseopplysninger.hodemelding.XMLCV
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -236,6 +237,16 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
     private  data class Fellesformat(private val fellesformat: XMLEIFellesformat, private val marshaller: Function<XMLEIFellesformat, String>)  {
         val xml = marshaller.apply(fellesformat)
     }
+    fun idFra(id: String, typeId: XMLCV) = HMOF.createXMLIdent().apply {
+        this.id = id
+        this.typeId = typeId
+    }
 
+    fun type(s: String, v: String, dn: String) =
+        XMLCV().apply {
+            this.s = s
+            this.v = v
+            this.dn = dn
+        }
 
 }
