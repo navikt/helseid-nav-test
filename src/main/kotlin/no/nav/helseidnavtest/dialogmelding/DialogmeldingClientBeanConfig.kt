@@ -38,12 +38,16 @@ class DialogmeldingClientBeanConfig {
 
     @Bean
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
+        setPackagesToScan("no.nav.helseopplysninger")
+        /*
         setClassesToBeBound(XMLEIFellesformat::class.java,
             XMLSporinformasjonBlokkType::class.java,
             XMLMsgHead::class.java,
             XMLDialogmelding::class.java,
             XMLBase64Container::class.java,
             XMLAppRec::class.java)
+            
+         */
         setJaxbContextProperties(mapOf(JAXB_FORMATTED_OUTPUT to true, JAXB_ENCODING to "UTF-8"))
     }
 
