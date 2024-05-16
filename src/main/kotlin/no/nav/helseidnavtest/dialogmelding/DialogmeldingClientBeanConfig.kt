@@ -10,14 +10,12 @@ import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import no.nav.helseopplysninger.fellesformat2.XMLSporinformasjonBlokkType
-import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
-import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.support.converter.MarshallingMessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
@@ -39,7 +37,7 @@ class DialogmeldingClientBeanConfig {
 
 
     @Bean
-    fun jaxb2Marshaller(): Jaxb2Marshaller = Jaxb2Marshaller().apply {
+    fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
         setClassesToBeBound(XMLEIFellesformat::class.java,
             XMLSporinformasjonBlokkType::class.java,
             XMLMsgHead::class.java,
