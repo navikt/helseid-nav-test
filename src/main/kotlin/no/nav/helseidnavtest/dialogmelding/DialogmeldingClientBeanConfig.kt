@@ -48,7 +48,7 @@ class DialogmeldingClientBeanConfig {
             XMLAppRec::class.java)
 
          */
-        setJaxbContextProperties(mapOf(JAXB_FORMATTED_OUTPUT to true, JAXB_ENCODING to "UTF-8"))
+        //setJaxbContextProperties(mapOf(JAXB_FORMATTED_OUTPUT to true, JAXB_ENCODING to "UTF-8"))
     }
 
     @Bean
