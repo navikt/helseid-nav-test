@@ -1,8 +1,11 @@
 package no.nav.helseidnavtest.dialogmelding
 
+import com.ibm.mq.jakarta.jms.MQQueueConnectionFactory
+import com.ibm.msg.client.commonservices.trace.Trace
+import com.ibm.msg.client.jakarta.jms.JmsConstants
+import com.ibm.msg.client.jakarta.jms.JmsConstants.*
+import com.ibm.msg.client.jakarta.wmq.common.CommonConstants.*
 import jakarta.jms.ConnectionFactory
-import jakarta.xml.bind.Marshaller.JAXB_ENCODING
-import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGMELDING
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseopplysninger.apprec.XMLAppRec
@@ -13,9 +16,12 @@ import no.nav.helseopplysninger.fellesformat2.XMLSporinformasjonBlokkType
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
+import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.support.converter.MarshallingMessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
@@ -54,18 +60,28 @@ class DialogmeldingClientBeanConfig {
 
 
     @Bean
-    fun jmsListenerContainerFactory(connectionFactory: ConnectionFactory, xmlMessageConverter: MessageConverter) =
+    fun jmsListenerContainerFactory(connectionFactory: MQQueueConnectionFactory, xmlMessageConverter: MessageConverter) =
         DefaultJmsListenerContainerFactory().apply {
             setConnectionFactory(connectionFactory)
             setMessageConverter(xmlMessageConverter)
         }
 
-/*  TODO
+    @Bean
+    @Primary
+   // @ConfigurationProperties(prefix = "ibm.mq")
+    fun mqConnectionFactory(): MQQueueConnectionFactory =
+        MQQueueConnectionFactory().apply {
+            setIntProperty(WMQ_CONNECTION_MODE, WMQ_CM_CLIENT)
+            setStringProperty(WMQ_QUEUE_MANAGER, "QM1")
+            setStringProperty(WMQ_CHANNEL, "DEV.ADMIN.SVRCONN")
+            setBooleanProperty(USER_AUTHENTICATION_MQCSP,false)
+        }
+
     @Bean
     fun jmsTemplate(connectionFactory: ConnectionFactory, xmlMessageConverter: MessageConverter) =
         JmsTemplate(connectionFactory).apply {
             messageConverter = xmlMessageConverter
         }
-        */
+
 
 }

@@ -1,9 +1,35 @@
 package no.nav.helse.helseidnavtest
-
+import com.ibm.mq.jakarta.jms.MQQueueConnectionFactory
+import no.nav.helseidnavtest.dialogmelding.*
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGMELDING
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle.*
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
+import org.springframework.core.io.ClassPathResource
+import org.springframework.jms.core.JmsTemplate
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -11,53 +37,84 @@ import java.time.Duration
 import java.util.*
 
 
-@Testcontainers
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//@Testcontainers
+@TestInstance(PER_CLASS)
+@Import(DialogmeldingClientBeanConfig::class)
+@TestPropertySource(locations = ["classpath:application-test.properties"], properties = ["dialogmelding.request=request","dialogmelding.base-uri=http://www.vg.no"])
+@EnableConfigurationProperties(DialogmeldingConfig::class)
+@ContextConfiguration(classes =  [ApprecSender::class,MQQueueConnectionFactory::class,DialogmeldingRestAdapter::class, ApprecMottaker::class])
+@ExtendWith(SpringExtension::class)
+@ExtendWith(MockitoExtension::class)
+@AutoConfigureWebClient
+@WebMvcTest
+@ActiveProfiles("test")
 class IBMMQTest {
+
+    @Autowired
+    lateinit var sender: JmsTemplate
+    @Mock
+    lateinit var adresse: AdresseRegisterClient
+    @Autowired
+    lateinit var cfg: DialogmeldingConfig
+
+
+    @Value("\${ibm.mq.conn-name}")
+    lateinit var qm: String
+
+    @Autowired
+    lateinit var a: DialogmeldingRestAdapter
+
+    @AfterAll
+    fun tearDown() {
+        //x'ibmMqContainer.stop()
+    }
     @Test
     fun testMQConnection() {
-        val host = ibmMqContainer.host
-        val port = ibmMqContainer.getMappedPort(1414)
+       sender.convertAndSend(cfg.request, msg())
 
 
         // Use IBM MQ client library to connect to the container
         // Example:
-        // MQQueueManager queueManager = new MQQueueManager("QM1", createConnectionProperties(host, port));
-        // Perform your test logic here
+    // Perform your test logic here
 
         // Assert some conditions based on the test logic
         // Example: assertNotNull(queueManager);
     }
 
-    // Helper method to create connection properties
-    private fun createConnectionProperties(host: String, port: Int): Properties {
-        val properties: Properties = Properties()
-        properties.put("hostname", host)
-        properties.put("port", port)
-        properties.put("channel", "DEV.APP.SVRCONN")
-        properties.put("queueManager", "QM1")
-        properties.put("transportType", 1)
-        return properties
+
+    fun msg()  {
+        val kontor = BehandlerKontor("Et legekontor", "Fyrstikkalleen 1", Postnummer(1234),
+            "Oslo", Orgnummer(123456789), PartnerId(42),HerId(12345678))
+
+        val behandler =  Behandler(UUID.randomUUID(),
+            Fødselsnummer("26900799232"), Navn("Ole", "Mellomnavn", "Olsen"),
+            HerId(123456789), HprId(987654321), "12345678", kontor)
+
+        val b = Dialogmelding(uuid = UUID.randomUUID(),
+            behandler = behandler,
+            id =  Fødselsnummer("26900799232"),
+            conversationUuid =  UUID.randomUUID(),
+            tekst = "dette er litt tekst",
+            vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
+        )
+        val arbeidstaker = Arbeidstaker(Fødselsnummer("03016536325"), Navn( "Ola", "Mellomnavn", "Olsen"))
+        val m  = DialogmeldingMapper(adresse).xmlFra(b, arbeidstaker)
     }
 
     companion object {
-        @Container
-        private val ibmMqContainer = GenericContainer("ibmcom/mq:latest")
-            .withEnv("LICENSE", "accept")
-            .withEnv("MQ_QMGR_NAME", "QM1")
-            .withExposedPorts(1414, 9443)
-            .withStartupTimeout(Duration.ofMinutes(5))
 
-        @BeforeAll
-       @JvmStatic
-        fun setUp() {
-            ibmMqContainer.start()
-        }
+       // @Container
+       // @ServiceConnection
+       // val ibmMqContainer = GenericContainer("ibmcom/mq:latest")
+       //     .withExposedPorts(1414)
+       //     .withStartupTimeout(Duration.ofMinutes(5)).apply {
+        //        start()
+        //    }
 
-        @AfterAll
-        @JvmStatic
-        fun tearDown() {
-            ibmMqContainer.stop()
+       // @DynamicPropertySource
+       // @JvmStatic
+        fun mq(registry: DynamicPropertyRegistry) {
+          //  registry.add("ibm.mq.connName") { "${ibmMqContainer.host}(${ibmMqContainer.getMappedPort(1414)})" }
         }
     }
 }

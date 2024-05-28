@@ -157,7 +157,8 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                     id = NAV_ORGNR.verdi
                     typeId = type(NAV_OID, ENH, ENHET_DESC)
                 })
-                ident.add(idFra(adresse.herIdForOrgnummer(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
+              //TODO  ident.add(idFra(HerId("22").verdi,type(NAV_OID, HER, HER_DESC)))
+                //ident.add(idFra(adresse.herIdForOrgnummer(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
             }
         }
 

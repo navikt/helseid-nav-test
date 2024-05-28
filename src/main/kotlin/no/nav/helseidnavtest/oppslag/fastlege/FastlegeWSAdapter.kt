@@ -23,7 +23,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         }
     }
 
-    fun kontorViaPasient(pasient: String) =
+    fun kontorForPasient(pasient: String) =
         runCatching {
             with(client.getPatientGPDetails(pasient)) {
                 with(gpContract.value) {

@@ -39,4 +39,8 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
         else {
             throw NotImplementedError("Dialogmelding oppslag er ikke aktivert")
         }
+
+    override fun toString(): String {
+        return "DialogmeldingRestAdapter(cf=$cf)"
+    }
 }

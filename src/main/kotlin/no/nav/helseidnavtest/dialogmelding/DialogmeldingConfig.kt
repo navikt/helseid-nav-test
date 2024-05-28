@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties(DIALOGMELDING)
-class DialogmeldingConfig(baseUri: URI, val path: String = PATH,enabled: Boolean = true, pingPath: String = PINGPATH,
+ class DialogmeldingConfig(baseUri: URI, val path: String = PATH,enabled: Boolean = true, pingPath: String = PINGPATH,
                                val request: String, val reply: String) : AbstractRestConfig(baseUri, pingPath, DIALOGMELDING, enabled) {
 
     companion object {

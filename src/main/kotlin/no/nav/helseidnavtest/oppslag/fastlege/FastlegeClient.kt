@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 @Retryable(include = [RecoverableException::class])
 class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val adresseClient: AdresseRegisterClient, private val partnerClient: DialogmeldingClient) {
-    fun kontorForPasient(pasient: Fødselsnummer) = fastlegeAdapter.kontorViaPasient(pasient.verdi).apply {
+    fun kontorForPasient(pasient: Fødselsnummer) = fastlegeAdapter.kontorForPasient(pasient.verdi).apply {
         adresseClient.herIdForOrgnummer(orgnummer).let {
             herId = it
             partnerId = partnerClient.partnerId(it, this)

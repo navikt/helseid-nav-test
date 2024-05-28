@@ -23,7 +23,8 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
     }
 
     fun herIdForId(id: String): Int = runCatching {
-        client.searchById(id).communicationParty.single().herId.also {
+        client.searchById(id).communicationParty.single()
+            .herId.also {
             log.info("Returnerer kommunikasjonspart $it for $id")
         }
     }.getOrElse {

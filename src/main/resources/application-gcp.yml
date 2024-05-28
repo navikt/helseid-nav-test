@@ -101,6 +101,7 @@ ibm:
     password: ${dialogmelding.password}
     queue-manager: ${dialogmelding.qm}
     application-name: ${spring.application.name}
-    conn-name: ${dialogmelding.host}(${dialogmelding.port})
+    connName: ${dialogmelding.host}(${dialogmelding.port})
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
+
