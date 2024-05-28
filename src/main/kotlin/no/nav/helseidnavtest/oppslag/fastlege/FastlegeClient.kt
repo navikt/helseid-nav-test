@@ -17,5 +17,8 @@ class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val
             partnerId = partnerClient.partnerId(it, this)
         }
     }
+
+    fun lege(pasient: Fødselsnummer) = fastlegeAdapter.lege(pasient.verdi)
+
     fun herIdForLegeViaPasient(pasient: Fødselsnummer) = HerId(fastlegeAdapter.herIdForLegeViaPasient(pasient.verdi))
 }

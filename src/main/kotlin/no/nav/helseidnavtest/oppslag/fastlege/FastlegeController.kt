@@ -14,4 +14,8 @@ class FastlegeController(private val client: FastlegeClient) {
 
     @GetMapping("/herid")
     fun herIdForLege(@RequestParam pasient: Fødselsnummer) = client.herIdForLegeViaPasient(pasient)
-  }
+
+    @GetMapping("/lege")
+    fun lege(@RequestParam pasient: Fødselsnummer) = client.lege(pasient)
+
+}
