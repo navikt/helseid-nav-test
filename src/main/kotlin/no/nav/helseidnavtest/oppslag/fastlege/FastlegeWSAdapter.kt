@@ -57,7 +57,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         }
     }
 
-    private data class Lege(val fnr: Fødselsnummer, val navn: Navn)
+     data class Lege(val fnr: Fødselsnummer, val navn: Navn)
 
     fun kontorViaPasient(pasient: String) =
         runCatching {
