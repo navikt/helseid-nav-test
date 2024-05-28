@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.oppslag.fastlege
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingClient
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import org.springframework.retry.annotation.Retryable
