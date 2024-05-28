@@ -26,11 +26,17 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
     }
 
     fun lege(pasient: String) = runCatching {
-        client.getPatientGPDetails(pasient)?.gpContract?.value?.doctorCycles?.value?.gpOnContractAssociation?.map {
-            with(it.gp.value)  {
-                Pair(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
-            }
-        }
+            client.getPatientGPDetails(pasient)?.let { d ->
+                d.doctorCycles?.let { c ->
+                c.value?.let { a ->
+                    a.gpOnContractAssociation?.map {
+                        with(it.gp.value)  {
+                            Pair(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
+                        }
+                    }
+                } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", uri=cfg.url)
+            } ?: throw NotFoundException("Fant ikke doktorsykler for pasient $pasient", uri=cfg.url)
+        } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri=cfg.url)
     }.getOrElse {
         when (it) {
             is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
