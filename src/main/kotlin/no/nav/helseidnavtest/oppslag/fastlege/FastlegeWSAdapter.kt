@@ -37,7 +37,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             else -> throw it
         }
     }.also {
-        if (it.isNullOrEmpty()) throw NotFoundException("Fant ikke legedetaljer for pasient $pasient", "${cfg.url}")
+        if (it.isNullOrEmpty()) throw NotFoundException("Fant ikke legedetaljer for pasient $pasient", uri=cfg.url)
     }
 
     fun kontorViaPasient(pasient: String) =
