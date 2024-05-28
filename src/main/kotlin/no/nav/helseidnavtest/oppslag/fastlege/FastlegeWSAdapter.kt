@@ -43,7 +43,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
                             log.info("GP for pasient $pasient: ${it.nin.value}")
                             with(it)  {
                                 log.info("GP FNR for pasient $pasient: ${this.nin.value}")
-                                Pair(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
+                                Lege(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
                             }
                         }?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
                     } ?: throw NotFoundException("Fant ikke kontraktassosiasjon for pasient $pasient", uri=cfg.url)
@@ -56,6 +56,8 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             else -> throw it
         }
     }
+
+    private data class Lege(val fnr: Fødselsnummer, val navn: Navn)
 
     fun kontorViaPasient(pasient: String) =
         runCatching {
