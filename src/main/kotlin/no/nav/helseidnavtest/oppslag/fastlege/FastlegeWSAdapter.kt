@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
+import jakarta.xml.bind.JAXBElement
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
@@ -7,6 +8,7 @@ import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nhn.schemas.reg.flr.IFlrReadOperations
 import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
+import no.nhn.schemas.reg.flr.ObjectFactory
 import no.nhn.schemas.reg.flr.WSGPOffice
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
@@ -15,9 +17,19 @@ import org.springframework.stereotype.Component
 class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
 
     private val log = getLogger(FastlegeWSAdapter::class.java)
-
-
     private val client = createPort<IFlrReadOperations>(cfg)
+
+    fun fastlegeFMR(navn: String) = runCatching {
+        val search = OF.createWSGPSearchParameters().apply {
+            fullText = OF.createWSGPContractQueryParametersFullText(navn)
+            page = 1
+        }
+        client.searchForGP(search).results.value.gpDetails.map {
+            it.gp.value?.nin?.value
+        }
+    }.getOrElse {
+        throw it
+    }
 
     fun herIdForLegeViaPasient(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient).gpHerId.value
@@ -81,4 +93,8 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         }
     override fun ping() = emptyMap<String,String>()
     override fun pingEndpoint() = "${cfg.url}"
+
+    companion object {
+        private val OF = ObjectFactory()
+    }
 }

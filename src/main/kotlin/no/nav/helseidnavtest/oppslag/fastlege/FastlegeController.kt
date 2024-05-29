@@ -18,4 +18,6 @@ class FastlegeController(private val client: FastlegeClient) {
     @GetMapping("/lege")
     fun lege(@RequestParam pasient: Fødselsnummer) = client.lege(pasient)
 
+    @GetMapping("/legefnr")
+    fun legeFnr(@RequestParam navn: String) = client.legeFNR(navn)
 }
