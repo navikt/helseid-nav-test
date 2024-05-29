@@ -29,13 +29,13 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
                 Person(Fødselsnummer(nin.value),
                     Navn(firstName.value, middleName.value, lastName.value))
             }
-            val x = d.contracts.value.gpOnContractAssociation.map {a ->
-                 a.gpContract.value.patientList.value.patientToGPContractAssociation.map {l ->
+            val x = d.contracts?.value?.gpOnContractAssociation?.map {a ->
+                 a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map {l ->
                     with(l.patient.value) {
                         Person(Fødselsnummer(nin.value), Navn(firstName.value, middleName.value, lastName.value))
                     }
-                }
-            }.flatten()
+                } ?: emptyList()
+            }?.flatten() ?: emptyList()
             LegeListe(lege, x)
         }
     }.getOrElse {
