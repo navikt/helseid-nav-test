@@ -18,7 +18,7 @@ class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val
         }
     }
 
-    fun legeFNR(navn: String) = fastlegeAdapter.fastlegeFNR(navn)
+    fun legeFNR(navn: String) = fastlegeAdapter.pasienterForFastlege(navn)
 
 
     fun lege(pasient: Fødselsnummer) = fastlegeAdapter.lege(pasient.verdi)

@@ -6,7 +6,7 @@ import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nhn.schemas.reg.flr.IFlrReadOperations
-import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
+import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
 import no.nhn.schemas.reg.flr.ObjectFactory
 import no.nhn.schemas.reg.flr.WSGPOffice
 import org.slf4j.LoggerFactory.getLogger
@@ -18,31 +18,44 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
     private val log = getLogger(FastlegeWSAdapter::class.java)
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun fastlegeFNR(navn: String) = runCatching {
+    fun pasienterForFastlege(navn: String) = runCatching {
         val search = OF.createWSGPSearchParameters().apply {
             fullText = OF.createWSGPContractQueryParametersFullText(navn)
             page = 1
             pageSize = 10
         }
-        client.searchForGP(search).results.value.gpDetails.map {
-            it.gp.value?.nin?.value
+        client.searchForGP(search).results.value.gpDetails.map {d ->
+            val lege = with(d.gp.value) {
+                Person(Fødselsnummer(nin.value),
+                    Navn(firstName.value, middleName.value, lastName.value))
+            }
+            val x = d.contracts.value.gpOnContractAssociation.map {a ->
+                 a.gpContract.value.patientList.value.patientToGPContractAssociation.map {l ->
+                    with(l.patient.value) {
+                        Person(Fødselsnummer(nin.value), Navn(firstName.value, middleName.value, lastName.value))
+                    }
+                }
+            }.flatten()
+            LegeListe(lege, x)
         }
     }.getOrElse {
-        throw it
+        when (it) {
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn",it.message, cfg.url, it)
+            else -> throw it
+        }
     }
 
     fun herIdForLegeViaPasient(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
             else -> throw it
         }
     }
 
     fun lege(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient)?.let { d ->
-
             log.info("Detaljer for pasient $pasient: $d")
             d.doctorCycles?.let { c ->
                 log.info("Sykler for pasient $pasient: $c")
@@ -54,7 +67,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
                             log.info("GP for pasient $pasient: ${it.nin.value}")
                             with(it)  {
                                 log.info("GP FNR for pasient $pasient: ${this.nin.value}")
-                                Lege(d.gpContractId,Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
+                                Lege(d.gpContractId,Person(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value)))
                             }
                         }?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
                     } ?: throw NotFoundException("Fant ikke kontraktassosiasjon for pasient $pasient", uri=cfg.url)
@@ -63,12 +76,14 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri=cfg.url)
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
             else -> throw it
         }
     }
 
-     data class Lege(val kontraktId: Long, val fnr: Fødselsnummer, val navn: Navn)
+    data class LegeListe(val lege: Person, val pasienter: List<Person>)
+    data class Person(val fnr: Fødselsnummer, val navn: Navn)
+    data class Lege(val kontraktId: Long, val person: Person)
 
     fun kontorViaPasient(pasient: String) =
         runCatching {
@@ -79,7 +94,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             }
         }.getOrElse {
             when (it) {
-                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
+                is ReadFault -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
                 else -> throw it
             }
         }
