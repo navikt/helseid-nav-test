@@ -30,7 +30,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
                     Navn(firstName.value, middleName.value, lastName.value))
             }
             if (d.contracts == null) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri=cfg.url)
-            log.info("Vi har kontrakter for fastlege $navn")
+            log.info("Vi har kontrakter for fastlege $navn ${d.contracts?.value?.gpOnContractAssociation}")
             val x = d.contracts?.value?.gpOnContractAssociation?.map {a ->
                 log.info("KontraktId: ${a.gpContractId}")
                  a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map {l ->
