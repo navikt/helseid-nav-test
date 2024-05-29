@@ -31,6 +31,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             }
             if (d.contracts == null) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri=cfg.url)
             val x = d.contracts.value.gpOnContractAssociation?.map {a ->
+                log.info("KontraktId: ${a.gpContractId}")
                  a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map {l ->
                     with(l.patient.value) {
                         Person(Fødselsnummer(nin.value), Navn(firstName.value, middleName.value, lastName.value))
