@@ -3,9 +3,7 @@ package no.nav.helseidnavtest.oppslag.fastlege
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterWSAdapter
 import no.nav.helseidnavtest.oppslag.createPort
-import no.nav.helseidnavtest.oppslag.person.Person
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nhn.schemas.reg.flr.IFlrReadOperations
 import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
@@ -32,6 +30,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
 
     fun lege(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient)?.let { d ->
+
             log.info("Detaljer for pasient $pasient: $d")
             d.doctorCycles?.let { c ->
                 log.info("Sykler for pasient $pasient: $c")
@@ -43,7 +42,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
                             log.info("GP for pasient $pasient: ${it.nin.value}")
                             with(it)  {
                                 log.info("GP FNR for pasient $pasient: ${this.nin.value}")
-                                Lege(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
+                                Lege(d.gpContractId,Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value))
                             }
                         }?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
                     } ?: throw NotFoundException("Fant ikke kontraktassosiasjon for pasient $pasient", uri=cfg.url)
@@ -57,7 +56,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         }
     }
 
-     data class Lege(val fnr: Fødselsnummer, val navn: Navn)
+     data class Lege(val kontraktId: Long, val fnr: Fødselsnummer, val navn: Navn)
 
     fun kontorViaPasient(pasient: String) =
         runCatching {
