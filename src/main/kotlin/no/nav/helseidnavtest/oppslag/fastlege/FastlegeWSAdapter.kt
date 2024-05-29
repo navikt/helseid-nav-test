@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
-import jakarta.xml.bind.JAXBElement
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
@@ -19,10 +18,11 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
     private val log = getLogger(FastlegeWSAdapter::class.java)
     private val client = createPort<IFlrReadOperations>(cfg)
 
-    fun fastlegeFMR(navn: String) = runCatching {
+    fun fastlegeFNR(navn: String) = runCatching {
         val search = OF.createWSGPSearchParameters().apply {
             fullText = OF.createWSGPContractQueryParametersFullText(navn)
             page = 1
+            pageSize = 10
         }
         client.searchForGP(search).results.value.gpDetails.map {
             it.gp.value?.nin?.value
