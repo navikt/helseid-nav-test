@@ -24,7 +24,9 @@ import javax.xml.transform.stream.StreamResult
 @Component
 class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
 
-    fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(createFellesformat(melding, arbeidstaker), ::marshall).xml
+    fun fellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =  createFellesformat(melding, arbeidstaker)
+
+    fun xmlFra(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = Fellesformat(fellesformat(melding, arbeidstaker), ::marshall).xml
 
     private fun marshall(element: Any?) =
         run {

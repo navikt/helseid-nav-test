@@ -5,7 +5,7 @@ import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.createPort
 import no.nhn.schemas.reg.flr.IFlrReadOperations
-import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage
+import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
 import no.nhn.schemas.reg.flr.WSGPOffice
 import org.springframework.stereotype.Component
 
@@ -18,7 +18,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
             else -> throw it
         }
     }
@@ -32,7 +32,7 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             }
         }.getOrElse {
             when (it) {
-                is IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
+                is ReadFault -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
                 else -> throw it
             }
         }

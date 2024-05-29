@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.dialogmelding
 
+import com.ibm.mq.jakarta.jms.MQConnectionFactory
 import com.ibm.mq.jakarta.jms.MQQueueConnectionFactory
 import com.ibm.msg.client.commonservices.trace.Trace
 import com.ibm.msg.client.jakarta.jms.JmsConstants
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
+import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter
 import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.support.converter.MarshallingMessageConverter
 import org.springframework.jms.support.converter.MessageConverter
@@ -68,14 +70,19 @@ class DialogmeldingClientBeanConfig {
 
     @Bean
     @Primary
-   // @ConfigurationProperties(prefix = "ibm.mq")
-    fun mqConnectionFactory(): MQQueueConnectionFactory =
-        MQQueueConnectionFactory().apply {
+    fun mqConnectionFactory(): MQConnectionFactory =
+        MQConnectionFactory().apply {
             setIntProperty(WMQ_CONNECTION_MODE, WMQ_CM_CLIENT)
             setStringProperty(WMQ_QUEUE_MANAGER, "QM1")
-            setStringProperty(WMQ_CHANNEL, "DEV.ADMIN.SVRCONN")
-            setBooleanProperty(USER_AUTHENTICATION_MQCSP,false)
+            setStringProperty(WMQ_CHANNEL, "DEV.APP.SVRCONN")
         }
+
+    @Bean
+    fun  cf(mq: MQConnectionFactory) = UserCredentialsConnectionFactoryAdapter().apply {
+        setUsername("app")
+        setPassword("password")
+        setTargetConnectionFactory(mq)
+    }
 
     @Bean
     fun jmsTemplate(connectionFactory: ConnectionFactory, xmlMessageConverter: MessageConverter) =
