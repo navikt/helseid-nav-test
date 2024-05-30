@@ -25,12 +25,14 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             pageSize = 10
         }
         client.searchForGP(search).results.value.gpDetails.map {d ->
+
             val lege = with(d.gp.value) {
                 Person(Fødselsnummer(nin.value),
                     Navn(firstName.value, middleName.value, lastName.value))
             }
-            if (d.contracts == null) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri=cfg.url)
-            log.info("Vi har kontrakter for fastlege $navn ${d.contracts?.value}")
+            if (d.contracts.isNil) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri=cfg.url)
+            if (d.contracts.value.gpOnContractAssociation.isNullOrEmpty()) throw NotFoundException("Fant ikke kontraktassosiasjoner for fastlege $navn", uri=cfg.url)
+            log.info("Vi har kontraktassosiasjoner for fastlege $navn ${d.contracts.value.gpOnContractAssociation.size}")
             val x = d.contracts?.value?.gpOnContractAssociation?.map {a ->
                 log.info("KontraktId: ${a.gpContractId}")
                  a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map {l ->
