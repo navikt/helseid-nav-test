@@ -13,13 +13,11 @@ import no.nav.helseopplysninger.hodemelding.XMLCV
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
-import java.io.StringWriter
 import java.math.BigInteger.ZERO
 import java.time.LocalDate
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.function.Function
-import javax.xml.transform.stream.StreamResult
 
 @Component
 class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
@@ -29,8 +27,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
     private fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
-                val hm = hodemelding(melding, arbeidstaker)
-                add(hm)
+                add(hodemelding(melding, arbeidstaker))
                 add(mottakenhetBlokk(melding))
                 add(sporinformasjonBlokk())
             }
@@ -40,8 +37,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
     private fun hodemelding(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         HMOF.createXMLMsgHead().apply {
             msgInfo = msgInfo(melding, arbeidstaker)
-            document.add(dialogmeldingDocument(melding))
-            document.add(vedleggDocument(melding))
+            document.addAll(listOf(dialogmeldingDocument(melding), vedleggDocument(melding)))
         }
     private fun mottakenhetBlokk(melding: Dialogmelding) =
         with(melding) {
