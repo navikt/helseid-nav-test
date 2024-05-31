@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
+import no.nav.helseidnavtest.dialogmelding.AvtaleId
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -20,4 +21,8 @@ class FastlegeController(private val client: FastlegeClient) {
 
     @GetMapping("/legefnr")
     fun legeFnr(@RequestParam navn: String) = client.legeFNR(navn)
+
+    @GetMapping("/avtale")
+    fun legeFnr(@RequestParam id: AvtaleId) = client.pasienterForAvtale(id)
+}
 }

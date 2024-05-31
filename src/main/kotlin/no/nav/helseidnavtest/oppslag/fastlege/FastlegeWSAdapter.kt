@@ -18,6 +18,21 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
     private val log = getLogger(FastlegeWSAdapter::class.java)
     private val client = createPort<IFlrReadOperations>(cfg)
 
+    fun pasienterForAvtale(avtale: AvtaleId) = runCatching {
+        client.getGPPatientList(avtale.verdi)?.patientToGPContractAssociation?.map {
+            with(it.patient.value) {
+                Person(Fødselsnummer(nin.value), Navn(firstName.value, middleName.value, lastName.value))
+            }
+        }
+    }.getOrElse {
+        when (it) {
+            is ReadFault -> throw NotFoundException("Fant ikke fastlegeliste for avtale $avtale",it.message, cfg.url, it)
+            else -> throw it
+        }
+    }
+
+
+
     fun pasienterForFastlege(navn: String) = runCatching {
         val search = OF.createWSGPSearchParameters().apply {
             fullText = OF.createWSGPContractQueryParametersFullText(navn)

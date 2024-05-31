@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory
+import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.support.converter.MarshallingMessageConverter
 import org.springframework.jms.support.converter.MessageConverter
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
@@ -60,12 +61,11 @@ class DialogmeldingClientBeanConfig {
             setMessageConverter(xmlMessageConverter)
         }
 
-/*  TODO
     @Bean
     fun jmsTemplate(connectionFactory: ConnectionFactory, xmlMessageConverter: MessageConverter) =
         JmsTemplate(connectionFactory).apply {
             messageConverter = xmlMessageConverter
         }
-        */
+
 
 }

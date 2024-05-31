@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
+import no.nav.helseidnavtest.dialogmelding.AvtaleId
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingClient
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
@@ -17,6 +18,8 @@ class FastlegeClient(private val fastlegeAdapter: FastlegeWSAdapter, private val
             partnerId = partnerClient.partnerId(it, this)
         }
     }
+
+    fun pasienterForAvtale(id: AvtaleId) = fastlegeAdapter.pasienterForAvtale(id)
 
     fun legeFNR(navn: String) = fastlegeAdapter.pasienterForFastlege(navn)
 

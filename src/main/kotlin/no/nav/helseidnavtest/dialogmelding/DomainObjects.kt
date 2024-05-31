@@ -131,6 +131,13 @@ value class HerId(val verdi : String)  {
     constructor(verdi: Int) : this("$verdi")
 }
 @JvmInline
+value class AvtaleId(val verdi : Long)  {
+    init {
+        require(verdi > 0) { "AvtaleId  $verdi  må være > 0" }
+
+    }
+}
+@JvmInline
 value class HprId(val verdi : String)  {
     constructor(verdi: Int) : this("$verdi")
 }

@@ -1,15 +1,12 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import no.nav.helseidnavtest.error.IrrecoverableException
-import no.nav.helseidnavtest.error.RecoverableException
-import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterWSAdapter
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
-import org.springframework.retry.annotation.Retryable
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder.*
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
@@ -21,10 +18,10 @@ import java.util.UUID.*
 class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
 
     @PreAuthorize("hasAuthority('LE_4')")
-    fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID = randomUUID()) =
+    fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
-                mapper.xmlFra(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
+                mapper.fellesFormat(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
                     behandler(navn, fastlege.herIdForLegeViaPasient(pasient), HprId(hprNumber), fnr, fastlege.kontorForPasient(pasient))
             },uuid), arbeidstaker(pasient))
         }
