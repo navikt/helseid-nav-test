@@ -25,4 +25,3 @@ class FastlegeController(private val client: FastlegeClient) {
     @GetMapping("/avtale")
     fun legeFnr(@RequestParam id: AvtaleId) = client.pasienterForAvtale(id)
 }
-}
