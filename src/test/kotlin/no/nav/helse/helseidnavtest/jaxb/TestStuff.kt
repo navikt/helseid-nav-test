@@ -33,7 +33,7 @@ class TestStuff {
             vedlegg = ClassPathResource("test.pdf").inputStream.readBytes(),
             )
         val arbeidstaker = Arbeidstaker(Fødselsnummer("03016536325"), Navn( "Ola", "Mellomnavn", "Olsen"))
-        val m  = DialogmeldingMapper(adresse).xmlFra(b, arbeidstaker)
+        val m  = DialogmeldingMapper(adresse).fellesFormat(b, arbeidstaker)
        println(m)
     }
 }
