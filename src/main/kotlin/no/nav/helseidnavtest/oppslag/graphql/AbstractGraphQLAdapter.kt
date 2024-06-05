@@ -44,7 +44,7 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
         is IrrecoverableException -> throw e
-        else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message ?: "", uri, e)
+        else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
     }
 }
 class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
