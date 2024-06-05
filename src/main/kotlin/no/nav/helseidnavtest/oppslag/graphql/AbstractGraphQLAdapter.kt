@@ -15,7 +15,7 @@ import java.net.URI
 
 abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val handler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
-    protected inline fun <reified T> query(graphQL : HttpGraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
+    protected inline fun <reified T> query(graphQL : HttpSyncGraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
            log.info("Eksekverer {} med {}", T::class.java.simpleName, vars)
             graphQL

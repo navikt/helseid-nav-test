@@ -9,11 +9,11 @@ import no.nav.helseidnavtest.oppslag.graphql.AbstractGraphQLAdapter
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import no.nav.helseidnavtest.oppslag.person.PDLMapper.pdlPersonTilPerson
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.graphql.client.HttpGraphQlClient
+import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.web.client.RestClient
 
 @Component
-class PDLRestClientAdapter(@Qualifier(PDL)  private val graphQlClient : HttpGraphQlClient, @Qualifier(PDL) restClient: RestClient, cfg : PDLConfig, ) : AbstractGraphQLAdapter(restClient,cfg) {
+class PDLRestClientAdapter(@Qualifier(PDL)  private val graphQlClient : HttpSyncGraphQlClient, @Qualifier(PDL) restClient: RestClient, cfg : PDLConfig, ) : AbstractGraphQLAdapter(restClient,cfg) {
 
     override fun ping() : Map<String, String> {
         restClient
