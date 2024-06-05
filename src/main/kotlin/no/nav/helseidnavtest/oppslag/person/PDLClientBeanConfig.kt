@@ -33,9 +33,9 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun syncGraphQLClient(@Qualifier(PDL) client: RestClient) : HttpSyncGraphQlClient =
+    fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) : HttpSyncGraphQlClient =
         HttpSyncGraphQlClient.builder(client)
-            .url("https://graphql-api.pdl")
+            .url(cfg.baseUri)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
 
