@@ -30,15 +30,19 @@ class PDLClientBeanConfig {
                 clientCredentialsRequestInterceptor,
                 consumerRequestInterceptor(),
                 behandlingRequestInterceptor())
-        }.build()
+        }.build().also {
+            log.info("Opprettet PDL REST klient $it")
+        }
 
     @Bean
     @Qualifier(PDL)
     fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) : HttpSyncGraphQlClient =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
-            .interceptor(LoggingGraphQLInterceptor())
-            .build()
+           // .interceptor(LoggingGraphQLInterceptor())
+            .build().also {
+                log.info("Opprettet PDL GraphQL klient $it med $it")
+            }
 
     @Bean
     @Qualifier(PDL)
