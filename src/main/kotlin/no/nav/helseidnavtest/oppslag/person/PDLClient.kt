@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component
 
 @Component
 @Retryable(retryFor = [RecoverableException::class])
-class PDLClient(private val pdl: PDLWebClientAdapter) {
+class PDLClient(private val pdl: PDLRestClientAdapter) {
 
     private val log = getLogger(PDLClient::class.java)
 
     fun ping() = pdl.ping()
     fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
     @Recover
-    fun recover(ex: RecoverableException, fnr: Fødselsnummer) :Nothing= throw ex.also {
+    fun recover(ex: RecoverableException, fnr: Fødselsnummer) :Nothing = throw ex.also {
         log.error("Recoverable exception feilet for oppslag på fnr {}", fnr,it)
     }
 }

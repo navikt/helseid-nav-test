@@ -3,20 +3,19 @@ package no.nav.helseidnavtest.oppslag.graphql
 import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import no.nav.helseidnavtest.oppslag.rest.AbstractWebClientAdapter
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
-import org.springframework.graphql.client.GraphQlClientInterceptor.Chain
+import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
 import org.springframework.http.HttpStatus.*
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
 import java.net.URI
 
-abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConfig, val handler : GraphQLErrorHandler) : AbstractWebClientAdapter(client, cfg) {
+abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val handler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
-
-    protected inline fun <reified T> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
+    protected inline fun <reified T> query(graphQL : HttpGraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
            log.info("Eksekverer {} med {}", T::class.java.simpleName, vars)
             graphQL
@@ -32,7 +31,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
                         else ->  it
                     }
                 }
-               // .retryWhen(retrySpec(log, "/graphql") { it is RecoverableGraphQLException })
                 .block().also {
                     log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
                 }
@@ -42,16 +40,6 @@ abstract class AbstractGraphQLAdapter(client : WebClient, cfg : AbstractRestConf
         }
 }
 
- class LoggingGraphQLInterceptor : GraphQlClientInterceptor {
-
-    private val log = getLogger(LoggingGraphQLInterceptor::class.java)
-
-     override fun intercept(request : ClientGraphQlRequest, chain : Chain) =
-         chain.next(request).also {
-             log.trace("Eksekverer {} ", request.document)
-         }
-}
-
 /* Denne kalles når retry har gitt opp */
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
@@ -59,3 +47,13 @@ interface GraphQLErrorHandler {
         else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message ?: "", uri, e)
     }
 }
+class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
+
+    private val log = getLogger(LoggingGraphQLInterceptor::class.java)
+
+    override fun intercept(request: ClientGraphQlRequest, chain: Chain) =
+        chain.next(request).also {
+            log.trace("Eksekverer {} ", request.document)
+        }
+}
+
