@@ -7,6 +7,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consume
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.temaRequestInterceptor
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class PDLClientBeanConfig {
+    protected val log = getLogger(PDLController::class.java)
 
     @Bean
     @Qualifier(PDL)
@@ -46,8 +48,10 @@ class PDLClientBeanConfig {
                 .principal("anonymous")
                 .build()
         )?.let {
+            log.info("Fant token for PDL")
             request.headers.setBearerAuth(it.accessToken.tokenValue)
-        }
+        } ?: log.warn("Fant ikke token for PDL")
+
         execution.execute(request, body)
     }
 
