@@ -10,7 +10,6 @@ import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.graphql.client.HttpGraphQlClient
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
