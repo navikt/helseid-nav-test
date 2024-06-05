@@ -1,63 +1,83 @@
 package no.nav.helse.helseidnavtest
 
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
+import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
+import no.nav.helseidnavtest.oppslag.person.PDLClient
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.Duration
-import java.util.*
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.oidc.OidcIdToken
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.test.context.support.WithSecurityContext
+import org.springframework.security.test.context.support.WithSecurityContextFactory
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 
-@Testcontainers
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IBMMQTest {
+//@SpringBootTest
+@ExtendWith(MockitoExtension::class)
+@ExtendWith(SpringExtension::class)
+
+ class IBMMQTest {
+
+
+    @Retention(RUNTIME)
+   // @WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
+    annotation class WithMockCustomUser(val username: String = "rob", val name: String = "Rob Winch")
+
+    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
+
+    //@Autowired
+    //lateinit var marshaller: Jaxb2Marshaller
+
+    @Mock
+    lateinit var adresse: AdresseRegisterClient
+    @Mock
+    lateinit var pdl: PDLClient
+    @Mock
+    lateinit var fastlege: FastlegeClient
+
     @Test
     fun testMQConnection() {
-        val host = ibmMqContainer.host
-        val port = ibmMqContainer.getMappedPort(1414)
-
-
-        // Use IBM MQ client library to connect to the container
-        // Example:
-        // MQQueueManager queueManager = new MQQueueManager("QM1", createConnectionProperties(host, port));
-        // Perform your test logic here
-
-        // Assert some conditions based on the test logic
-        // Example: assertNotNull(queueManager);
     }
-
-    // Helper method to create connection properties
-    private fun createConnectionProperties(host: String, port: Int): Properties {
-        val properties: Properties = Properties()
-        properties.put("hostname", host)
-        properties.put("port", port)
-        properties.put("channel", "DEV.APP.SVRCONN")
-        properties.put("queueManager", "QM1")
-        properties.put("transportType", 1)
-        return properties
-    }
-
-    companion object {
-        @Container
-        private val ibmMqContainer = GenericContainer("ibmcom/mq:latest")
-            .withEnv("LICENSE", "accept")
-            .withEnv("MQ_QMGR_NAME", "QM1")
-            .withExposedPorts(1414, 9443)
-            .withStartupTimeout(Duration.ofMinutes(5))
-
-        @BeforeAll
-       @JvmStatic
-        fun setUp() {
-            ibmMqContainer.start()
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun tearDown() {
-            ibmMqContainer.stop()
+    class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
+        override fun createSecurityContext(customUser: WithMockCustomUser): SecurityContext {
+            val context = SecurityContextHolder.createEmptyContext()
+          //  val principal = OAuth2User(customUser.name, customUser.username)
+           // val auth: Authentication =
+         //       OAuth2AuthenticationToken(principal, listOf(SimpleGrantedAuthority("LE_4")), "1")
+          //  context.authentication = auth
+            return context
         }
     }
 }
+
+
+/*
+@TestConfiguration
+@SpringBootConfiguration
+class TestConfig {
+    @Bean
+    fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
+        setClassesToBeBound(
+            XMLEIFellesformat::class.java,
+            XMLSporinformasjonBlokkType::class.java,
+            XMLMsgHead::class.java,
+            XMLDialogmelding::class.java,
+            XMLBase64Container::class.java,
+            XMLAppRec::class.java)
+    }
+}*/
+

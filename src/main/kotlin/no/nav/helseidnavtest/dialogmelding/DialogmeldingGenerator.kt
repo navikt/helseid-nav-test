@@ -22,7 +22,7 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
                 mapper.fellesFormat(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
-                    behandler(navn, fastlege.herIdForLegeViaPasient(pasient), HprId(hprNumber), fnr, fastlege.kontorForPasient(pasient))
+                    behandler(navn, fastlege.herIdForLegeViaPasient(pasient), hprNumber, fnr, fastlege.kontorForPasient(pasient))
             },uuid), arbeidstaker(pasient))
         }
             else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
