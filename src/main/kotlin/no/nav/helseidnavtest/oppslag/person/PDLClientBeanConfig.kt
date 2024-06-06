@@ -45,7 +45,7 @@ class PDLClientBeanConfig {
     @Bean
     @Qualifier(PDL)
     fun pdlClientCredentialsRequestInterceptor(clientManager: OAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { req, body, execution ->
-       log.info("Setter PDL token")
+       log.info("Setter PDL token med client manager $clientManager")
         clientManager.authorize(
             withClientRegistrationId(PDL)
                 .principal("anonymous")
