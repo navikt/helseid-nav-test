@@ -31,6 +31,7 @@ class PDLClientBeanConfig {
                 consumerRequestInterceptor(),
                 behandlingRequestInterceptor())
         }.build().also {
+
             log.info("Opprettet PDL REST klient $it")
         }
 
@@ -41,7 +42,7 @@ class PDLClientBeanConfig {
             .url(cfg.baseUri)
            .interceptor(LoggingGraphQLInterceptor())
             .build().also {
-                log.info("Opprettet PDL GraphQL klient $it med $it")
+                log.info("Opprettet PDL GraphQL klient $it med $client")
             }
 
     @Bean
