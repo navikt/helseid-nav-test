@@ -17,7 +17,7 @@ class PDLClient(private val pdl: PDLRestClientAdapter) {
     fun ping() = pdl.ping()
     fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
     @Recover
-    fun navn(ex: RecoverableException,fnr: Fødselsnummer) : Navn = throw ex.also {
+    fun navn(ex: Exception,fnr: Fødselsnummer) : Navn = throw ex.also {
         log.error("Recoverable exception feilet for oppslag på fnr {}", fnr,it)
     }
 }
