@@ -27,12 +27,11 @@ class PDLClientBeanConfig {
     @Bean
     @Qualifier(PDL)
     fun pdlRestClient(b: RestClient.Builder, cfg: PDLConfig, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) : RestClient =
-       b.requestInterceptor(clientCredentialsRequestInterceptor)
-           .requestInterceptor(temaRequestInterceptor(HELSE))
-           .requestInterceptor(consumerRequestInterceptor())
-           .requestInterceptor(behandlingRequestInterceptor()).build().also {
-            log.info("Opprettet PDL REST klient $it")
-        }
+        b.requestInterceptor(clientCredentialsRequestInterceptor)
+            .requestInterceptor(temaRequestInterceptor(HELSE))
+            .requestInterceptor(consumerRequestInterceptor())
+            .requestInterceptor(behandlingRequestInterceptor())
+            .build()
 
     @Bean
     @Qualifier(PDL)
@@ -40,26 +39,20 @@ class PDLClientBeanConfig {
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
            .interceptor(LoggingGraphQLInterceptor())
-            .build().also {
-                log.info("Opprettet PDL GraphQL klient $it med $client")
-            }
-
+            .build()
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository: ClientRegistrationRepository, authorizedClientService: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService)
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service)
 
     @Bean
     @Qualifier(PDL)
     fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { req, body, execution ->
-       log.info("Setter PDL token med client manager $clientManager og request $req")
         clientManager.authorize(
             withClientRegistrationId(PDL)
                 .principal("anonymous")
                 .build()
         )?.let {
-            log.info("Fant token for PDL")
             req.headers.setBearerAuth(it.accessToken.tokenValue)
-        } ?: log.warn("Fant ikke token for PDL")
-
+        }
         execution.execute(req, body)
     }
 
