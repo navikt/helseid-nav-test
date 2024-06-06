@@ -17,7 +17,7 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
 
     protected inline fun <reified T> query(graphQL : HttpSyncGraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
-           log.info("{} Eksekverer {} med {}",query, T::class.java.simpleName, vars)
+           log.info("{} Eksekverer {} med {}",graphQL, T::class.java.simpleName, vars)
             graphQL
                 .documentName(query.first)
                 .variables(vars)
