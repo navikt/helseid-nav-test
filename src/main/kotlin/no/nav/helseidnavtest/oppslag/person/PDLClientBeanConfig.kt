@@ -28,7 +28,8 @@ class PDLClientBeanConfig {
     @Qualifier(PDL)
     fun pdlRestClient(b: RestClient.Builder, cfg: PDLConfig, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) : RestClient =
        b.requestInterceptors {
-           listOf(clientCredentialsRequestInterceptor,temaRequestInterceptor(HELSE),consumerRequestInterceptor(),behandlingRequestInterceptor())
+           it.addAll(
+           listOf(clientCredentialsRequestInterceptor,temaRequestInterceptor(HELSE),consumerRequestInterceptor(),behandlingRequestInterceptor()))
        }
       /*  b.requestInterceptor(clientCredentialsRequestInterceptor)
             .requestInterceptor(temaRequestInterceptor(HELSE))
