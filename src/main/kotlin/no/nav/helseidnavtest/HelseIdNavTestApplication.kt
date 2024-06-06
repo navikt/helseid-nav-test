@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest
 import no.nav.boot.conditionals.Cluster.Companion.profiler
+import org.springframework.boot.WebApplicationType.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
@@ -20,5 +21,7 @@ class HelseIdNavTestApplication
 fun main(args: Array<String>) {
     runApplication<HelseIdNavTestApplication>(*args) {
         setAdditionalProfiles(*profiler())
+        webApplicationType = SERVLET
+
     }
 }
