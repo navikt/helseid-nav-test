@@ -22,25 +22,21 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class PDLClientBeanConfig {
-    protected val log = getLogger(PDLController::class.java)
+    protected val log = getLogger(PDLClientBeanConfig::class.java)
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: RestClient.Builder, cfg: PDLConfig, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) : RestClient =
+    fun pdlRestClient(b: RestClient.Builder, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
         b.requestInterceptors {
-           it.addAll(
-           listOf(clientCredentialsRequestInterceptor,temaRequestInterceptor(HELSE),consumerRequestInterceptor(),behandlingRequestInterceptor()))
-       }
-
-      /*  b.requestInterceptor(clientCredentialsRequestInterceptor)
-            .requestInterceptor(temaRequestInterceptor(HELSE))
-            .requestInterceptor(consumerRequestInterceptor())
-            .requestInterceptor(behandlingRequestInterceptor())*/
-            .build()
+           it.addAll(listOf(clientCredentialsRequestInterceptor,
+               temaRequestInterceptor(HELSE),
+               consumerRequestInterceptor(),
+               behandlingRequestInterceptor()))
+       }.build()
 
     @Bean
     @Qualifier(PDL)
-    fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) : HttpSyncGraphQlClient =
+    fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
            .interceptor(LoggingGraphQLInterceptor())

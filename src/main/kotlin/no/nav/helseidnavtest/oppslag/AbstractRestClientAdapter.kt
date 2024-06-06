@@ -41,7 +41,6 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 
         private fun generellRequestInterceptor(key : String, value : () -> String) =
             ClientHttpRequestInterceptor { req, b, next ->
-                log.info("Setter $key til ${value.invoke()}")
                 req.headers.add(key, value.invoke())
                 next.execute(req, b)
             }
