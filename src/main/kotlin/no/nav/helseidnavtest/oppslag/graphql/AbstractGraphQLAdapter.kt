@@ -9,13 +9,13 @@ import no.nav.helseidnavtest.oppslag.graphql.GraphQLExtensions.oversett
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.graphql.client.*
 import org.springframework.graphql.client.SyncGraphQlClientInterceptor.Chain
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
 import java.net.URI
 
 abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val handler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
-    protected inline fun <reified T> query(graphQL : HttpSyncGraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
+    protected inline fun <reified T> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
            log.info("{} Eksekverer {} med {}",graphQL, T::class.java.simpleName, vars)
             graphQL
