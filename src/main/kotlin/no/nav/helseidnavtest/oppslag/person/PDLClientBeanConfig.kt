@@ -39,24 +39,24 @@ class PDLClientBeanConfig {
     fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) : HttpSyncGraphQlClient =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
-           // .interceptor(LoggingGraphQLInterceptor())
+           .interceptor(LoggingGraphQLInterceptor())
             .build().also {
                 log.info("Opprettet PDL GraphQL klient $it med $it")
             }
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: OAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { request, body, execution ->
+    fun pdlClientCredentialsRequestInterceptor(clientManager: OAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { req, body, execution ->
         clientManager.authorize(
             withClientRegistrationId(PDL)
                 .principal("anonymous")
                 .build()
         )?.let {
             log.info("Fant token for PDL")
-            request.headers.setBearerAuth(it.accessToken.tokenValue)
+            req.headers.setBearerAuth(it.accessToken.tokenValue)
         } ?: log.warn("Fant ikke token for PDL")
 
-        execution.execute(request, body)
+        execution.execute(req, body)
     }
 
     @Bean

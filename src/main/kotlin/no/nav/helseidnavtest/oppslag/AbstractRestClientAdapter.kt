@@ -13,7 +13,6 @@ import java.util.*
 abstract class AbstractRestClientAdapter(protected open val restClient : RestClient, protected val cfg : AbstractRestConfig,
                                          private val pingClient : RestClient = restClient) : Pingable {
 
-    protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
 
     override fun ping() : Map<String, String> {
@@ -38,6 +37,19 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
     override fun toString() = "webClient=$restClient, cfg=$cfg, pingClient=$pingClient, baseUri=$baseUri"
 
     companion object {
+        val log = getLogger(AbstractRestClientAdapter::class.java)
+
+        private fun generellRequestInterceptor(key : String, value : () -> String) =
+            ClientHttpRequestInterceptor { req, b, next ->
+                log.info("Setter $key til ${value.invoke()}")
+                req.headers.add(key, value.invoke())
+                next.execute(req, b)
+            }
+
+        fun consumerRequestInterceptor() = generellRequestInterceptor(NAV_CONSUMER_ID) { "helse" }
+        fun behandlingRequestInterceptor() = generellRequestInterceptor(BEHANDLINGSNUMMER) { BID }
+        fun temaRequestInterceptor(tema : String) = generellRequestInterceptor(TEMA) { tema }
+
 
         private object CallIdGenerator {
 
@@ -81,15 +93,8 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 
         private fun toMDC(key : String, value : String?, defaultValue : String? = null) = MDC.put(key, value ?: defaultValue)
 
-        private fun generellRequestInterceptor(key : String, value : () -> String) =
-            ClientHttpRequestInterceptor { req, b, next ->
-                req.headers.add(key, value.invoke())
-                next.execute(req, b)
-            }
-
-        fun consumerRequestInterceptor() = generellRequestInterceptor(NAV_CONSUMER_ID) { "helse" }
-        fun behandlingRequestInterceptor() = generellRequestInterceptor(BEHANDLINGSNUMMER) { BID }
-        fun temaRequestInterceptor(tema : String) = generellRequestInterceptor(TEMA) { tema }
     }
+
+
 }
 
