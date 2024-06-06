@@ -15,7 +15,8 @@ import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.web.client.RestClient
 
 
@@ -42,6 +43,9 @@ class PDLClientBeanConfig {
             .build().also {
                 log.info("Opprettet PDL GraphQL klient $it med $client")
             }
+
+    @Bean
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository: ClientRegistrationRepository, authorizedClientService: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService)
 
     @Bean
     @Qualifier(PDL)
