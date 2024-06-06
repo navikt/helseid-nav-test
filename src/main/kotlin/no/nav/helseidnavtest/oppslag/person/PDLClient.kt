@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.person
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.error.RecoverableException
+import no.nav.helseidnavtest.oppslag.person.Person.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.retry.annotation.Recover
 import org.springframework.retry.annotation.Retryable
@@ -16,7 +17,7 @@ class PDLClient(private val pdl: PDLRestClientAdapter) {
     fun ping() = pdl.ping()
     fun navn(fnr: Fødselsnummer) = pdl.person(fnr).navn
     @Recover
-    fun recover(fnr: Fødselsnummer,ex: RecoverableException) :Nothing = throw ex.also {
+    fun recover(ex: RecoverableException,fnr: Fødselsnummer) : Navn = throw ex.also {
         log.error("Recoverable exception feilet for oppslag på fnr {}", fnr,it)
     }
 }

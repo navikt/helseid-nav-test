@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableWebMvc
 @EnableMethodSecurity
 @ConfigurationPropertiesScan
-@EnableRetry
+@EnableRetry(proxyTargetClass=true)
 @EnableJms
 class HelseIdNavTestApplication
 fun main(args: Array<String>) {
