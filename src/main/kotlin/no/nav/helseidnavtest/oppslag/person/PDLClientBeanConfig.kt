@@ -25,13 +25,10 @@ class PDLClientBeanConfig {
     @Bean
     @Qualifier(PDL)
     fun pdlRestClient(b: RestClient.Builder, cfg: PDLConfig, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) : RestClient =
-        b.requestInterceptors {
-            listOf(temaRequestInterceptor(HELSE),
-                clientCredentialsRequestInterceptor,
-                consumerRequestInterceptor(),
-                behandlingRequestInterceptor())
-        }.build().also {
-
+       b.requestInterceptor(clientCredentialsRequestInterceptor)
+           .requestInterceptor(temaRequestInterceptor(HELSE))
+           .requestInterceptor(consumerRequestInterceptor())
+           .requestInterceptor(behandlingRequestInterceptor()).build().also {
             log.info("Opprettet PDL REST klient $it")
         }
 
@@ -48,6 +45,7 @@ class PDLClientBeanConfig {
     @Bean
     @Qualifier(PDL)
     fun pdlClientCredentialsRequestInterceptor(clientManager: OAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { req, body, execution ->
+       log.info("Setter PDL token")
         clientManager.authorize(
             withClientRegistrationId(PDL)
                 .principal("anonymous")
