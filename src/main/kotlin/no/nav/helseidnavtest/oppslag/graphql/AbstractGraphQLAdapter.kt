@@ -21,7 +21,7 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
                 .documentName(query.first)
                 .variables(vars)
                 .executeSync()
-                .field(query.second)
+           //     .field(query.second)
                 .toEntity(T::class.java)
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
