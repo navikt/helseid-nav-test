@@ -13,11 +13,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class PDLRestClientAdapter(
-    @Qualifier(PDL) private val graphQlClient: GraphQlClient,
-    @Qualifier(PDL) restClient: RestClient,
-    cfg: PDLConfig
-) : AbstractGraphQLAdapter(restClient,cfg) {
+class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient, @Qualifier(PDL) restClient: RestClient, cfg: PDLConfig) : AbstractGraphQLAdapter(restClient,cfg) {
 
     override fun ping() : Map<String, String> {
         restClient

@@ -7,7 +7,6 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consume
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.temaRequestInterceptor
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,7 +21,6 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class PDLClientBeanConfig {
-    protected val log = getLogger(PDLClientBeanConfig::class.java)
 
     @Bean
     @Qualifier(PDL)
@@ -39,7 +37,7 @@ class PDLClientBeanConfig {
     fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
-           .interceptor(LoggingGraphQLInterceptor())
+            .interceptor(LoggingGraphQLInterceptor())
             .build()
     @Bean
     fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service)

@@ -17,12 +17,14 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
 
     protected inline fun <reified T> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
-           log.info("{} Eksekverer {} med {}",graphQL, T::class.java.simpleName, vars)
             graphQL
                 .documentName(query.first)
                 .variables(vars)
-                .retrieve(query.second)
+                .executeSync()
+                .field(query.second)
+              //  .retrieve(query.second)
                 .toEntity(T::class.java)
+/*
                 .onErrorMap {
                     when(it) {
                         is FieldAccessException -> it.oversett(cfg.baseUri)
@@ -33,7 +35,7 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
                 }
                 .block().also {
                     log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
-                }
+                }*/
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             handler.handle(cfg.baseUri, it)
@@ -53,7 +55,7 @@ class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 
     override fun intercept(request: ClientGraphQlRequest, chain: Chain) =
         chain.next(request).also {
-            log.trace("Eksekverer {} ", request.document)
+          //  log.trace("Eksekverer {} ", request.document)
         }
 }
 
