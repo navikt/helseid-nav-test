@@ -44,7 +44,7 @@ class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 
     override fun intercept(request: ClientGraphQlRequest, chain: Chain) =
         chain.next(request).also {
-          //  log.trace("Eksekverer {} ", request.document)
+           log.trace("Eksekverer {} ", request.document)
         }
 }
 
