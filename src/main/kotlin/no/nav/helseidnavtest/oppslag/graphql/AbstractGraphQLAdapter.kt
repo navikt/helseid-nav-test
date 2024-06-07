@@ -30,12 +30,13 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
 }
 
 interface GraphQLErrorHandler {
-    fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
-        is FieldAccessException -> throw e.oversett(uri)
-        is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR, e.message ?: "Transport feil", uri, e)
-        is IrrecoverableException -> throw e
-        else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
-    }
+    fun handle(uri: URI, e : Throwable) : Nothing =
+        when (e) {
+            is FieldAccessException -> throw e.oversett(uri)
+            is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR, e.message ?: "Transport feil", uri, e)
+            is IrrecoverableException -> throw e
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
+        }
 }
 class LoggingGraphQLInterceptor : SyncGraphQlClientInterceptor {
 

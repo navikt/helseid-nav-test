@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.graphql
 
 import no.nav.helseidnavtest.error.IrrecoverableException
+import no.nav.helseidnavtest.error.NotFoundException
 import org.slf4j.LoggerFactory.*
 import org.springframework.graphql.ResponseError
 import org.springframework.graphql.client.FieldAccessException
