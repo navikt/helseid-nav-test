@@ -22,29 +22,17 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-              //  .retrieve(query.second)
                 .toEntity(T::class.java)
-/*
-                .onErrorMap {
-                    when(it) {
-                        is FieldAccessException -> it.oversett(cfg.baseUri)
-                        is GraphQlTransportException -> RecoverableException(INTERNAL_SERVER_ERROR, it.message ?: "Transport feil", cfg.baseUri, it
-                        )
-                        else ->  it
-                    }
-                }
-                .block().also {
-                    log.trace(CONFIDENTIAL,"Slo opp {} {}", T::class.java.simpleName, it)
-                }*/
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             handler.handle(cfg.baseUri, it)
         }
 }
 
-/* Denne kalles når retry har gitt opp */
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing = when (e) {
+        is FieldAccessException -> throw e.oversett(uri)
+        is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR, e.message ?: "Transport feil", uri, e)
         is IrrecoverableException -> throw e
         else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
     }
