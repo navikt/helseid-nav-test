@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
 import java.net.URI
 
-abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val handler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
+abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val errorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
     protected inline fun <reified T : Any> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
@@ -21,19 +21,12 @@ abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestCon
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-                .entityType(T::class)
-               // .toEntity(T::class.java)
+                .toEntity(T::class.java)
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
-            handler.handle(cfg.baseUri, it)
-        }
-    inline fun <reified T: Any> ClientResponseField.entityType(kClass: T) : Any =
-        when (kClass) {
-            List::class -> toEntityList(T::class.java)
-            else -> toEntity(T::class.java)
+            errorHandler.handle(cfg.baseUri, it)
         }
 }
-
 
 
 interface GraphQLErrorHandler {
@@ -41,7 +34,6 @@ interface GraphQLErrorHandler {
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
             is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR, e.message ?: "Transport feil", uri, e)
-            is IrrecoverableException -> throw e
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
         }
 }
