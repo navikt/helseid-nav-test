@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.oppslag.graphql
 
-import no.nav.boot.conditionals.EnvUtil.CONFIDENTIAL
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
@@ -15,19 +14,27 @@ import java.net.URI
 
 abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val handler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
-    protected inline fun <reified T> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
+    protected inline fun <reified T : Any> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
             graphQL
                 .documentName(query.first)
                 .variables(vars)
                 .executeSync()
                 .field(query.second)
-                .toEntity(T::class.java)
+                .entityType(T::class)
+               // .toEntity(T::class.java)
         }.getOrElse {
             log.warn("Feil ved oppslag av {}", T::class.java.simpleName, it)
             handler.handle(cfg.baseUri, it)
         }
+    inline fun <reified T: Any> ClientResponseField.entityType(kClass: T) : Any =
+        when (kClass) {
+            List::class -> toEntityList(T::class.java)
+            else -> toEntity(T::class.java)
+        }
 }
+
+
 
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e : Throwable) : Nothing =
