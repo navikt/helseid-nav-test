@@ -41,14 +41,14 @@ spec:
             enabled: true
     image: {{image}}
     liveness:
-        path: /actuator/health/liveness
+        path: /monitoring/health/liveness
         initialDelay: 60
     readiness:
-        path: /actuator/health/readiness
+        path: /monitoring/health/readiness
         initialDelay: 60
     prometheus:
         enabled: true
-        path: /actuator/prometheus
+        path: /monitoring/prometheus
     replicas:
         min: 1
         max: 1
