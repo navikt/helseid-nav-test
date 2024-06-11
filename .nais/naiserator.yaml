@@ -34,6 +34,9 @@ spec:
                 -   host: {{aareg}}
                 -   host: {{ereg}}
     observability:
+        autoInstrumentation:
+            enabled: true
+            runtime: java
         tracing:
             enabled: true
     port: 8080
