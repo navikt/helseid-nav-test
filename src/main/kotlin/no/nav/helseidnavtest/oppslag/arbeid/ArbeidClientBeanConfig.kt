@@ -28,5 +28,5 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(ARBEID, clientManager)
+    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(ARBEID, clientManager)
 }
