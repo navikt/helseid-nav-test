@@ -1,20 +1,17 @@
 package no.nav.helseidnavtest.oppslag
 
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID1
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID2
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID3
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CONSUMER_ID
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CONSUMER_ID2
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.callId
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consumerId
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
+import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
 import org.springframework.web.client.RestClient
 import java.util.*
 
@@ -102,7 +99,18 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
         }
 
         private fun toMDC(key : String, value : String?, defaultValue : String? = null) = MDC.put(key, value ?: defaultValue)
-
     }
 }
 
+class TokenExchangingRequestInterceptor(private val shortName: String, private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+        clientManager.authorize(
+            withClientRegistrationId(shortName)
+                .principal("anonymous")
+                .build()
+        )?.let {
+            req.headers.setBearerAuth(it.accessToken.tokenValue)
+        }
+        return execution.execute(req, body)
+    }
+}

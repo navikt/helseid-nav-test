@@ -6,6 +6,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.behandl
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consumerRequestInterceptor
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.correlatingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.temaRequestInterceptor
+import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
@@ -15,14 +16,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.*
 
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class PDLClientBeanConfig {
 
     @Bean
@@ -47,16 +47,7 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = ClientHttpRequestInterceptor { req, body, execution ->
-        clientManager.authorize(
-            withClientRegistrationId(PDL)
-                .principal("anonymous")
-                .build()
-        )?.let {
-            req.headers.setBearerAuth(it.accessToken.tokenValue)
-        }
-        execution.execute(req, body)
-    }
+    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(PDL, clientManager)
 
     @Bean
     fun pdlHealthIndicator(a: PDLRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
