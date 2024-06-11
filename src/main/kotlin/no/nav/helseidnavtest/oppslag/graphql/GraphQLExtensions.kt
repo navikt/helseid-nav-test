@@ -26,7 +26,7 @@ object GraphQLExtensions {
             Unauthorized -> IrrecoverableException(UNAUTHORIZED, "Uautorisert", msg, uri)
             Unauthenticated -> IrrecoverableException(FORBIDDEN, "Uautentisert", msg, uri)
             BadRequest -> IrrecoverableException(BAD_REQUEST, "Bad request", msg, uri)
-            NotFound -> IrrecoverableException(NOT_FOUND, "Ikke funnet", msg, uri)
+            NotFound -> NotFoundException(detail = msg, uri = uri)
             else -> IrrecoverableException(INTERNAL_SERVER_ERROR, "Ukjent feil", msg, uri)
         }
 }
