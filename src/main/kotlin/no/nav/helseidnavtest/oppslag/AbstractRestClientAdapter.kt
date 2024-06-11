@@ -1,6 +1,14 @@
 package no.nav.helseidnavtest.oppslag
 
 import no.nav.helseidnavtest.health.Pingable
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID1
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID2
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CALL_ID3
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CONSUMER_ID
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.NAV_CONSUMER_ID2
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.callId
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consumerId
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpStatusCode
@@ -41,11 +49,11 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 
         private fun generellRequestInterceptor(key : String, value : () -> String) =
             ClientHttpRequestInterceptor { req, b, next ->
-                req.headers.add(key, value.invoke())
+                req.headers.add(key, value())
                 next.execute(req, b)
             }
 
-        fun consumerRequestInterceptor() = generellRequestInterceptor(NAV_CONSUMER_ID) { "helse" }
+        fun consumerRequestInterceptor() = generellRequestInterceptor(NAV_CONSUMER_ID) { HELSE }
         fun behandlingRequestInterceptor() = generellRequestInterceptor(BEHANDLINGSNUMMER) { BID }
         fun temaRequestInterceptor(tema : String) = generellRequestInterceptor(TEMA) { tema }
 
@@ -53,31 +61,34 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
         private object CallIdGenerator {
 
             fun create() = "${UUID.randomUUID()}"
-        }        /*
-        fun correlatingFilterFunction(defaultConsumerId : String) =
-            ExchangeFilterFunction { req : ClientRequest, next : ExchangeFunction ->
-                next.exchange(
-                    ClientRequest.from(req)
-                        .header(NAV_CONSUMER_ID, consumerId(defaultConsumerId))
-                        .header(NAV_CONSUMER_ID2, consumerId(defaultConsumerId))
-                        .header(NAV_CALL_ID, callId())
-                        .header(NAV_CALL_ID1, callId())
-                        .header(NAV_CALL_ID2, callId())
-                        .header(NAV_CALL_ID3, callId())
-                        .build())
+        }
+
+        fun correlatingRequestInterceptor(defaultConsumerId : String) =
+            ClientHttpRequestInterceptor { req, b, next ->
+
+                with(req.headers) {
+                    mapOf(
+                        NAV_CONSUMER_ID to consumerId(defaultConsumerId),
+                        NAV_CONSUMER_ID2 to consumerId(defaultConsumerId),
+                        NAV_CALL_ID to callId(),
+                        NAV_CALL_ID1 to callId(),
+                        NAV_CALL_ID2 to callId(),
+                        NAV_CALL_ID3 to callId()
+                    ).forEach { (key, value) -> add(key, value) }
+                }
+                next.execute(req, b)
             }
 
-*/
         const val TEMA = "tema"
         const val HELSE = "helseopplysninger"
-        const val BEHANDLINGSNUMMER = "behandlingsnummer"
-        const val BID = "B287"
-        const val NAV_CONSUMER_ID = "Nav-Consumer-Id"
-        const val NAV_CONSUMER_ID2 = "consumerId"
-        const val NAV_CALL_ID = "Nav-CallId"
-        const val NAV_CALL_ID1 = "Nav-Call-Id"
-        const val NAV_CALL_ID2 = "callId"
-        const val NAV_CALL_ID3 = "X-Correlation-ID"
+        private const val BEHANDLINGSNUMMER = "behandlingsnummer"
+        private const val BID = "B287"
+        private const val NAV_CONSUMER_ID = "Nav-Consumer-Id"
+        private const val NAV_CONSUMER_ID2 = "consumerId"
+        private const val NAV_CALL_ID = "Nav-CallId"
+        private const val NAV_CALL_ID1 = "Nav-Call-Id"
+        private const val NAV_CALL_ID2 = "callId"
+        private const val NAV_CALL_ID3 = "X-Correlation-ID"
 
         private fun callId() = MDC.get(NAV_CALL_ID) ?: run {
             val id = CallIdGenerator.create()
@@ -93,7 +104,5 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
         private fun toMDC(key : String, value : String?, defaultValue : String? = null) = MDC.put(key, value ?: defaultValue)
 
     }
-
-
 }
 

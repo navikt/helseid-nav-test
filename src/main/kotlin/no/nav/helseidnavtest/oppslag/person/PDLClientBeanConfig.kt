@@ -4,10 +4,12 @@ import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.HELSE
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.behandlingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.consumerRequestInterceptor
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.correlatingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.temaRequestInterceptor
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpSyncGraphQlClient
@@ -17,6 +19,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withCli
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.*
 
 
 @Configuration
@@ -24,7 +27,7 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlRestClient(b: RestClient.Builder, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
+    fun pdlRestClient(b: Builder, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
         b.requestInterceptors {
            it.addAll(listOf(clientCredentialsRequestInterceptor,
                temaRequestInterceptor(HELSE),
@@ -34,7 +37,7 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun syncGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) =
+    fun syncPdlGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
             .interceptor(LoggingGraphQLInterceptor())
@@ -57,9 +60,12 @@ class PDLClientBeanConfig {
 
     @Bean
     fun pdlHealthIndicator(a: PDLRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}
+
+    @Bean
+    fun restClientCustomizer() = RestClientCustomizer {
+        it.requestInterceptor(correlatingRequestInterceptor(HELSE))
+    }
 }
-
-
 
 
 
