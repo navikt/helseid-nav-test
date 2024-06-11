@@ -39,9 +39,6 @@ spec:
             runtime: java
         logging:
             enabled: true
-        tracing:
-            enabled: true
-    port: 8080
     image: {{image}}
     liveness:
         path: /actuator/health/liveness
