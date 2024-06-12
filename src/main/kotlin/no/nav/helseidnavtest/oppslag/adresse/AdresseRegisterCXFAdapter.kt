@@ -22,7 +22,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
        (client as BindingProvider).requestContext.apply {
            put(USERNAME_PROPERTY, cfg.username)
            put(PASSWORD_PROPERTY, cfg.password)
-           put(ENDPOINT_ADDRESS_PROPERTY, cfg.url)
+           put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
        }
    }
 
