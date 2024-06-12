@@ -12,6 +12,7 @@
         <logger name="no.nav.helse" level="trace"/>
         <logger name="org.springframework.web.client" level="info"/>
         <logger name="org.springframework.graphql" level="trace"/>
+        <logger name="org.apache.cxf.ws.security" level="trace"/>
     </springProfile>
     <springProfile name="local,test">
         <appender name="stdout"
