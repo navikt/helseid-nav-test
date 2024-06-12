@@ -27,12 +27,15 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
         val port  = service.getPort(ICommunicationPartyService::class.java)
         val client  = ClientProxy.getClient(port)
         client.outInterceptors.add(WSS4JOutInterceptor());
-        (service as BindingProvider).requestContext.apply {
-            put(USERNAME_PROPERTY, cfg.username)
-            put(PASSWORD_PROPERTY, cfg.password)
-            put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
+        return service.wsHttpBindingICommunicationPartyService.also {
+            (it as BindingProvider).apply {
+                requestContext.apply {
+                    put(USERNAME_PROPERTY, cfg.username)
+                    put(PASSWORD_PROPERTY, cfg.password)
+                    put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
+                }
+            }
         }
-        return service.wsHttpBindingICommunicationPartyService
     }
 
     fun herIdForId(id: String): Int = runCatching {
