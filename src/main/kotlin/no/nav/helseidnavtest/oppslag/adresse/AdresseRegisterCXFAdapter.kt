@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.health.Pingable
 import no.nhn.register.communicationparty.CommunicationParty_Service
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.apache.cxf.frontend.ClientProxy
+import org.apache.cxf.transport.http.HTTPConduit
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
@@ -26,15 +27,11 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     private final fun start(service: CommunicationParty_Service): ICommunicationPartyService {
         val port  = service.getPort(ICommunicationPartyService::class.java)
         val client  = ClientProxy.getClient(port)
+        val co = client.conduit as HTTPConduit
+        co.authorization.userName = cfg.username
+        co.authorization.password = cfg.password
         client.outInterceptors.add(WSS4JOutInterceptor());
-        return service.wsHttpBindingICommunicationPartyService.also {
-            (it as BindingProvider).apply {
-                requestContext.apply {
-                    put(USERNAME_PROPERTY, cfg.username)
-                    put(PASSWORD_PROPERTY, cfg.password)
-                    put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
-                }
-            }
+        return service.wsHttpBindingICommunicationPartyService
         }
     }
 
