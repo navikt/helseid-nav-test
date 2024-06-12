@@ -31,7 +31,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
         co.authorization.userName = cfg.username
         co.authorization.password = cfg.password
         client.outInterceptors.add(WSS4JOutInterceptor());
-        return service.wsHttpBindingICommunicationPartyService
+        return service.basicHttpBindingICommunicationPartyService
     }
 
     fun herIdForId(id: String): Int = runCatching {
