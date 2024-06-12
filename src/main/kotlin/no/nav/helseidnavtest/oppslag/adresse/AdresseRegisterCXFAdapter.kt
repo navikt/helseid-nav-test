@@ -27,7 +27,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
         val port  = service.getPort(ICommunicationPartyService::class.java)
         val client  = ClientProxy.getClient(port)
         client.outInterceptors.add(WSS4JOutInterceptor());
-        (client as BindingProvider).requestContext.apply {
+        (service as BindingProvider).requestContext.apply {
             put(USERNAME_PROPERTY, cfg.username)
             put(PASSWORD_PROPERTY, cfg.password)
             put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
