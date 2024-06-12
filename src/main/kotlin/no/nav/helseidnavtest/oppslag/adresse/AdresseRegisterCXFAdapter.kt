@@ -1,26 +1,30 @@
 package no.nav.helseidnavtest.oppslag.adresse
+import jakarta.xml.ws.BindingProvider
+import jakarta.xml.ws.BindingProvider.*
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.oppslag.createPort
-import no.nhn.register.communicationparty.ICommunicationPartyService
+import no.nhn.register.communicationparty.CommunicationParty_Service
 import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
 @Component
-class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
+class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
 
-    private val log = getLogger(AdresseRegisterWSAdapter::class.java)
 
-    private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
-        proxy {}
-        port {
-            withBasicAuth(cfg.username, cfg.password)
-        }
-    }
+    private val log = getLogger(AdresseRegisterCXFAdapter::class.java)
+
+    private val client = CommunicationParty_Service().wsHttpBindingICommunicationPartyService
+   init {
+       (client as BindingProvider).requestContext.apply {
+           put(USERNAME_PROPERTY, cfg.username)
+           put(PASSWORD_PROPERTY, cfg.password)
+           put(ENDPOINT_ADDRESS_PROPERTY, cfg.url)
+       }
+   }
 
     fun herIdForId(id: String): Int = runCatching {
         client.searchById(id).communicationParty.single().herId.also {
@@ -34,6 +38,8 @@ class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingabl
                 else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
             }
         }
+
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
+
 }

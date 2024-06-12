@@ -104,7 +104,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 authorize("/pdl", permitAll)
                 authorize("/xml/**", permitAll)
                 authorize("/monitoring/**", permitAll)
-                authorize("/actuator/**", permitAll)
                 authorize("/hello", hasAuthority("LE_4"))
                 authorize(anyRequest, permitAll)
             }

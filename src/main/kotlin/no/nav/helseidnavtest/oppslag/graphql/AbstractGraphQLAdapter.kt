@@ -14,7 +14,7 @@ import java.net.URI
 
 abstract class AbstractGraphQLAdapter(client : RestClient, cfg : AbstractRestConfig, protected val errorHandler: GraphQLErrorHandler = object : GraphQLErrorHandler {}) : AbstractRestClientAdapter(client, cfg) {
 
-    protected inline fun <reified T : Any> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
+    protected inline fun <reified T> query(graphQL : GraphQlClient, query : Pair<String, String>, vars : Map<String, String>) =
         runCatching {
             graphQL
                 .documentName(query.first)
