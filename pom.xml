@@ -321,6 +321,10 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/ar.wsdl</wsdl>
+                                    <wsdlLocation>classpath:/ar.wsdl</wsdlLocation>
+                                    <extraargs>
+                                        <extraarg>-all</extraarg>
+                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
