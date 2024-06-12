@@ -6,10 +6,14 @@ import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
 import no.nhn.register.communicationparty.CommunicationParty_Service
-import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
+import no.nhn.register.communicationparty.ICommunicationPartyService
+import org.apache.cxf.frontend.ClientProxy
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
+import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
+
 
 @Component
 class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
@@ -17,14 +21,19 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
 
     private val log = getLogger(AdresseRegisterCXFAdapter::class.java)
 
-    private val client = CommunicationParty_Service().wsHttpBindingICommunicationPartyService
-   init {
-       (client as BindingProvider).requestContext.apply {
-           put(USERNAME_PROPERTY, cfg.username)
-           put(PASSWORD_PROPERTY, cfg.password)
-           put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
-       }
-   }
+    private val client = start(CommunicationParty_Service())
+
+    private final fun start(service: CommunicationParty_Service): ICommunicationPartyService {
+        val port  = service.getPort(ICommunicationPartyService::class.java)
+        val client  = ClientProxy.getClient(port)
+        client.outInterceptors.add(WSS4JOutInterceptor());
+        (client as BindingProvider).requestContext.apply {
+            put(USERNAME_PROPERTY, cfg.username)
+            put(PASSWORD_PROPERTY, cfg.password)
+            put(ENDPOINT_ADDRESS_PROPERTY, "${cfg.url}")
+        }
+        return service.wsHttpBindingICommunicationPartyService
+    }
 
     fun herIdForId(id: String): Int = runCatching {
         client.searchById(id).communicationParty.single().herId.also {
