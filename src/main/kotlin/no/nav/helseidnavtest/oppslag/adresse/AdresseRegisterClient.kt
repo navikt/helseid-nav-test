@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Retryable(include = [RecoverableException::class])
-class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
+class AdresseRegisterClient(private val adapter: AdresseRegisterWSAdapter) {
 
     private val log = getLogger(AdresseRegisterClient::class.java)
 

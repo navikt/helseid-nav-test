@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
-//@Component
+@Component
 class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
 
     private val log = getLogger(AdresseRegisterWSAdapter::class.java)

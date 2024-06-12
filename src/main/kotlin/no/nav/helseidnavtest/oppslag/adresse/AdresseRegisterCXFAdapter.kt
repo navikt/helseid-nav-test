@@ -12,11 +12,10 @@ import org.apache.cxf.transport.http.HTTPConduit
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
-import org.springframework.stereotype.Component
 import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
 
 
-@Component
+//@Component
 class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
 
 
@@ -25,13 +24,14 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     private val client = start(CommunicationParty_Service())
 
     private final fun start(service: CommunicationParty_Service): ICommunicationPartyService {
+
         val port  = service.getPort(ICommunicationPartyService::class.java)
         val client  = ClientProxy.getClient(port)
         val co = client.conduit as HTTPConduit
         co.authorization.userName = cfg.username
         co.authorization.password = cfg.password
         client.outInterceptors.add(WSS4JOutInterceptor());
-        return service.basicHttpBindingICommunicationPartyService
+        return service.wsHttpBindingICommunicationPartyService
     }
 
     fun herIdForId(id: String): Int = runCatching {
