@@ -6,7 +6,6 @@ import org.apache.cxf.transport.http.HTTPConduit
 import java.net.URI
 
 inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>("${cfg.url}") {
-  //  proxy {}
     port {
         with(cfg) {
             withBasicAuth(username, password)
@@ -19,7 +18,6 @@ inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConf
         JaxWsProxyFactoryBean().apply {
             address = endpoint
             serviceClass = T::class.java
-            it.proxyConfigurator(this)
         }.create() as T
         ).apply {
             it.portConfigurator(this)
@@ -28,12 +26,7 @@ inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConf
 
 
 class PortConfigurator<T> {
-    var proxyConfigurator: JaxWsProxyFactoryBean.() -> Unit = {}
     var portConfigurator: T.() -> Unit = {}
-
-    fun proxy(configurator: JaxWsProxyFactoryBean.() -> Unit) {
-        proxyConfigurator = configurator
-    }
 
     fun port(configurator: T.() -> Unit) {
         portConfigurator = configurator
