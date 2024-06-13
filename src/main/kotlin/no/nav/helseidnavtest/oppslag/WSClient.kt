@@ -6,15 +6,15 @@ import org.apache.cxf.transport.http.HTTPConduit
 import java.net.URI
 
 inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>("${cfg.url}") {
-    proxy {}
+  //  proxy {}
     port {
         with(cfg) {
             withBasicAuth(username, password)
         }
     }
 }
-inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConfigurator<T>.() -> Unit = {}): T = PortConfigurator<T>().let {
-    extraConfiguration(it)
+inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConfigurator<T>.() -> Unit = {}) =
+    PortConfigurator<T>().let { extraConfiguration(it)
     (
         JaxWsProxyFactoryBean().apply {
             address = endpoint
