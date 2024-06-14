@@ -8,31 +8,28 @@ import org.apache.cxf.ext.logging.LoggingOutInterceptor
 import org.apache.cxf.frontend.ClientProxy
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.transport.http.HTTPConduit
+import java.net.URI
 
-abstract class AbstractCXFAdapter<T>(val cfg: WSConfig) :Pingable {
+abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
 
     protected inline fun <reified T> client(): T {
 
-        val factory = JaxWsProxyFactoryBean().apply {
-            address = cfg.url.toString()
+        val service = JaxWsProxyFactoryBean().apply {
+            address = "${cfg.url}"
+        }.create(T::class.java)
+
+        val client: Client = ClientProxy.getClient(service).apply {
+            inInterceptors.add(LoggingInInterceptor())
+            outInterceptors.add(LoggingOutInterceptor())
         }
-
-        val service = factory.create(T::class.java)
-        val client: Client = ClientProxy.getClient(service)
-
-        // Add logging interceptors for debugging
-        client.inInterceptors.add(LoggingInInterceptor())
-        client.outInterceptors.add(LoggingOutInterceptor())
-
-        // Set up HTTP authentication
-        val httpConduit = client.conduit as HTTPConduit
-        val authorizationPolicy = AuthorizationPolicy().apply {
+        (client.conduit as HTTPConduit).authorization = AuthorizationPolicy().apply {
             userName = cfg.username
             password = cfg.password
         }
-        httpConduit.authorization = authorizationPolicy
         return service
     }
 
+    override fun pingEndpoint() = "${cfg.url}"
 
 }
+abstract class BasicAuthConfig(val url: URI, val username: String, val password:  String)

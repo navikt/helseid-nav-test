@@ -11,7 +11,7 @@ import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunica
 
 
 @Component
-class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter<ICommunicationPartyService>(cfg) {
+class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter(cfg) {
 
     private val log = getLogger(AdresseRegisterCXFAdapter::class.java)
 
@@ -31,8 +31,6 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
         }
 
     override fun ping() = mapOf(Pair("ping",client.ping()))
-
-    override fun pingEndpoint() = "${cfg.url}"
 
 }
 

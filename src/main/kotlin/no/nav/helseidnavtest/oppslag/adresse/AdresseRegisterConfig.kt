@@ -1,8 +1,8 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
-import no.nav.helseidnavtest.oppslag.WSConfig
+import no.nav.helseidnavtest.oppslag.BasicAuthConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import java.net.URI
 
 @ConfigurationProperties("adresse")
-class AdresseRegisterConfig(url: String, username: String, password: String) : WSConfig(URI.create(url),username,password)
+class AdresseRegisterConfig(url: String, username: String, password: String) : BasicAuthConfig(URI.create(url),username,password)

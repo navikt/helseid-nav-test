@@ -2,8 +2,7 @@ package no.nav.helseidnavtest.oppslag.fastlege
 
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
-import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.oppslag.createPort
+import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nhn.schemas.reg.flr.IFlrReadOperations
 import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
@@ -13,10 +12,10 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
+class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
 
-    private val log = getLogger(FastlegeWSAdapter::class.java)
-    private val client = createPort<IFlrReadOperations>(cfg)
+    private val log = getLogger(FastlegeCXFAdapter::class.java)
+    private val client = client<IFlrReadOperations>()
 
     fun pasienterForAvtale(avtale: AvtaleId) = runCatching {
         client.getGPPatientList(avtale.verdi)?.patientToGPContractAssociation?.map {
