@@ -2,7 +2,6 @@ package no.nav.helseidnavtest.oppslag
 
 import no.nav.helseidnavtest.health.Pingable
 import org.apache.cxf.configuration.security.AuthorizationPolicy
-import org.apache.cxf.endpoint.Client
 import org.apache.cxf.ext.logging.LoggingInInterceptor
 import org.apache.cxf.ext.logging.LoggingOutInterceptor
 import org.apache.cxf.frontend.ClientProxy
@@ -18,7 +17,7 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
             address = "${cfg.url}"
         }.create(T::class.java)
 
-        val client: Client = ClientProxy.getClient(service).apply {
+        val client = ClientProxy.getClient(service).apply {
             inInterceptors.add(LoggingInInterceptor())
             outInterceptors.add(LoggingOutInterceptor())
         }
