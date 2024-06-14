@@ -60,9 +60,14 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
             address = cfg.url.toString()
         }
 
+        log.info("Creating service for ${cfg.url}")
+
         val service = factory.create(CommunicationParty_Service::class.java)
 
+        log.info("Service created for ${cfg.url}")
         val client: Client = ClientProxy.getClient(service)
+
+        log.info("Client created for ${cfg.url}")
 
         // Add logging interceptors for debugging
         client.inInterceptors.add(LoggingInInterceptor())
@@ -75,7 +80,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
             password = cfg.password
         }
         httpConduit.authorization = authorizationPolicy
-
+        log.info("HTTP Conduit created for ${cfg.url}")
         return service
     }
 
