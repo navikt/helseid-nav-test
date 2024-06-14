@@ -26,7 +26,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     private val log = getLogger(AdresseRegisterCXFAdapter::class.java)
 
 
-    private val client = service(cfg).wsHttpBindingICommunicationPartyService
+    private val client = service(cfg)
 
     private fun init(service: CommunicationParty_Service): ICommunicationPartyService {
 
