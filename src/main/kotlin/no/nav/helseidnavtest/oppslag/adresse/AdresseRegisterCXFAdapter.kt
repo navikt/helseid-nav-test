@@ -1,36 +1,39 @@
 package no.nav.helseidnavtest.oppslag.adresse
-import jakarta.xml.ws.BindingProvider
-import jakarta.xml.ws.BindingProvider.*
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
 import no.nhn.register.communicationparty.CommunicationParty_Service
 import no.nhn.register.communicationparty.ICommunicationPartyService
+import org.apache.cxf.configuration.security.AuthorizationPolicy
+import org.apache.cxf.endpoint.Client
+import org.apache.cxf.ext.logging.LoggingInInterceptor
+import org.apache.cxf.ext.logging.LoggingOutInterceptor
 import org.apache.cxf.frontend.ClientProxy
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.transport.http.HTTPConduit
-import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
+import org.springframework.stereotype.Component
+
 import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
 
 
-//@Component
+@Component
 class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
 
 
     private val log = getLogger(AdresseRegisterCXFAdapter::class.java)
 
-    private val client = start(CommunicationParty_Service())
 
-    private final fun start(service: CommunicationParty_Service): ICommunicationPartyService {
+    private val client = service(cfg).wsHttpBindingICommunicationPartyService
 
-        val port  = service.getPort(ICommunicationPartyService::class.java)
-        val client  = ClientProxy.getClient(port)
-        val co = client.conduit as HTTPConduit
-        co.authorization.userName = cfg.username
-        co.authorization.password = cfg.password
-        client.outInterceptors.add(WSS4JOutInterceptor());
+    private fun init(service: CommunicationParty_Service): ICommunicationPartyService {
+
+        (ClientProxy.getClient(service.getPort(ICommunicationPartyService::class.java)).conduit as HTTPConduit).authorization.apply {
+            userName = cfg.username;
+            password = cfg.password
+        }
         return service.wsHttpBindingICommunicationPartyService
     }
 
@@ -50,4 +53,33 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
+    fun service(cfg: AdresseRegisterConfig): CommunicationParty_Service {
+
+
+        val factory = JaxWsProxyFactoryBean().apply {
+            address = cfg.url.toString()
+        }
+
+        val service = factory.create(CommunicationParty_Service::class.java)
+
+        val client: Client = ClientProxy.getClient(service)
+
+        // Add logging interceptors for debugging
+        client.inInterceptors.add(LoggingInInterceptor())
+        client.outInterceptors.add(LoggingOutInterceptor())
+
+        // Set up HTTP authentication
+        val httpConduit = client.conduit as HTTPConduit
+        val authorizationPolicy = AuthorizationPolicy().apply {
+            userName = cfg.username
+            password = cfg.password
+        }
+        httpConduit.authorization = authorizationPolicy
+
+        return service
+    }
+
 }
+
+
+

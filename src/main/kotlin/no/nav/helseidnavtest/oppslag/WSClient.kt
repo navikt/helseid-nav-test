@@ -14,12 +14,10 @@ inline fun <reified T> createPort(cfg: WSConfig) = createPort<T>("${cfg.url}") {
 }
 inline fun <reified T> createPort(endpoint: String, extraConfiguration: PortConfigurator<T>.() -> Unit = {}) =
     PortConfigurator<T>().let { extraConfiguration(it)
-    (
-        JaxWsProxyFactoryBean().apply {
+    (JaxWsProxyFactoryBean().apply {
             address = endpoint
             serviceClass = T::class.java
-        }.create() as T
-        ).apply {
+        }.create() as T).apply {
             it.portConfigurator(this)
         }
 }

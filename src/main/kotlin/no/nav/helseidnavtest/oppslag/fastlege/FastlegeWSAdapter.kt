@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
+class FastlegeWSAdapter(private val cfg: FastlegeConfig) : Pingable {
 
     private val log = getLogger(FastlegeWSAdapter::class.java)
     private val client = createPort<IFlrReadOperations>(cfg)
@@ -30,7 +30,6 @@ class FastlegeWSAdapter(val cfg: FastlegeConfig) : Pingable {
             else -> throw it
         }
     }
-
 
 
     fun pasienterForFastlege(navn: String) = runCatching {

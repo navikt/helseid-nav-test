@@ -10,17 +10,12 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.*
 import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class AdresseRegisterWSAdapter(private val cfg: AdresseRegisterConfig) : Pingable {
 
     private val log = getLogger(AdresseRegisterWSAdapter::class.java)
 
-    private val client = createPort<ICommunicationPartyService>("${cfg.url}") {
-        proxy {}
-        port {
-            withBasicAuth(cfg.username, cfg.password)
-        }
-    }
+    private val client = createPort<ICommunicationPartyService>(cfg)
 
     fun herIdForId(id: String): Int = runCatching {
         client.searchById(id).communicationParty.single().herId.also {
