@@ -56,6 +56,9 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     fun service(cfg: AdresseRegisterConfig): CommunicationParty_Service {
 
 
+        try {
+
+
         val factory = JaxWsProxyFactoryBean().apply {
             address = cfg.url.toString()
         }
@@ -82,6 +85,10 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
         httpConduit.authorization = authorizationPolicy
         log.info("HTTP Conduit created for ${cfg.url}")
         return service
+        } catch (e: Exception) {
+            log.error("Error creating service for ${cfg.url}", e)
+            throw e
+        }
     }
 
 }
