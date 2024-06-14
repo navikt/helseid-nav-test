@@ -53,7 +53,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
     override fun ping() = mapOf(Pair("ping",client.ping()))
     override fun pingEndpoint() = "${cfg.url}"
 
-    fun service(cfg: AdresseRegisterConfig): CommunicationParty_Service {
+    fun service(cfg: AdresseRegisterConfig): ICommunicationPartyService {
 
 
         try {
