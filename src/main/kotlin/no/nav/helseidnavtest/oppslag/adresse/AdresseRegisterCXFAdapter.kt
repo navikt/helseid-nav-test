@@ -65,7 +65,7 @@ class AdresseRegisterCXFAdapter(private val cfg: AdresseRegisterConfig) : Pingab
 
         log.info("Creating service for ${cfg.url}")
 
-        val service = factory.create(CommunicationParty_Service::class.java)
+        val service = factory.create(ICommunicationPartyService::class.java)
 
         log.info("Service created for ${cfg.url}")
         val client: Client = ClientProxy.getClient(service)
