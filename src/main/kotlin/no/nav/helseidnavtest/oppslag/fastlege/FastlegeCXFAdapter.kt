@@ -74,27 +74,19 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
 
     fun lege(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient)?.let { d ->
-            log.info("Detaljer for pasient $pasient: $d")
-            d.doctorCycles?.let { c ->
-                log.info("Sykler for pasient $pasient: $c")
-                c.value?.let { a ->
-                    log.info("Assosiasjoner for pasient $pasient: $a")
-                    a.gpOnContractAssociation?.map {
-                        log.info("Assosiasjon for pasient $pasient: $it")
-                        it.gp.value?.let {
-                            log.info("GP for pasient $pasient: ${it.nin.value}")
-                            with(it)  {
-                                log.info("GP FNR for pasient $pasient: ${this.nin.value}")
-                                Lege(d.gpContractId,Person(Fødselsnummer(nin.value),Navn(firstName.value, middleName.value,lastName.value)))
-                            }
-                        }?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
-                    } ?: throw NotFoundException("Fant ikke kontraktassosiasjon for pasient $pasient", uri=cfg.url)
-                } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", uri=cfg.url)
-            } ?: throw NotFoundException("Fant ikke doktorsykler for pasient $pasient", uri=cfg.url)
+            d.doctorCycles?.value?.let { a ->
+                a.gpOnContractAssociation?.firstNotNullOfOrNull {
+                    it.gp.value?.let {
+                        Lege(d.gpContractId,
+                            Person(Fødselsnummer(it.nin.value), Navn(it.firstName.value, it.middleName.value, it.lastName.value))
+                        )
+                    }
+                } ?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
+            } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", uri=cfg.url)
         } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri=cfg.url)
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", it.message, cfg.url, it)
             else -> throw it
         }
     }
