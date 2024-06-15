@@ -8,21 +8,19 @@ import java.net.URI
 
 abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
 
-    protected inline fun <reified T> client(): T {
-
-        val service = JaxWsProxyFactoryBean().apply {
-            address = "${cfg.url}"
-            with(features) {
-                add(LoggingFeature().apply {
-                    setPrettyLogging(true)
-                    setSensitiveElementNames(setOf("Sex"))
-                })
-                add(HttpConduitFeature().apply { username = cfg.username; password = cfg.password})
-            }
-
-        }.create(T::class.java)
-        return service
-    }
+    protected inline fun <reified T> client() = JaxWsProxyFactoryBean().apply {
+        address = "${cfg.url}"
+        with(features) {
+            add(LoggingFeature().apply {
+                setPrettyLogging(true)
+                setSensitiveElementNames(setOf("Sex"))
+            })
+            add(HttpConduitFeature().apply {
+                username = cfg.username
+                password = cfg.password
+            })
+        }
+    }.create(T::class.java)
 
     override fun pingEndpoint() = "${cfg.url}"
 
