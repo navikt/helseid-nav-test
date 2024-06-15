@@ -13,18 +13,14 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
         val service = JaxWsProxyFactoryBean().apply {
             address = "${cfg.url}"
             with(features) {
-                add(LoggingFeature().apply { setPrettyLogging(true) })
+                add(LoggingFeature().apply {
+                    setPrettyLogging(true)
+                    setSensitiveElementNames(setOf("Address"))
+                })
                 add(HttpConduitFeature().apply { username = cfg.username; password = cfg.password})
             }
 
         }.create(T::class.java)
-
-        /*
-        val client = ClientProxy.getClient(service)
-        (client.conduit as HTTPConduit).authorization = AuthorizationPolicy().apply {
-            userName = cfg.username
-            password = cfg.password
-        }*/
         return service
     }
 
