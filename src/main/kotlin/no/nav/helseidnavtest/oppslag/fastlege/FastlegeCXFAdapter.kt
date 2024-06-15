@@ -75,8 +75,8 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
     fun lege(pasient: String) = runCatching {
         client.getPatientGPDetails(pasient)?.let { d ->
             d.doctorCycles?.value?.let { a ->
-                a.gpOnContractAssociation?.firstNotNullOfOrNull {
-                    it.gp.value?.let {
+                a.gpOnContractAssociation?.firstNotNullOfOrNull { c ->
+                    c.gp.value?.let {
                         Lege(d.gpContractId,
                             Person(Fødselsnummer(it.nin.value), Navn(it.firstName.value, it.middleName.value, it.lastName.value))
                         )
@@ -117,7 +117,6 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
             }
         }
     override fun ping() = emptyMap<String,String>()
-    override fun pingEndpoint() = "${cfg.url}"
 
     companion object {
         private val OF = ObjectFactory()

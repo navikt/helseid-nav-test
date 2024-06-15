@@ -22,13 +22,13 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
             log.info("Returnerer kommunikasjonspart $it for $id")
         }
     }.getOrElse {
-            when (it) {
-                is CommPartyFault -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url,it)
-                is NoSuchElementException -> throw NotFoundException(detail = "Fant ikke kommunikasjonspart for $id", uri = cfg.url, cause = it)
-                is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "For mange kommunikasjonsparter for $id", it.message,cfg.url,it)
-                else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
-            }
+        when (it) {
+            is CommPartyFault -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url,it)
+            is NoSuchElementException -> throw NotFoundException(detail = "Fant ikke kommunikasjonspart for $id", uri = cfg.url, cause = it)
+            is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "For mange kommunikasjonsparter for $id", it.message,cfg.url,it)
+            else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
         }
+    }
 
     override fun ping() = mapOf(Pair("ping",client.ping()))
 

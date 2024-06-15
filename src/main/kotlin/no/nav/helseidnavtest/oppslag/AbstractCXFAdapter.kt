@@ -2,8 +2,7 @@ package no.nav.helseidnavtest.oppslag
 
 import no.nav.helseidnavtest.health.Pingable
 import org.apache.cxf.configuration.security.AuthorizationPolicy
-import org.apache.cxf.ext.logging.LoggingInInterceptor
-import org.apache.cxf.ext.logging.LoggingOutInterceptor
+import org.apache.cxf.ext.logging.LoggingFeature
 import org.apache.cxf.frontend.ClientProxy
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
 import org.apache.cxf.transport.http.HTTPConduit
@@ -15,12 +14,11 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
 
         val service = JaxWsProxyFactoryBean().apply {
             address = "${cfg.url}"
+            features.add(LoggingFeature().apply { setPrettyLogging(true) })
+
         }.create(T::class.java)
 
-        val client = ClientProxy.getClient(service).apply {
-            inInterceptors.add(LoggingInInterceptor())
-            outInterceptors.add(LoggingOutInterceptor())
-        }
+        val client = ClientProxy.getClient(service)
         (client.conduit as HTTPConduit).authorization = AuthorizationPolicy().apply {
             userName = cfg.username
             password = cfg.password

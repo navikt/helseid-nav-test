@@ -23,7 +23,6 @@ class FastlegeClient(private val fastlegeAdapter: FastlegeCXFAdapter, private va
 
     fun legeFNR(navn: String) = fastlegeAdapter.pasienterForFastlege(navn)
 
-
     fun lege(pasient: Fødselsnummer) = fastlegeAdapter.lege(pasient.verdi)
 
     fun herIdForLegeViaPasient(pasient: Fødselsnummer) = HerId(fastlegeAdapter.herIdForLegeViaPasient(pasient.verdi))

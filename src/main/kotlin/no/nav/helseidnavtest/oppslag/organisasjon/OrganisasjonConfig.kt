@@ -5,7 +5,7 @@ import no.nav.helseidnavtest.oppslag.organisasjon.OrganisasjonConfig.Companion.O
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.bind.DefaultValue
 import org.springframework.web.util.UriBuilder
-import org.springframework.web.util.UriComponentsBuilder
+import org.springframework.web.util.UriComponentsBuilder.*
 import java.net.URI
 
 @ConfigurationProperties(ORGANISASJON)
@@ -20,7 +20,7 @@ class OrganisasjonConfig(baseUri: URI, private val organisasjonPath: String = V1
         private const val V1_ORGANISASJON = "v1/organisasjon/{orgnr}"
         private const val TESTORG = "947064649"
         private fun pingPath(organisasjonPath: String) =
-            UriComponentsBuilder.newInstance()
+            newInstance()
                 .path(organisasjonPath)
                 .build(TESTORG)
                 .toString()
