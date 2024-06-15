@@ -15,7 +15,7 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
             with(features) {
                 add(LoggingFeature().apply {
                     setPrettyLogging(true)
-                    setSensitiveElementNames(setOf("Address"))
+                    setSensitiveElementNames(setOf("Sex"))
                 })
                 add(HttpConduitFeature().apply { username = cfg.username; password = cfg.password})
             }
