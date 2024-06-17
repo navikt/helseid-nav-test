@@ -8,13 +8,11 @@ import no.nhn.schemas.reg.flr.IFlrReadOperations
 import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
 import no.nhn.schemas.reg.flr.ObjectFactory
 import no.nhn.schemas.reg.flr.WSGPOffice
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 
 @Component
 class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
 
-    private val log = getLogger(FastlegeCXFAdapter::class.java)
     private val client = client<IFlrReadOperations>()
 
     fun pasienterForAvtale(avtale: AvtaleId) = runCatching {
