@@ -115,3 +115,5 @@ ibm:
     conn-name: ${dialogmelding.host}(${dialogmelding.port})
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
+edi20:
+  base-uri: https://api.tjener.test.melding.nhn.no
