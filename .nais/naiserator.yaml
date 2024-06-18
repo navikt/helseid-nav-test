@@ -86,6 +86,10 @@ spec:
             value: {{env}}
         -   name: clientid
             value: {{clientid}}
+        -   name: clientid-test1
+            value: {{clientid-test1}}
+        -   name: clientid-test2
+            value: {{clientid-test2}}
         -   name: aareg
             value: {{aareg}}
         - name: ereg

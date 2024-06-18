@@ -34,6 +34,16 @@ spring:
           issuer-uri: ${helse-id.issuer}
       client:
         registration:
+          edi20-1:
+            authorization-grant-type: client_credentials
+            client-authentication-method: private_key_jwt
+            client-secret: ${clientid-test1}
+            provider: helse-id
+          edi20-2:
+            authorization-grant-type: client_credentials
+            client-authentication-method: private_key_jwt
+            client-secret: ${clientid-test2}
+            provider: helse-id
           pdl:
             authorization-grant-type: client_credentials
             client-authentication-method: client_secret_basic

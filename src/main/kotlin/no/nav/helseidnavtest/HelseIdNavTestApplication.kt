@@ -21,7 +21,5 @@ class HelseIdNavTestApplication
 fun main(args: Array<String>) {
     runApplication<HelseIdNavTestApplication>(*args) {
         setAdditionalProfiles(*profiler())
-        webApplicationType = SERVLET
-
     }
 }

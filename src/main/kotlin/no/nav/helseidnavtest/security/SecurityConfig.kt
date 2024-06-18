@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
@@ -27,12 +27,14 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
-class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
+class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@Value("\${helse-id.test1.jwk}") private val test1: String) {
 
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val jwk = JWK.parse(assertion)
+    private val jwk1 = JWK.parse(test1)
+
 
     private val log = getLogger(SecurityConfig::class.java)
 
@@ -62,6 +64,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
+                "edi20-1" -> jwk1
                 "helse-id" -> jwk
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
@@ -77,7 +80,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
     @Bean
     fun pkceResolver(repo: ClientRegistrationRepository) =
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
-            setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce())
+            setAuthorizationRequestCustomizer(withPkce())
         }
 
     @Bean
@@ -91,8 +94,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
                 }
             }
             oauth2ResourceServer {
-                jwt {
-                }
+                jwt {}
             }
             oauth2Client {}
             logout {
@@ -111,3 +113,4 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String) {
         return http.build()
     }
 }
+
