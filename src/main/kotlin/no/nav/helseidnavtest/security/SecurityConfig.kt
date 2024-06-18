@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient
+import org.springframework.security.oauth2.client.endpoint.DefaultClientCredentialsTokenResponseClient
+import org.springframework.security.oauth2.client.endpoint.DefaultJwtBearerTokenResponseClient
+import org.springframework.security.oauth2.client.endpoint.JwtBearerGrantRequestEntityConverter
 import org.springframework.security.oauth2.client.endpoint.NimbusJwtClientAuthenticationParametersConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler
@@ -61,7 +64,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
     @Bean
-    fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
+    fun requestEntityConverter() = JwtBearerGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
                 "edi20-1" -> jwk1
@@ -72,8 +75,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     }
 
     @Bean
-    fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
-        DefaultAuthorizationCodeTokenResponseClient().apply {
+    fun authCodeResponseClient(converter: JwtBearerGrantRequestEntityConverter) =
+        DefaultJwtBearerTokenResponseClient().apply {
             setRequestEntityConverter(converter)
         }
 
