@@ -37,12 +37,12 @@ spring:
           edi20-1:
             authorization-grant-type: client_credentials
             client-authentication-method: private_key_jwt
-            client-secret: ${clientid-test1}
+            client-id: ${clientid-test1}
             provider: helse-id
           edi20-2:
             authorization-grant-type: client_credentials
             client-authentication-method: private_key_jwt
-            client-secret: ${clientid-test2}
+            client-id: ${clientid-test2}
             provider: helse-id
           pdl:
             authorization-grant-type: client_credentials
