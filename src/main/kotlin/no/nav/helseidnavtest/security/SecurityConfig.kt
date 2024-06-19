@@ -74,13 +74,13 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         })
     }
 
-    //@Bean
-    fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
+    @Bean
+    fun authCodeResponseClient(/*converter: OAuth2AuthorizationCodeGrantRequestEntityConverter*/) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
-            setRequestEntityConverter(converter)
+         //   setRequestEntityConverter(converter)
         }
 
-    //@Bean
+    @Bean
     fun pkceResolver(repo: ClientRegistrationRepository) =
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
