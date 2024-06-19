@@ -21,13 +21,11 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 
 
 @Configuration
@@ -37,8 +35,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
-    private val jwk = JWK.parse(assertion)
-    private val jwk1 = JWK.parse(test1)
+    private val jwt = JWK.parse(assertion)
+    private val jwt1 = JWK.parse(test1)
 
 
     private val log = getLogger(SecurityConfig::class.java)
@@ -69,8 +67,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
-                "edi20-1" -> jwk1
-                "helse-id" -> jwk
+                "edi20-1" -> jwt1
+                "helse-id" -> jwt
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
@@ -126,8 +124,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
                         if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
                             when (reg.registrationId) {
-                                "edi20-1" -> jwk1.also {  log.info("Klient: edi20") }
-                                "helse-id" -> jwk.also {  log.info("Klient: helseid") }
+                                "edi20-1" -> jwt1.also {  log.info("Klient: edi20") }
+                                "helse-id" -> jwt.also {  log.info("Klient: helseid") }
                                 else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
                             }
                         } else {
