@@ -69,8 +69,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
-                "edi20-1" -> jwk1.also {  log.info("Klient: edi20") }
-                "helse-id" -> jwk.also {  log.info("Klient: helseid") }
+                "edi20-1" -> jwk1
+                "helse-id" -> jwk
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
@@ -126,8 +126,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     val jwkResolver: (ClientRegistration) -> JWK? = { clientRegistration ->
                         if (clientRegistration.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
                             when (clientRegistration.registrationId) {
-                                "edi20-1" -> jwk1
-                                "helse-id" -> jwk
+                                "edi20-1" -> jwk1.also {  log.info("Klient: edi20") }
+                                "helse-id" -> jwk.also {  log.info("Klient: helseid") }
                                 else -> throw IllegalArgumentException("Ukjent klient: ${clientRegistration.registrationId}")
                             }
                         } else {
