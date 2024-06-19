@@ -92,13 +92,17 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
-                   // authorizationRequestResolver = resolver
+                    authorizationRequestResolver = resolver
                 }
             }
             oauth2ResourceServer {
                 jwt {}
             }
-            oauth2Client {}
+            oauth2Client {
+               authorizationCodeGrant {
+                      authorizationRequestResolver = resolver
+                    }
+            }
             logout {
                 logoutSuccessHandler = successHandler
             }
