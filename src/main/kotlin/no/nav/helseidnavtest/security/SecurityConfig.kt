@@ -65,7 +65,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
-    @Bean
+    //@Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
@@ -76,26 +76,26 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         })
     }
 
-    @Bean
+    //@Bean
     fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
             setRequestEntityConverter(converter)
         }
 
-    @Bean
+    //@Bean
     fun pkceResolver(repo: ClientRegistrationRepository) =
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
         }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, resolver: OAuth2AuthorizationRequestResolver, successHandler: LogoutSuccessHandler
+    fun securityFilterChain(http: HttpSecurity, /*resolver: OAuth2AuthorizationRequestResolver,*/ successHandler: LogoutSuccessHandler
     ): SecurityFilterChain {
         http {
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
-                    authorizationRequestResolver = resolver
+                   // authorizationRequestResolver = resolver
                 }
             }
             oauth2ResourceServer {
