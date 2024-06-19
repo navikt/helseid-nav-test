@@ -20,10 +20,14 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod.*
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 
 
 @Configuration
@@ -119,12 +123,12 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         setAuthorizedClientProvider(
             OAuth2AuthorizedClientProviderBuilder.builder()
                 .clientCredentials {
-                    val jwkResolver: (ClientRegistration) -> JWK? = { clientRegistration ->
-                        if (clientRegistration.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
-                            when (clientRegistration.registrationId) {
+                    val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
+                        if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
+                            when (reg.registrationId) {
                                 "edi20-1" -> jwk1.also {  log.info("Klient: edi20") }
                                 "helse-id" -> jwk.also {  log.info("Klient: helseid") }
-                                else -> throw IllegalArgumentException("Ukjent klient: ${clientRegistration.registrationId}")
+                                else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
                             }
                         } else {
                             null
@@ -133,6 +137,11 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
                     val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
                         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter(jwkResolver))
+                        addParametersConverter {
+                            LinkedMultiValueMap<String,String>().apply {
+                                this[CLIENT_ID] = it.clientRegistration.clientId
+                            }
+                        }
                     }
                     it.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
                         setRequestEntityConverter(requestEntityConverter)

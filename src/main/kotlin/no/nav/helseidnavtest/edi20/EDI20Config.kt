@@ -4,7 +4,6 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import java.net.URI
 import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import no.nav.helseidnavtest.oppslag.organisasjon.OrgNummer
 import org.springframework.web.util.UriBuilder
 
 @ConfigurationProperties(EDI20)
