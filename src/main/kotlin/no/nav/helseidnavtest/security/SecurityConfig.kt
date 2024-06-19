@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -12,7 +13,6 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.endpoint.*
@@ -34,7 +34,6 @@ import org.springframework.util.LinkedMultiValueMap
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
 class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@Value("\${helse-id.test1.jwk}") private val test1: String) {
-
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
@@ -70,8 +69,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
-                "edi20-1" -> jwk1
-                "helse-id" -> jwk
+                "edi20-1" -> jwk1.also {  log.info("Klient: edi20") }
+                "helse-id" -> jwk.also {  log.info("Klient: helseid") }
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
