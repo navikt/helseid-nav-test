@@ -42,8 +42,6 @@ class PDLClientBeanConfig {
             .url(cfg.baseUri)
             .interceptor(LoggingGraphQLInterceptor())
             .build()
-    @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service)
 
     @Bean
     @Qualifier(PDL)
