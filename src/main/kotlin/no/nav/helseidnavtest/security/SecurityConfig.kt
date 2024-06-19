@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -21,13 +20,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.*
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import org.springframework.util.LinkedMultiValueMap
 
 
 @Configuration
@@ -135,17 +131,12 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                         }
                     }
 
-                    val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter()
-                    val parametersConverter = NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver)
-                    requestEntityConverter.addParametersConverter(parametersConverter)
-                    requestEntityConverter.addParametersConverter { source ->
-                        val parameters = LinkedMultiValueMap<String, String>()
-                        parameters[CLIENT_ID] = source.clientRegistration.clientId
-                        parameters
+                    val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
+                        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter(jwkResolver))
                     }
-                    val responseClient = DefaultClientCredentialsTokenResponseClient()
-                    responseClient.setRequestEntityConverter(requestEntityConverter)
-                    it.accessTokenResponseClient(responseClient)
+                    it.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
+                        setRequestEntityConverter(requestEntityConverter)
+                    })
                 }
                 .build()
         )
