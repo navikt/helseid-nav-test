@@ -22,34 +22,30 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
-    fun illegal(e: Exception, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, BAD_REQUEST,headers)
+    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
 
     @ExceptionHandler(AccessDeniedException::class)
-    fun accessDenied(e: AccessDeniedException, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, UNAUTHORIZED,headers)
+    fun accessDenied(e: AccessDeniedException, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
 
     @ExceptionHandler(Exception::class)
-    fun catchAll(e: Exception, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, BAD_REQUEST,headers)
+    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
-    private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus, headers: HttpHeaders) =
+    private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
         status(status)
             .headers(HttpHeaders().apply { contentType = APPLICATION_PROBLEM_JSON })
             .body(createProblemDetail(e, status, e.message ?: e.javaClass.simpleName,null, null, req).apply {
-            }.also { log(e, it, req, status, headers) })
+            }.also { log(e, it, req, status) })
 
-    private fun log(t: Throwable, problem: ProblemDetail, req: NativeWebRequest, status: HttpStatus, headers: HttpHeaders) {
+    private fun log(t: Throwable, problem: ProblemDetail, req: NativeWebRequest, status: HttpStatus) =
         if(status in listOf(UNPROCESSABLE_ENTITY,UNSUPPORTED_MEDIA_TYPE)) {
-            logWarning(req, problem, status, headers,t)
+            logWarning(req, problem, status, t)
         }
         else {
-            logError(req, problem, status, headers,t)
+            logError(req, problem, status, t)
         }
-    }
 
-    private fun logError(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, headers: HttpHeaders, t: Throwable) {
-        log.error("OOPS $req $headers $problem ${status.reasonPhrase}: ${t.message}", t)
-    }
+    private fun logError(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.error("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
 
-    private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus,headers: HttpHeaders, t: Throwable) =
-        log.warn("OOPS $req $headers, $problem ${status.reasonPhrase}: ${t.message}", t)
+    private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.warn("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
 }
