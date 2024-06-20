@@ -11,13 +11,6 @@ import org.springframework.web.servlet.ModelAndView
 @RestController
 class HelseopplysningerController {
 
-    private fun roll() = ModelAndView("redirect:https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
-    @GetMapping("/")
-    fun root() = roll()
-
-    @GetMapping("/error")
-    fun error() = roll()
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication) = dump(authentication)
