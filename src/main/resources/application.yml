@@ -42,6 +42,9 @@ spring:
             client-authentication-method: private_key_jwt
             client-id: ${clientid-test1}
             provider: helse-id
+            scope:
+              - nhn:msh/api
+              - offline_access
           edi20-2:
             authorization-grant-type: client_credentials
             client-authentication-method: private_key_jwt
