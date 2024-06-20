@@ -27,6 +27,7 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
 import java.time.Instant
+import java.time.Instant.*
 
 
 @Configuration
@@ -136,7 +137,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
                     val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
                         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver).apply {
-                            setJwtClientAssertionCustomizer { it.claims.notBefore(Instant.now()) }
+                            setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
                         })
                         addParametersConverter {
                             LinkedMultiValueMap<String,String>().apply {

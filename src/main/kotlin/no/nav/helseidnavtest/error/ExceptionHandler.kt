@@ -22,14 +22,14 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
 
     @ExceptionHandler(IllegalArgumentException::class, DatabindException::class)
-    fun illegal(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+    fun illegal(e: Exception, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, BAD_REQUEST)
 
 
     @ExceptionHandler(AccessDeniedException::class)
-    fun accessDenied(e: AccessDeniedException, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
+    fun accessDenied(e: AccessDeniedException, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, UNAUTHORIZED)
 
     @ExceptionHandler(Exception::class)
-    fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
+    fun catchAll(e: Exception, req: NativeWebRequest, headers: HttpHeaders) = createProblem(e, req, BAD_REQUEST)
 
     private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
         status(status)
