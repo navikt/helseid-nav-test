@@ -29,7 +29,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
     //@ExceptionHandler(AccessDeniedException::class)
     fun accessDenied(e: AccessDeniedException, req: NativeWebRequest) = createProblem(e, req, UNAUTHORIZED)
 
-    //@ExceptionHandler(Exception::class)
+    @ExceptionHandler(Exception::class)
     fun catchAll(e: Exception, req: NativeWebRequest) = createProblem(e, req, BAD_REQUEST)
 
     private fun createProblem(e: Exception, req: NativeWebRequest, status: HttpStatus) =
