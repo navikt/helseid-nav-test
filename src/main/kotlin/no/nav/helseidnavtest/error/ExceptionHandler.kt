@@ -12,11 +12,12 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice
+@RestControllerAdvice
 @Order(-1)
 class ExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = getLogger(javaClass)
