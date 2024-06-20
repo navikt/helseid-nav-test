@@ -26,6 +26,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
+import java.time.Instant
 
 
 @Configuration
@@ -120,7 +121,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
         setAuthorizedClientProvider(
             OAuth2AuthorizedClientProviderBuilder.builder()
-                .clientCredentials {
+                .clientCredentials { p ->
                     val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
                         if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
                             when (reg.registrationId) {
@@ -134,14 +135,16 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     }
 
                     val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
-                        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter(jwkResolver))
+                        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver).apply {
+                            setJwtClientAssertionCustomizer { it.claims.notBefore(Instant.now()) }
+                        })
                         addParametersConverter {
                             LinkedMultiValueMap<String,String>().apply {
                                 this[CLIENT_ID] = it.clientRegistration.clientId
                             }
                         }
                     }
-                    it.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
+                    p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
                         setRequestEntityConverter(requestEntityConverter)
                     })
                 }
