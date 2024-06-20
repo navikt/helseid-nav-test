@@ -106,7 +106,7 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         clientManager.authorize(
             withClientRegistrationId(shortName)
-                .principal("anonymous")
+                .principal("0e850898-05ec-4ad2-a028-5b5988ce75dd")
                 .build()
         )?.let {
             req.headers.setBearerAuth(it.accessToken.tokenValue)
