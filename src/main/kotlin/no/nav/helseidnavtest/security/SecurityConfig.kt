@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.security
 import com.nimbusds.jose.jwk.JWK
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -117,6 +118,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
         return http.build()
     }
+
+    @Bean
+    fun traceRepo() = InMemoryHttpExchangeRepository()
 
     @Bean
     fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {

@@ -1,4 +1,7 @@
 management:
+   httpexchanges:
+     recording:
+       enabled: true
    health:
     ping:
       enabled: false
