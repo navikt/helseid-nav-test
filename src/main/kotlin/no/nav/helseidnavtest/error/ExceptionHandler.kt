@@ -46,7 +46,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             logError(req, problem, status, t)
         }
 
-    private fun logError(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.error("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
+    private fun logError(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.error("OOPS ${req.nativeResponse} $req $problem ${status.reasonPhrase}: ${t.message}", t)
 
-    private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.warn("OOPS $req $problem ${status.reasonPhrase}: ${t.message}", t)
+    private fun logWarning(req: NativeWebRequest, problem: ProblemDetail, status: HttpStatus, t: Throwable) = log.warn("OOPS  ${req.nativeResponse}  $req $problem ${status.reasonPhrase}: ${t.message}", t)
 }
