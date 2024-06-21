@@ -12,7 +12,7 @@ class EDI20Config(baseUri: URI,
                    private val messagesPath : String = DEFAULT_MESSAGES_PATH,
                   enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
 
-    fun messagesURI(b: UriBuilder) = b.path(messagesPath).build()
+    val messagesURI = "$baseUri$messagesPath"
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
