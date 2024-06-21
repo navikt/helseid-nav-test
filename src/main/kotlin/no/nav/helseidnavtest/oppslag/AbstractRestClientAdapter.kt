@@ -103,13 +103,15 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 }
 
 class TokenExchangingRequestInterceptor(private val shortName: String, private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+    val log = getLogger(TokenExchangingRequestInterceptor::class.java)
+
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         clientManager.authorize(
             withClientRegistrationId(shortName)
                 .principal("0e850898-05ec-4ad2-a028-5b5988ce75dd")
                 .build()
-        )?.let {
-            req.headers.setBearerAuth(it.accessToken.tokenValue)
+        )?.let { c ->
+            req.headers.setBearerAuth(c.accessToken.tokenValue).also { log.info("Token exchanged for $shortName fikk token ${c.accessToken.tokenValue}") }
         }
         return execution.execute(req, body)
     }
