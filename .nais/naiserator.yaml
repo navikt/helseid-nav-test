@@ -25,6 +25,7 @@ spec:
     accessPolicy:
         outbound:
             external:
+                -   host:  api.tjener.test.melding.nhn.no
                 -   host: {{dialogmelding.partnerhost}}
                 -   host: {{dialogmelding.host}}
                     ports:
