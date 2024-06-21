@@ -44,7 +44,6 @@ spring:
             provider: helse-id
             scope:
               - nhn:msh/api
-              - offline_access
           edi20-2:
             authorization-grant-type: client_credentials
             client-authentication-method: private_key_jwt
