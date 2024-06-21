@@ -66,11 +66,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
-    //@Bean
+    @Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
-                "edi20-1" -> jwt1
                 "helse-id" -> jwt
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
@@ -78,9 +77,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     }
 
     @Bean
-    fun authCodeResponseClient(/*converter: OAuth2AuthorizationCodeGrantRequestEntityConverter*/) =
+    fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
-         //   setRequestEntityConverter(converter)
+           setRequestEntityConverter(converter)
         }
 
     @Bean
@@ -102,7 +101,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             oauth2ResourceServer {
                 jwt {}
             }
-            oauth2Client {}
+            oauth2Client {
+
+            }
             logout {
                 logoutSuccessHandler = successHandler
             }
@@ -131,7 +132,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                         if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
                             when (reg.registrationId) {
                                 "edi20-1" -> jwt1.also {  log.info("Klient: edi20") }
-                                "helse-id" -> jwt.also {  log.info("Klient: helseid") }
                                 else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
                             }
                         } else {

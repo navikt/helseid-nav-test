@@ -111,7 +111,7 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
                 .principal("0e850898-05ec-4ad2-a028-5b5988ce75dd")
                 .build()
         )?.let { c ->
-            req.headers.setBearerAuth(c.accessToken.tokenValue).also { log.info("Token exchanged for $shortName fikk token ${c.accessToken.tokenValue}") }
+            req.headers.setBearerAuth(c.accessToken.tokenValue)
         }
         return execution.execute(req, body)
     }
