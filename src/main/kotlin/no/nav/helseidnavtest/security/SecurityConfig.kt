@@ -105,9 +105,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                 jwt {}
             }
             oauth2Client {
-                authorizationCodeGrant {
+                //authorizationCodeGrant {
                    // authorizationRequestResolver = resolver
-                }
+                //}
             }
             logout {
                 logoutSuccessHandler = successHandler
