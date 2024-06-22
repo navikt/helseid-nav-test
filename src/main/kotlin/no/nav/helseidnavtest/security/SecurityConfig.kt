@@ -12,8 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
-import org.springframework.security.oauth2.client.AuthorizationCodeOAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.endpoint.*
@@ -22,13 +22,15 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.authorizationCode
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
+import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
-import java.time.Instant
 import java.time.Instant.*
 
 
@@ -90,20 +92,22 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, /*resolver: OAuth2AuthorizationRequestResolver,*/ successHandler: LogoutSuccessHandler
+    fun securityFilterChain(http: HttpSecurity, resolver: OAuth2AuthorizationRequestResolver, successHandler: LogoutSuccessHandler
     ): SecurityFilterChain {
         http {
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
-                   // authorizationRequestResolver = resolver
+                    authorizationRequestResolver = resolver
                 }
             }
             oauth2ResourceServer {
                 jwt {}
             }
             oauth2Client {
-
+                authorizationCodeGrant {
+                    authorizationRequestResolver = resolver
+                }
             }
             logout {
                 logoutSuccessHandler = successHandler
@@ -130,19 +134,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()
                     .clientCredentials { p ->
-                        val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
-                            if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
-                                when (reg.registrationId) {
-                                    "edi20-1" -> jwt1.also {  log.info("Klient: edi20-1") }
-                                    else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
-                                }
-                            } else {
-                                null
-                            }
-                        }
-
                         val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
-                            addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver).apply {
+                            addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver()).apply {
                                 setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
                             })
                             addParametersConverter {
@@ -154,8 +147,20 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                         p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
                             setRequestEntityConverter(requestEntityConverter)
                         })
-                    }.authorizationCode()
+                    }
                     .build()
             )
         }
+
+
+    private fun jwkResolver(): (ClientRegistration) -> JWK? = {
+        if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
+            when (it.registrationId) {
+                "edi20-1" -> jwt1.also { log.info("Klient: edi20-1") }
+                else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
+            }
+        } else {
+            null
+        }
+    }
 }
