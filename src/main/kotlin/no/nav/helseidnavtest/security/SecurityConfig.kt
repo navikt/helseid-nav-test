@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
+import org.springframework.security.oauth2.client.AuthorizationCodeOAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
@@ -124,36 +125,37 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun traceRepo() = InMemoryHttpExchangeRepository()
 
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) = AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
-        setAuthorizedClientProvider(
-            OAuth2AuthorizedClientProviderBuilder.builder()
-                .clientCredentials { p ->
-                    val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
-                        if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
-                            when (reg.registrationId) {
-                                "edi20-1" -> jwt1.also {  log.info("Klient: edi20") }
-                                else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
+        AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
+            setAuthorizedClientProvider(
+                OAuth2AuthorizedClientProviderBuilder.builder()
+                    .clientCredentials { p ->
+                        val jwkResolver: (ClientRegistration) -> JWK? = { reg ->
+                            if (reg.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
+                                when (reg.registrationId) {
+                                    "edi20-1" -> jwt1.also {  log.info("Klient: edi20-1") }
+                                    else -> throw IllegalArgumentException("Ukjent klient: ${reg.registrationId}")
+                                }
+                            } else {
+                                null
                             }
-                        } else {
-                            null
                         }
-                    }
 
-                    val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
-                        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver).apply {
-                            setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
-                        })
-                        addParametersConverter {
-                            LinkedMultiValueMap<String,String>().apply {
-                                this[CLIENT_ID] = it.clientRegistration.clientId
+                        val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
+                            addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver).apply {
+                                setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
+                            })
+                            addParametersConverter {
+                                LinkedMultiValueMap<String,String>().apply {
+                                    this[CLIENT_ID] = it.clientRegistration.clientId
+                                }
                             }
                         }
-                    }
-                    p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
-                        setRequestEntityConverter(requestEntityConverter)
-                    })
-                }
-                .build()
-        )
-    }
+                        p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
+                            setRequestEntityConverter(requestEntityConverter)
+                        })
+                    }.authorizationCode()
+                    .build()
+            )
+        }
 }
