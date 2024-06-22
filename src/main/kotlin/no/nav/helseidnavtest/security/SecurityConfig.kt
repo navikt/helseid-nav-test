@@ -106,7 +106,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             }
             oauth2Client {
                 authorizationCodeGrant {
-                    authorizationRequestResolver = resolver
+                   // authorizationRequestResolver = resolver
                 }
             }
             logout {
@@ -153,14 +153,14 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
 
-    private fun jwkResolver(): (ClientRegistration) -> JWK? = {
+    private fun jwkResolver(): (ClientRegistration) -> JWK = {
         if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
             when (it.registrationId) {
                 "edi20-1" -> jwt1.also { log.info("Klient: edi20-1") }
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         } else {
-            null
+            throw IllegalArgumentException("Ukjent autentiseringsmetode: ${it.clientAuthenticationMethod}")
         }
     }
 }
