@@ -23,9 +23,6 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
                 .uri(cf::messagesURI)
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                //.onStatus({ !it.is2xxSuccessful }) { _, res ->
-                //    log.error("Error in messages request ${res.statusCode} ")
-                //}
                 .body<String>().also { log.trace("Messages response {}", it) }
                 .also { log.trace("Response {}", it) }
         }
