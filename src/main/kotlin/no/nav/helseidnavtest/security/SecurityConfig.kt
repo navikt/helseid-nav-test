@@ -92,8 +92,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, resolver: OAuth2AuthorizationRequestResolver, successHandler: LogoutSuccessHandler
-    ): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity, resolver: OAuth2AuthorizationRequestResolver, successHandler: LogoutSuccessHandler): SecurityFilterChain {
         http {
             oauth2Login {
                 authorizationEndpoint {
@@ -104,11 +103,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             oauth2ResourceServer {
                 jwt {}
             }
-            oauth2Client {
-                //authorizationCodeGrant {
-                   // authorizationRequestResolver = resolver
-                //}
-            }
+            oauth2Client {}
             logout {
                 logoutSuccessHandler = successHandler
             }

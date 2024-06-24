@@ -20,12 +20,12 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         if (cf.isEnabled) {
             restClient
                 .get()
-                .uri(cf.messagesURI)
+                .uri { b -> cf.messagesURI(b) }
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .onStatus({ !it.is2xxSuccessful }) { _, _ ->
-                    log.error("Error in messages request")
-                }
+                //.onStatus({ !it.is2xxSuccessful }) { _, res ->
+                //    log.error("Error in messages request ${res.statusCode} ")
+                //}
                 .body<String>().also { log.trace("Messages response {}", it) }
                 .also { log.trace("Response {}", it) }
         }
