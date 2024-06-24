@@ -114,7 +114,7 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
             req.headers.setBearerAuth(c.accessToken.tokenValue).also {
                 log.trace("Token exchanged for {}", c.clientRegistration.registrationId)
             }
-        }
+        } ?: log.error("Token exchange failed for {}", shortName)
         return execution.execute(req, body)
     }
 }
