@@ -69,7 +69,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
-    @Bean
+   // @Bean
     fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
@@ -79,7 +79,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         })
     }
 
-    @Bean
+   // @Bean
     fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
            setRequestEntityConverter(converter)
@@ -98,6 +98,9 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
                     authorizationRequestResolver = resolver
+                }
+                tokenEndpoint {
+                    accessTokenResponseClient = authCodeResponseClient(requestEntityConverter())
                 }
             }
             oauth2ResourceServer {
