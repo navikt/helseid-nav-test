@@ -106,13 +106,14 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
     val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+       log.info("Token exchange for {}", shortName)
         clientManager.authorize(
             withClientRegistrationId(shortName)
                 .principal("0e850898-05ec-4ad2-a028-5b5988ce75dd")
                 .build()
         )?.let { c ->
             req.headers.setBearerAuth(c.accessToken.tokenValue).also {
-                log.trace("Token exchanged for {}", c.clientRegistration.registrationId)
+                log.info("Token exchanged for {}", c.clientRegistration.registrationId)
             }
         } ?: log.error("Token exchange failed for {}", shortName)
         return execution.execute(req, body)
