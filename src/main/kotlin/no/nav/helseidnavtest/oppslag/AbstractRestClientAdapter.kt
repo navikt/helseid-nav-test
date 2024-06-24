@@ -109,7 +109,7 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
        log.info("Token exchange for {}", shortName)
         clientManager.authorize(
             withClientRegistrationId(shortName)
-                .principal("system")
+                .principal("ARBEIDS- OG VELFERDSETATEN - Meldingstjener SHP REST klient (NAV-HELSE-TEST1)")
                 .build()
         )?.let { c ->
             req.headers.setBearerAuth(c.accessToken.tokenValue).also {
