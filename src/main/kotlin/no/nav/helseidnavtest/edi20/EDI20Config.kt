@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.web.util.UriBuilder
+import java.lang.Boolean.FALSE
 
 @ConfigurationProperties(EDI20)
 class EDI20Config(baseUri: URI,
@@ -15,9 +16,11 @@ class EDI20Config(baseUri: URI,
 
     private val log = getLogger(EDI20Config::class.java)
 
-
-    val messagesURI = "$baseUri$messagesPath"
-    fun messagesURI(b: UriBuilder) = b.path(messagesPath).build().also { log.info("messagesURI: $it") }
+    fun messagesURI(b: UriBuilder) = b
+        .path(messagesPath)
+        .queryParam("IncludeAppRec", FALSE)
+        .queryParam("ToHerIds",8142519)
+        .build()
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

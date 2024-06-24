@@ -20,7 +20,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         if (cf.isEnabled) {
             restClient
                 .get()
-                .uri { b -> cf.messagesURI(b) }
+                .uri(cf::messagesURI)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 //.onStatus({ !it.is2xxSuccessful }) { _, res ->
