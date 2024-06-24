@@ -117,4 +117,6 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
         } ?: log.error("Token exchange failed for {}", shortName)
         return execution.execute(req, body)
     }
+
+    override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
 }

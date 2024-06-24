@@ -20,7 +20,7 @@ class EDI20Config(baseUri: URI,
         .path(messagesPath)
         .queryParam("IncludeAppRec", FALSE)
         .queryParam("ToHerIds",8142519)
-        .build()
+        .build().also { log.info("messagesURI: $it")}
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

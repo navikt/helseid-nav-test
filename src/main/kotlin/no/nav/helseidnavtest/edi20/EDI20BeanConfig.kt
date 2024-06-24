@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,8 +11,11 @@ import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2A
 import org.springframework.web.client.RestClient.*
 
 
-@Configuration(proxyBeanMethods = false)
+@Configuration(proxyBeanMethods = true)
 class EDI20BeanConfig {
+
+    private val log = getLogger(EDI20BeanConfig::class.java)
+
 
     @Bean
     @Qualifier(EDI20)
@@ -19,7 +23,9 @@ class EDI20BeanConfig {
         b.baseUrl("${cfg.baseUri}")
         .requestInterceptors {
            it.add(clientCredentialsRequestInterceptor)
-       }.build()
+       }.build().also {
+              log.info("Created EDI20RestClient for $clientCredentialsRequestInterceptor")
+            }
 
     @Bean
     @Qualifier(EDI20)
