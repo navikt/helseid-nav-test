@@ -7,7 +7,6 @@ import com.nimbusds.jose.JWSAlgorithm.RS256
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.ECDSASigner
 import com.nimbusds.jose.crypto.RSASSASigner
-import com.nimbusds.jose.jwk.Curve
 import com.nimbusds.jose.jwk.Curve.*
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
@@ -16,7 +15,6 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.log
-import org.bouncycastle.cert.ocsp.Req
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -51,7 +49,6 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.context.request.RequestContextHolder
 import java.security.PrivateKey
 import java.time.Instant
 import java.time.Instant.now
@@ -119,7 +116,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     authorizationRequestResolver = pkceAddingResolver(repo)
                 }
                 tokenEndpoint {
-                    accessTokenResponseClient = DPoPAuthorizationCodeTokenRequestClient(DPoPUtils(),converter()) // authCodeResponseClient(converter())
+                    accessTokenResponseClient = //DPoPAuthorizationCodeTokenRequestClient(DPoPUtils(),converter())
+                 authCodeResponseClient(converter())
                 }
             }
             oauth2ResourceServer {
@@ -221,14 +219,14 @@ class DPoPAuthorizationCodeTokenRequestClient(
     private val defaultAuthorizationCodeTokenResponseClient = DefaultAuthorizationCodeTokenResponseClient().apply {
         setRequestEntityConverter(converter)
     }
-    override fun getTokenResponse(authorizationCodeGrantRequest: OAuth2AuthorizationCodeGrantRequest): OAuth2AccessTokenResponse
+    override fun getTokenResponse(req: OAuth2AuthorizationCodeGrantRequest): OAuth2AccessTokenResponse
     {
-        val oidcResponse = defaultAuthorizationCodeTokenResponseClient.getTokenResponse(authorizationCodeGrantRequest)
-        val codeVerifier = authorizationCodeGrantRequest.authorizationExchange.authorizationRequest.getAttribute<String>("code_verifier")
-        val code = authorizationCodeGrantRequest.authorizationExchange.authorizationResponse.code
-        val tokenURI = authorizationCodeGrantRequest.clientRegistration.providerDetails.tokenUri
-        val redirectURI = authorizationCodeGrantRequest.clientRegistration.redirectUri
-        val clientId = authorizationCodeGrantRequest.clientRegistration.clientId
+        val oidcResponse = defaultAuthorizationCodeTokenResponseClient.getTokenResponse(req)
+        val codeVerifier = req.authorizationExchange.authorizationRequest.getAttribute<String>("code_verifier")
+        val code = req.authorizationExchange.authorizationResponse.code
+        val tokenURI = req.clientRegistration.providerDetails.tokenUri
+        val redirectURI = req.clientRegistration.redirectUri
+        val clientId = req.clientRegistration.clientId
 
 
         //val sessionId = RequestContextHolder.currentRequestAttributes().sessionId
