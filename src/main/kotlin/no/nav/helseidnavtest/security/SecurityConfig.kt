@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.security
 
-import com.nimbusds.jose.*
+import com.nimbusds.jose.JWSAlgorithm.RS256
+import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jwt.JWTClaimsSet
@@ -29,16 +30,13 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
-import org.springframework.security.oauth2.core.OAuth2AccessToken
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
-import java.net.URI
 import java.security.PrivateKey
-import java.time.Instant.*
+import java.time.Instant.now
 import java.util.*
 
 
@@ -78,7 +76,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
     private fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addHeadersConverter(HeaderConverter())
+        addHeadersConverter(DefaultOAuth2TokenRequestHeadersConverter())
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
                 "helse-id" -> jwk
@@ -171,7 +169,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 class DPoPTokenGenerator(private val privateKey: PrivateKey) {
 
     fun generateDPoPToken(method: String, uri: String): String {
-        val signer: JWSSigner = RSASSASigner(privateKey)
+        val signer = RSASSASigner(privateKey)
         val claimsSet = JWTClaimsSet.Builder()
             .claim("htm", method)
             .claim("htu", uri)
@@ -179,7 +177,7 @@ class DPoPTokenGenerator(private val privateKey: PrivateKey) {
             .issueTime(Date())
             .build()
 
-        val signedJWT = SignedJWT(JWSHeader.Builder(JWSAlgorithm.RS256).build(), claimsSet)
+        val signedJWT = SignedJWT(JWSHeader.Builder(RS256).build(), claimsSet)
         signedJWT.sign(signer)
         return signedJWT.serialize()
     }
