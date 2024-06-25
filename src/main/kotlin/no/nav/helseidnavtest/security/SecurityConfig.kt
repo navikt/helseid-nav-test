@@ -1,9 +1,18 @@
 package no.nav.helseidnavtest.security
 
+import com.nimbusds.jose.Algorithm
+import com.nimbusds.jose.JOSEObjectType
+import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSAlgorithm.RS256
 import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.ECDSASigner
 import com.nimbusds.jose.crypto.RSASSASigner
+import com.nimbusds.jose.jwk.Curve
+import com.nimbusds.jose.jwk.Curve.*
+import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.jwk.KeyUse
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.log
@@ -12,8 +21,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.convert.converter.Converter
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -30,14 +42,20 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
+import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.context.request.RequestContextHolder
 import java.security.PrivateKey
+import java.time.Instant
 import java.time.Instant.now
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 
 @Configuration
@@ -75,8 +93,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
-    private fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addHeadersConverter(HeaderConverter())
+    private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
+        //addHeadersConverter(HeaderConverter())
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
                 "helse-id" -> jwk
@@ -100,7 +118,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     authorizationRequestResolver = pkceAddingResolver(repo)
                 }
                 tokenEndpoint {
-                    accessTokenResponseClient = authCodeResponseClient(requestEntityConverter())
+                    accessTokenResponseClient = DPoPAuthorizationCodeTokenRequestClient(DPoPUtils(),converter()) // authCodeResponseClient(converter())
                 }
             }
             oauth2ResourceServer {
@@ -189,39 +207,117 @@ class HeaderConverter : Converter<OAuth2AuthorizationCodeGrantRequest, HttpHeade
     }
 
 }
-/*
-class DPoPRequestEntityConverter(
-    private val delegate: OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>,
-    private val dPoPTokenGenerator: DPoPTokenGenerator
-) :
-    OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
-    fun getAccessToken(userRequest: OAuth2AuthorizationCodeGrantRequest): OAuth2AccessToken {
-        val accessToken: OAuth2AccessToken = delegate.getTokenResponse(userRequest).accessToken
 
-        try {
-            val dpopToken = dPoPTokenGenerator.generateDPoPToken(
-                userRequest.getHttpMethod().name(),
-                userRequest.getUri().toString()
-            )
 
-            val headers: HttpHeaders = HttpHeaders()
-            headers.add("DPoP", dpopToken)
+class DPoPAuthorizationCodeTokenRequestClient(
+    private val dpopUtils: DPoPUtils,
+    private val converter: OAuth2AuthorizationCodeGrantRequestEntityConverter,
+) : OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>
+{
+    private val mapResponseType: ParameterizedTypeReference<HashMap<String, String>> =
+        object : ParameterizedTypeReference<HashMap<String, String>>()
+        {}
+    private val defaultAuthorizationCodeTokenResponseClient = DefaultAuthorizationCodeTokenResponseClient().apply {
+        setRequestEntityConverter(converter)
+    }
+    override fun getTokenResponse(authorizationCodeGrantRequest: OAuth2AuthorizationCodeGrantRequest): OAuth2AccessTokenResponse
+    {
+        val oidcResponse = defaultAuthorizationCodeTokenResponseClient.getTokenResponse(authorizationCodeGrantRequest)
+        val codeVerifier = authorizationCodeGrantRequest.authorizationExchange.authorizationRequest.getAttribute<String>("code_verifier")
+        val code = authorizationCodeGrantRequest.authorizationExchange.authorizationResponse.code
+        val tokenURI = authorizationCodeGrantRequest.clientRegistration.providerDetails.tokenUri
+        val redirectURI = authorizationCodeGrantRequest.clientRegistration.redirectUri
+        val clientId = authorizationCodeGrantRequest.clientRegistration.clientId
 
-            val requestEntity: RequestEntity<*> = RequestEntity
-                .get(URI(userRequest.getUri().toString()))
-                .headers(headers)
-                .build()
+        val sessionId = RequestContextHolder.currentRequestAttributes().sessionId
+        val sessionKey = ECKeyGenerator(P_256)
+            .algorithm(Algorithm("EC"))
+            .keyUse(KeyUse.SIGNATURE)
+            .keyID(UUID.randomUUID().toString())
+            .generate()
 
-            // Send the request with DPoP headers
-            // ...
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to generate DPoP token", e)
-        }
+        dpopUtils.saveSessionKey(sessionId, sessionKey)
 
-        return accessToken
+        val jwt = dpopUtils.dpopJWT("POST", tokenURI, sessionKey)
+
+        val response = dpopResponse(codeVerifier, code, redirectURI, clientId, tokenURI, jwt)
+        return OAuth2AccessTokenResponse.withToken(response["access_token"])
+            .tokenType(OAuth2AccessToken.TokenType.BEARER)
+            .refreshToken(response["refresh_token"])
+            .additionalParameters(oidcResponse.additionalParameters)
+            .expiresIn(response["expires_in"]?.toLong() ?: 0)
+            .build()
     }
 
-    override fun getTokenResponse(authorizationGrantRequest: OAuth2AuthorizationCodeGrantRequest?): OAuth2AccessTokenResponse {
-        TODO("Not yet implemented")
+    private fun dpopResponse(
+        codeVerifier: String,
+        code: String,
+        redirectURI: String,
+        clientId: String,
+        tokenURI: String,
+        jwt: String
+    ): Map<String, String>
+    {
+        val headers = HttpHeaders()
+        headers.add("DPoP", jwt)
+        headers.add("Content-Type", "application/x-www-form-urlencoded")
+
+        val params = LinkedMultiValueMap<String, String>()
+        params.add("grant_type", "authorization_code")
+        params.add("code_verifier", codeVerifier)
+        params.add("code", code)
+        params.add("redirect_uri", redirectURI)
+        params.add("client_id", clientId)
+
+        val httpEntity = HttpEntity<LinkedMultiValueMap<String, String>>(params, headers)
+
+        return RestTemplate().exchange(
+            tokenURI,
+            HttpMethod.POST,
+            httpEntity,
+            mapResponseType
+        ).body ?: emptyMap()
     }
-}*/
+}
+
+
+class DPoPUtils
+{
+    private val sessionKeyMap: ConcurrentHashMap<String, ECKey> = ConcurrentHashMap()
+
+    fun sessionKey(sessionId: String): ECKey? = sessionKeyMap[sessionId]
+
+    fun saveSessionKey(sessionId: String, key: ECKey)
+    {
+        sessionKeyMap[sessionId] = key
+    }
+
+    fun removeSessionKey(sessionId: String)
+    {
+        sessionKeyMap.remove(sessionId)
+    }
+
+    fun dpopJWT(method: String, targetURI: String, sessionKey: ECKey): String =
+        signedJWT(header(sessionKey), payload(method, targetURI), sessionKey)
+
+    private fun signedJWT(header: JWSHeader, payload: JWTClaimsSet, sessionKey: ECKey): String
+    {
+        val signedJWT = SignedJWT(header, payload)
+        signedJWT.sign(ECDSASigner(sessionKey.toECPrivateKey()))
+        return signedJWT.serialize()
+    }
+
+    private fun payload(method: String, targetURI: String): JWTClaimsSet =
+        JWTClaimsSet.Builder()
+            .jwtID(UUID.randomUUID().toString())
+            .issueTime(Date.from(Instant.now()))
+            .claim("htm", method)
+            .claim("htu", targetURI)
+            .build()
+
+    private fun header(sessionKey: ECKey): JWSHeader =
+        JWSHeader.Builder(JWSAlgorithm.ES256)
+            .type(JOSEObjectType("dpop+jwt"))
+            .jwk(sessionKey.toPublicJWK())
+            .build();
+}
