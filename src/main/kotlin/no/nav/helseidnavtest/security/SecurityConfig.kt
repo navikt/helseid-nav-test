@@ -16,6 +16,7 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.log
+import org.bouncycastle.cert.ocsp.Req
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -229,14 +230,17 @@ class DPoPAuthorizationCodeTokenRequestClient(
         val redirectURI = authorizationCodeGrantRequest.clientRegistration.redirectUri
         val clientId = authorizationCodeGrantRequest.clientRegistration.clientId
 
-        val sessionId = RequestContextHolder.currentRequestAttributes().sessionId
+
+        //val sessionId = RequestContextHolder.currentRequestAttributes().sessionId
         val sessionKey = ECKeyGenerator(P_256)
             .algorithm(Algorithm("EC"))
             .keyUse(KeyUse.SIGNATURE)
             .keyID(UUID.randomUUID().toString())
             .generate()
 
-        dpopUtils.saveSessionKey(sessionId, sessionKey)
+        //dpopUtils.saveSessionKey(sessionId, sessionKey)
+
+
 
         val jwt = dpopUtils.dpopJWT("POST", tokenURI, sessionKey)
 
