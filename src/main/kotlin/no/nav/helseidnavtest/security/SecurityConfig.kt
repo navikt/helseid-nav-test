@@ -1,11 +1,18 @@
 package no.nav.helseidnavtest.security
 
+import com.nimbusds.jose.*
+import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
+import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.log
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.convert.converter.Converter
+import org.springframework.http.HttpHeaders
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -13,7 +20,6 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.endpoint.*
@@ -22,16 +28,18 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.authorizationCode
+import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
-import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
+import java.net.URI
+import java.security.PrivateKey
 import java.time.Instant.*
+import java.util.*
 
 
 @Configuration
@@ -41,8 +49,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
-    private val jwt = JWK.parse(assertion)
-    private val jwt1 = JWK.parse(test1)
+    private val jwk = JWK.parse(assertion)
+    private val jwk1 = JWK.parse(test1)
 
 
     private val log = getLogger(SecurityConfig::class.java)
@@ -69,35 +77,29 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
 
-   // @Bean
-    fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
+    private fun requestEntityConverter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
+        addHeadersConverter(HeaderConverter())
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
-                "helse-id" -> jwt
+                "helse-id" -> jwk
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
     }
 
-   // @Bean
-    fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
+    private fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
            setRequestEntityConverter(converter)
         }
 
-    @Bean
-    fun pkceResolver(repo: ClientRegistrationRepository) =
-        DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
-            setAuthorizationRequestCustomizer(withPkce())
-        }
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, resolver: OAuth2AuthorizationRequestResolver, successHandler: LogoutSuccessHandler): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity, repo: ClientRegistrationRepository, successHandler: LogoutSuccessHandler): SecurityFilterChain {
         http {
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
-                    authorizationRequestResolver = resolver
+                    authorizationRequestResolver = pkceAddingResolver(repo)
                 }
                 tokenEndpoint {
                     accessTokenResponseClient = authCodeResponseClient(requestEntityConverter())
@@ -123,6 +125,11 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         return http.build()
     }
 
+
+    private fun pkceAddingResolver(repo: ClientRegistrationRepository) =
+        DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
+            setAuthorizationRequestCustomizer(withPkce())
+        }
     @Bean
     fun traceRepo() = InMemoryHttpExchangeRepository()
 
@@ -150,11 +157,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             )
         }
 
-
     private fun jwkResolver(): (ClientRegistration) -> JWK = {
         if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
             when (it.registrationId) {
-                "edi20-1" -> jwt1.also { log.info("Klient: edi20-1") }
+                "edi20-1" -> jwk1.also { log.info("Klient: edi20-1") }
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         } else {
@@ -162,3 +168,62 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
     }
 }
+class DPoPTokenGenerator(private val privateKey: PrivateKey) {
+
+    fun generateDPoPToken(method: String, uri: String): String {
+        val signer: JWSSigner = RSASSASigner(privateKey)
+        val claimsSet = JWTClaimsSet.Builder()
+            .claim("htm", method)
+            .claim("htu", uri)
+            .jwtID(UUID.randomUUID().toString())
+            .issueTime(Date())
+            .build()
+
+        val signedJWT = SignedJWT(JWSHeader.Builder(JWSAlgorithm.RS256).build(), claimsSet)
+        signedJWT.sign(signer)
+        return signedJWT.serialize()
+    }
+}
+
+class HeaderConverter : Converter<OAuth2AuthorizationCodeGrantRequest, HttpHeaders> {
+    override fun convert(source: OAuth2AuthorizationCodeGrantRequest): HttpHeaders {
+       return HttpHeaders().also { log.info("HeaderConverter empty") }
+    }
+
+}
+/*
+class DPoPRequestEntityConverter(
+    private val delegate: OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>,
+    private val dPoPTokenGenerator: DPoPTokenGenerator
+) :
+    OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
+    fun getAccessToken(userRequest: OAuth2AuthorizationCodeGrantRequest): OAuth2AccessToken {
+        val accessToken: OAuth2AccessToken = delegate.getTokenResponse(userRequest).accessToken
+
+        try {
+            val dpopToken = dPoPTokenGenerator.generateDPoPToken(
+                userRequest.getHttpMethod().name(),
+                userRequest.getUri().toString()
+            )
+
+            val headers: HttpHeaders = HttpHeaders()
+            headers.add("DPoP", dpopToken)
+
+            val requestEntity: RequestEntity<*> = RequestEntity
+                .get(URI(userRequest.getUri().toString()))
+                .headers(headers)
+                .build()
+
+            // Send the request with DPoP headers
+            // ...
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to generate DPoP token", e)
+        }
+
+        return accessToken
+    }
+
+    override fun getTokenResponse(authorizationGrantRequest: OAuth2AuthorizationCodeGrantRequest?): OAuth2AccessTokenResponse {
+        TODO("Not yet implemented")
+    }
+}*/
