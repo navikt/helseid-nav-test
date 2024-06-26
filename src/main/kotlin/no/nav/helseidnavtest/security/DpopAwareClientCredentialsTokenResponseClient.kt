@@ -34,8 +34,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
 
     private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse? {
         try {
-            log.info("Requesting token from ${request.url}")
-
+            log.info("Requesting token from ${request.url} med headers ${request.headers}")
             return restClient.method(POST)
                 .uri(request.url)
                 .headers {
