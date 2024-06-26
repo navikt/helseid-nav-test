@@ -32,7 +32,6 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
         }
 
     private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
-        try {
             log.info("Requesting token from ${request.url} med headers ${request.headers}")
             return restClient.method(POST)
                 .uri(request.url)
@@ -47,20 +46,28 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                         val nonce = res.headers["dpop-nonce"]!!
                         log.info("Require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
                         val nyttproof = generator.generateProof(POST, "${req.uri}", nonce.first())
-                        log.info("Nytt proof er $nyttproof")
+                        log.info("Nytt proof er $nyttproof, skyter igjen")
+                       try {
+                        restClient.post()
+                            .uri(request.url)
+                            .headers {
+                                it.addAll(request.headers)
+                                it.add("dpop",nyttproof)
+                            }
+                            .body(request.body!!)
+                       }
+                       catch (e: Exception) {
+                           log.info("Unexpected response from token endpoint etter nonce: ${res.statusCode}")
+                           throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+                       }
                     }
                     else  {
-                        log.info("Unexpected response from token endpoint: ${res.statusCode} ${res.body}")
-                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+                        log.info("Unexpected response from first shot token endpoint: ${res.statusCode}")
+                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                     }
+                    log.info("Converting response from token endpoint: ${res.statusCode} ${res.body}")
                     res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
-        } catch (e: RestClientException) {
-            log.error("An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${e.message}",e)
-            val oauth2Error = OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE,
-                "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${e.message}", null)
-            throw OAuth2AuthorizationException(oauth2Error, e)
-        }
     }
 
     companion object {
