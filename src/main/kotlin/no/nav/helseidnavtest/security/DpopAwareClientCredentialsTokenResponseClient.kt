@@ -40,6 +40,10 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                 .body(request.body!!)
                 .exchange { req, res ->
                     res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
+                    if (res.statusCode.isError) {
+                        log.error("Error response from token endpoint: ${res.statusCode} ${res.body}")
+                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", null))
+                    }
                     res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
         } catch (e: RestClientException) {
