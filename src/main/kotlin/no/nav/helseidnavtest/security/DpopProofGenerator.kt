@@ -12,13 +12,14 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpMethod
 import java.time.Instant.now
 import java.util.Date.from
 import java.util.UUID
 
 class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generateProof(method: String, uri: String) =
-        SignedJWT(jwsHeader(), claims(method, uri)).apply {
+    fun generateProof(method: HttpMethod, uri: String) =
+        SignedJWT(jwsHeader(), claims(method.name(), uri)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
 
