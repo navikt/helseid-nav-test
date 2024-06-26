@@ -3,6 +3,9 @@ package no.nav.helseidnavtest.security
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.*
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.RequestEntity
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
@@ -28,7 +31,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
             getResponse(it)
         }
 
-    private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse? {
+    private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
         try {
             log.info("Requesting token from ${request.url} med headers ${request.headers}")
             return restClient.method(POST)
@@ -40,9 +43,15 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                 .body(request.body!!)
                 .exchange { req, res ->
                     res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
-                    if (res.statusCode.isError) {
-                        log.error("Error response from token endpoint: ${res.statusCode} ${res.body}")
-                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", null))
+                    if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
+                        val nonce = res.headers["dpop-nonce"]!!
+                        log.info("Require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
+                        val nyttproof = generator.generateProof(POST, "${req.uri}", nonce.first())
+                        log.info("Nytt proof er $nyttproof")
+                    }
+                    else  {
+                        log.info("Unexpected response from token endpoint: ${res.statusCode} ${res.body}")
+                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                     }
                     res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
