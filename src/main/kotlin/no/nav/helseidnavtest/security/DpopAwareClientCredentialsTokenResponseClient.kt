@@ -2,12 +2,9 @@ package no.nav.helseidnavtest.security
 
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpMethod.*
 import org.springframework.http.RequestEntity
-import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.FormHttpMessageConverter
-import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
@@ -17,7 +14,6 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.exchange
 
 
 class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
@@ -40,7 +36,9 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                 .headers {
                     it.addAll(request.headers)
                     it.add("dpop",generator.generateProof(POST, "${request.url}"))
-                }.exchange { req, res ->
+                }
+                .body(request.body!!)
+                .exchange { req, res ->
                     res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
                     res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
