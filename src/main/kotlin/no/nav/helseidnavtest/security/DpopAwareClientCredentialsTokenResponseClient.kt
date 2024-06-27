@@ -48,6 +48,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                         val nyttproof = generator.generateProof(POST, "${req.uri}", nonce.first())
                         log.info("Nytt proof er $nyttproof, skyter igjen")
                        try {
+                           log.info("Skyter igjen")
                         restClient.post()
                             .uri(request.url)
                             .headers {
@@ -55,9 +56,11 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                                 it.add("dpop",nyttproof)
                             }
                             .body(request.body!!)
+                            .retrieve()
+                            .toEntity(OAuth2AccessTokenResponse::class.java)
                        }
                        catch (e: Exception) {
-                           log.info("Unexpected response from token endpoint etter nonce: ${res.statusCode}")
+                           log.info("Unexpected response from second shot token endpoint: ${res.statusCode}",e)
                            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                        }
                     }
@@ -65,7 +68,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                         log.info("Unexpected response from first shot token endpoint: ${res.statusCode}")
                         throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                     }
-                    log.info("Converting response from token endpoint: ${res.statusCode} ${res.body}")
+                    //log.info("Converting response from token endpoint: ${res.statusCode} ${res.body}")
                     res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
     }
