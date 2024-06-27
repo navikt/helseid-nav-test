@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.RequestEntity
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
@@ -21,11 +22,11 @@ import org.springframework.web.client.RestTemplate
 
 
 class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
-    private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter()))
+    private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
+        setRequestFactory(HttpComponentsClientHttpRequestFactory())
+    }
 
-    private val restClient = RestClient.builder().messageConverters {
-        it.addAll(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter()))
-    }.build()
+    private val restClient = RestClient.create(restOperations)
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse? =
         requestEntityConverter.convert(request)?.let {
             log.info("Request converted to  ${it.body} ${it.headers} ${it.url}")
@@ -60,8 +61,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                                    res2.headers.forEach { (k, v) -> log.info("Response header second shot $k: $v") }
                                    log.info("Second shot response code from token endpoint: ${res2.statusCode}")
                                       if (res2.statusCode.value() in 200..299) {
-                                        res2.bodyTo(Map::class.java)!!.also { log.info("Second shot map response from token endpoint: $it")}
-                                          throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Artificial Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
+                                        res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!.also { log.info("Second shot map response from token endpoint: $it")}
                                       } else {
                                         log.info("Unexpected response from second shot token endpoint: ${res2.statusCode}")
                                         throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
