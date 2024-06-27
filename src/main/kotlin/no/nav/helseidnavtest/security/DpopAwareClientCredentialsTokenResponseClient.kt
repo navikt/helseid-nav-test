@@ -46,18 +46,25 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                         val nonce = res.headers["dpop-nonce"]!!
                         log.info("Require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
                         val nyttproof = generator.generateProof(POST, "${req.uri}", nonce.first())
-                        log.info("Nytt proof er $nyttproof, skyter igjen")
                        try {
                            log.info("Skyter igjen")
-                        restClient.post()
-                            .uri(request.url)
-                            .headers {
-                                it.addAll(request.headers)
-                                it.add("dpop",nyttproof)
-                            }
-                            .body(request.body!!)
-                            .retrieve()
-                            .toEntity(OAuth2AccessTokenResponse::class.java)
+                           restClient.method(POST)
+                               .uri(request.url)
+                               .headers {
+                                   it.addAll(request.headers)
+                                   it.add("dpop",nyttproof)
+                               }
+                               .body(request.body!!)
+                               .exchange {req2, res2 ->
+                                   res2.headers.forEach { (k, v) -> log.info("Response header second shot $k: $v") }
+                                   log.info("Second shot response code from token endpoint: ${res2.statusCode}")
+                                      if (res2.statusCode.value() in 200..299) {
+                                        res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                      } else {
+                                        log.info("Unexpected response from second shot token endpoint: ${res2.statusCode}")
+                                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
+                                      }
+                               }
                        }
                        catch (e: Exception) {
                            log.info("Unexpected response from second shot token endpoint: ${res.statusCode}",e)
@@ -68,8 +75,6 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                         log.info("Unexpected response from first shot token endpoint: ${res.statusCode}")
                         throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                     }
-                    //log.info("Converting response from token endpoint: ${res.statusCode} ${res.body}")
-                    res.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                 }
     }
 
