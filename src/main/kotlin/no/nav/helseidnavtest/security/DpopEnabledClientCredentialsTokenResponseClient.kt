@@ -37,21 +37,21 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add("dpop",generator.generate(POST, "${request.url}"))
+                it.add(" DPoP",generator.generate(POST, "${request.url}"))
             }
             .body(request.body!!)
             .exchange { req, res ->
                // res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
                     val nonce = res.headers["dpop-nonce"]!!
-                    log.info("Token require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
+                    log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
                     val nyttproof = generator.generate(POST, "${req.uri}", nonce.first())
                     try {
                         restClient.method(POST)
                             .uri(request.url)
                             .headers {
                                 it.addAll(request.headers)
-                                it.add("dpop",nyttproof)
+                                it.add(" DPoP",nyttproof)
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->
