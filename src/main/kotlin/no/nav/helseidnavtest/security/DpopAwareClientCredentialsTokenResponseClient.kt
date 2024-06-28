@@ -36,7 +36,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add("dpop",generator.generateProof(POST, "${request.url}"))
+                it.add("dpop",generator.generate(POST, "${request.url}"))
             }
             .body(request.body!!)
             .exchange { req, res ->
@@ -44,7 +44,7 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
                     val nonce = res.headers["dpop-nonce"]!!
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
-                    val nyttproof = generator.generateProof(POST, "${req.uri}", nonce.first())
+                    val nyttproof = generator.generate(POST, "${req.uri}", nonce.first())
                     try {
                         restClient.method(POST)
                             .uri(request.url)

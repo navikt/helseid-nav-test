@@ -18,7 +18,7 @@ import java.util.Date.from
 import java.util.UUID
 
 class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generateProof(method: HttpMethod, uri: String, nonce: String? = null) =
+    fun generate(method: HttpMethod, uri: String, nonce: String? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
