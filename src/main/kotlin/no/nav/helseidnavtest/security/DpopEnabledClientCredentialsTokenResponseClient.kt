@@ -41,7 +41,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
             }
             .body(request.body!!)
             .exchange { req, res ->
-                res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
+               // res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
                     val nonce = res.headers["dpop-nonce"]!!
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode} ${res.body}")
