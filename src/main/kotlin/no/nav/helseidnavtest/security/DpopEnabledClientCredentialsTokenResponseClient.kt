@@ -37,7 +37,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add(" DPoP",generator.generate(POST, "${request.url}"))
+                it.add("DPoP",generator.generate(POST, "${request.url}"))
             }
             .body(request.body!!)
             .exchange { req, res ->
