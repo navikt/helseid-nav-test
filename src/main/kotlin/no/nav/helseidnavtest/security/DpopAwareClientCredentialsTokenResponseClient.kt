@@ -54,7 +54,6 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->
-                                res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
                                     res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
