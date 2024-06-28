@@ -57,6 +57,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                             .exchange { _, res2 ->
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
+                                    log.info("XXXX " +res2.body.toString())
                                     res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                 } else {
                                     log.info("Unexpected response ${res2.statusCode} from second shot token endpoint")
