@@ -57,7 +57,14 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                             .exchange { _, res2 ->
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
-                                    log.info("XXXX " +res2.body.toString())
+                                   // log.info("All bytes " +res2.body.readAllBytes().toString(Charsets.UTF_8))
+                                    try {
+                                        res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                    }
+                                    catch (e: Exception) {
+                                        log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
+                                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
+                                    }
                                     res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                 } else {
                                     log.info("Unexpected response ${res2.statusCode} from second shot token endpoint")
