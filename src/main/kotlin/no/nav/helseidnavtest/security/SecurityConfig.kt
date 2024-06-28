@@ -1,17 +1,11 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
-import no.nav.helseidnavtest.edi20.EDI20Config
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.log
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.convert.converter.Converter
-import org.springframework.http.HttpHeaders
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -33,10 +27,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestOperations
 import java.time.Instant.*
-import java.util.*
 
 
 @Configuration
@@ -146,7 +137,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                                 }
                             }
                         }
-                        p.accessTokenResponseClient(DpopAwareClientCredentialsTokenResponseClient(DpopProofGenerator(),requestEntityConverter))
+                        p.accessTokenResponseClient(DpopEnabledClientCredentialsTokenResponseClient(DpopProofGenerator(),requestEntityConverter))
                       //  p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
                       //      setRequestEntityConverter(requestEntityConverter)
                       //  })

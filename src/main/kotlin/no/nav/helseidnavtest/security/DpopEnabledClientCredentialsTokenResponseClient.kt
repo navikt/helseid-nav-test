@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 
 
-class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DpopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
         setRequestFactory(HttpComponentsClientHttpRequestFactory())
         errorHandler = OAuth2ErrorResponseErrorHandler()
@@ -78,6 +78,6 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
 
     companion object {
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
-        private val log = LoggerFactory.getLogger(DpopAwareClientCredentialsTokenResponseClient::class.java)
+        private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)
     }
 }
