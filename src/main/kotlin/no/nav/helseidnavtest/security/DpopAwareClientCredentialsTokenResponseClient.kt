@@ -48,29 +48,32 @@ class DpopAwareClientCredentialsTokenResponseClient(private val generator: DpopP
                        try {
                            request.headers.add("dpop",nyttproof)
                            restOperations
-                               .exchange(request, OAuth2AccessTokenResponse::class.java)
-                               .body!!
-/*
-                           log.info("Token skyter igjen")
-                           restClient.method(POST)
-                               .uri(request.url)
-                               .headers {
-                                   it.addAll(request.headers)
-                                   it.add("dpop",nyttproof)
+                               .exchange(request, Map::class.java)
+                               .body!!.also { log.info("Token response code from token endpoint: $it, now throwing")
                                }
-                               .body(request.body!!)
-                               .exchange {req2, res2 ->
-                                   res2.headers.forEach { (k, v) -> log.info("Response header second shot $k: $v") }
-                                   res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
-                                   log.info("Token second shot response code from token endpoint: ${res2.statusCode}")
-                                      if (res2.statusCode.value() in 200..299) {
-                                           log.info("Konverterer body til OAuth2AccessTokenResponse")
-                                            res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
-                                      } else {
-                                        log.info("Unexpected response from second shot token endpoint: ${res2.statusCode}")
-                                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
-                                      }
-                               }*/
+                           throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+
+                           /*
+                                                      log.info("Token skyter igjen")
+                                                      restClient.method(POST)
+                                                          .uri(request.url)
+                                                          .headers {
+                                                              it.addAll(request.headers)
+                                                              it.add("dpop",nyttproof)
+                                                          }
+                                                          .body(request.body!!)
+                                                          .exchange {req2, res2 ->
+                                                              res2.headers.forEach { (k, v) -> log.info("Response header second shot $k: $v") }
+                                                              res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                                              log.info("Token second shot response code from token endpoint: ${res2.statusCode}")
+                                                                 if (res2.statusCode.value() in 200..299) {
+                                                                      log.info("Konverterer body til OAuth2AccessTokenResponse")
+                                                                       res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                                                 } else {
+                                                                   log.info("Unexpected response from second shot token endpoint: ${res2.statusCode}")
+                                                                   throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
+                                                                 }
+                                                          }*/
                        }
                        catch (e: Exception) {
                            log.info("Unexpected response from second shot token endpoint: ${res.statusCode}",e)
