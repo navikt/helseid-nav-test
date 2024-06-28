@@ -29,7 +29,7 @@ class EDI20BeanConfig {
 
     @Bean
     @Qualifier(EDI20)
-    fun edi20ClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor("$EDI20-1", clientManager)
+    fun edi20ClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor("dpop","$EDI20-1", clientManager)
 }
 
 

@@ -3,6 +3,8 @@ package no.nav.helseidnavtest.oppslag
 import no.nav.helseidnavtest.health.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -102,7 +104,7 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
     }
 }
 
-class TokenExchangingRequestInterceptor(private val shortName: String, private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+class TokenExchangingRequestInterceptor(private val tokenType: String = "Bearer", private val shortName: String, private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
     val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
@@ -112,7 +114,9 @@ class TokenExchangingRequestInterceptor(private val shortName: String, private v
                 .principal("ARBEIDS- OG VELFERDSETATEN - Meldingstjener SHP REST klient (NAV-HELSE-TEST1)")
                 .build()
         )?.let { c ->
-            req.headers.setBearerAuth(c.accessToken.tokenValue).also {
+            req.headers.add(AUTHORIZATION, tokenType + " " + c.accessToken.tokenValue)
+            //req.headers.setBearerAuth(c.accessToken.tokenValue)
+            .also {
                 log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
             }
         } ?: log.error("Token exchange failed for {}", shortName)
