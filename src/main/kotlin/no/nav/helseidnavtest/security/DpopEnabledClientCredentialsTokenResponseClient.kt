@@ -51,7 +51,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                             .uri(request.url)
                             .headers {
                                 it.addAll(request.headers)
-                                it.add(" DPoP",nyttproof)
+                                it.add("DPoP",nyttproof)
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->
