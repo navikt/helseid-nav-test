@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -58,9 +59,11 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                             .exchange { _, res2 ->
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
-                                   // log.info("All bytes " +res2.body.readAllBytes().toString(Charsets.UTF_8))
                                     try {
-                                        jacksonObjectMapper().readValue(res2.body, OAuth2AccessTokenResponse::class.java)
+                                        val m = jacksonObjectMapper().readValue(res2.body, Map::class.java)
+                                        log.info("2 Converted response to map $m")
+                                        OAuth2AccessTokenResponse
+                                            .withToken(m["access_token"] as String).build()
                                         //res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                     }
                                     catch (e: Exception) {
