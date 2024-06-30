@@ -44,11 +44,10 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
             }
             .body(request.body!!)
             .exchange { req, res ->
-               // res.headers.forEach { (k, v) -> log.info("Response header $k: $v") }
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
-                    val nonce = res.headers["dpop-nonce"]!!
+                    val nonce = res.headers["dpop-nonce"]!!.first()
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
-                    val nyttproof = generator.generate(POST, "${req.uri}", nonce.first())
+                    val nyttproof = generator.generate(POST, "${req.uri}", nonce)
                     try {
                         restClient.method(POST)
                             .uri(request.url)
@@ -64,9 +63,9 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
                                         log.info("2 Converted response to map $m")
                                         OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
-                                            .expiresIn(m["expires_in"] as Long)
+                                            .expiresIn((m["expires_in"] as Int).toLong())
                                             .scopes(setOf(m["scope"] as String))
-                                            .tokenType(BEARER) // TODO dette er jo feil
+                                            .tokenType(BEARER) // TODO dette er jo feil?
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -76,7 +75,6 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
                                         throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
                                     }
-                                  //  res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                 } else {
                                     log.info("Unexpected response ${res2.statusCode} from second shot token endpoint")
                                     throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))

@@ -114,8 +114,8 @@ class TokenExchangingRequestInterceptor(private val tokenType: String = "Bearer"
                 .principal("ARBEIDS- OG VELFERDSETATEN - Meldingstjener SHP REST klient (NAV-HELSE-TEST1)")
                 .build()
         )?.let { c ->
-            req.headers.add(AUTHORIZATION, tokenType + " " + c.accessToken.tokenValue)
-            //req.headers.setBearerAuth(c.accessToken.tokenValue)
+            // TODO Get and set the dpop proof here
+            req.headers.set(AUTHORIZATION,tokenType + " " + c.accessToken.tokenValue)
             .also {
                 log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
             }
