@@ -3,7 +3,6 @@ package no.nav.helseidnavtest.security
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -13,11 +12,9 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
-import org.springframework.security.oauth2.core.OAuth2AccessToken
-import org.springframework.security.oauth2.core.OAuth2AccessToken.*
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.*
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
-import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessTokenResponseConverter
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.web.client.RestClient
@@ -38,7 +35,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
     private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
-        log.info("Requesting token from ${request.url} med headers ${request.headers}")
+        log.info("Requesting token from ${request.url}")
         return restClient.method(POST)
             .uri(request.url)
             .headers {
@@ -69,7 +66,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
                                             .expiresIn(m["expires_in"] as Long)
                                             .scopes(setOf(m["scope"] as String))
-                                            .tokenType(TokenType.BEARER) // TODO dette er jo feil
+                                            .tokenType(BEARER) // TODO dette er jo feil
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
