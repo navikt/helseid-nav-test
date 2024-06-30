@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.security
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
@@ -59,7 +60,8 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
                                    // log.info("All bytes " +res2.body.readAllBytes().toString(Charsets.UTF_8))
                                     try {
-                                        res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                        jacksonObjectMapper().readValue(res2.body, OAuth2AccessTokenResponse::class.java)
+                                        //res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                     }
                                     catch (e: Exception) {
                                         log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
