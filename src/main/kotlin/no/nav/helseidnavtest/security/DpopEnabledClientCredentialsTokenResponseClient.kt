@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.security
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
@@ -61,12 +62,13 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
                                     try {
-                                        val m = jacksonObjectMapper().readValue(res2.body, MutableMap::class.java)
+                                        val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
                                         log.info("2 Converted response to map $m")
-                                        DefaultMapOAuth2AccessTokenResponseConverter().convert(m as MutableMap<String, Any>).also {
+                                        OAuth2AccessTokenResponse.withToken(m["access_token"].toString())
+                                            .additionalParameters(m)
+                                            .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
                                         }
-                                        //res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                     }
                                     catch (e: Exception) {
                                         log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
@@ -92,6 +94,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
     }
 
     companion object {
+        val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)
     }
