@@ -13,6 +13,7 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
+import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessTokenResponseConverter
@@ -65,6 +66,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
                                         log.info("2 Converted response to map $m")
                                         OAuth2AccessTokenResponse.withToken(m["access_token"].toString())
+                                            .tokenType(OAuth2AccessToken.TokenType.BEARER)
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -94,7 +96,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
     }
 
     companion object {
-        val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
+        val STRING_OBJECT_MAP = object : TypeReference<MutableMap<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)
     }
