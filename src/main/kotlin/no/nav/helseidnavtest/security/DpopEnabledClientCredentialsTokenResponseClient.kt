@@ -66,7 +66,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
                                         log.info("2 Converted response to map $m")
                                         OAuth2AccessTokenResponse.withToken(m["access_token"].toString())
-                                            .tokenType(OAuth2AccessToken.TokenType.BEARER)
+                                            .tokenType(OAuth2AccessToken.TokenType.BEARER) // TODO er jo feil
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -76,7 +76,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                         log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
                                         throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
                                     }
-                                    res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
+                                  //  res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                 } else {
                                     log.info("Unexpected response ${res2.statusCode} from second shot token endpoint")
                                     throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
