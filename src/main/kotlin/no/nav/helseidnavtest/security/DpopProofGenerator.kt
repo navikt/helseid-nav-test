@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.Algorithm
 import com.nimbusds.jose.JOSEObjectType
-import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSAlgorithm.ES256
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.ECDSASigner
 import com.nimbusds.jose.jwk.Curve.P_256
@@ -37,7 +37,7 @@ class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
         .claim("htu", uri)
 
 
-    private fun jwsHeader() = JWSHeader.Builder(JWSAlgorithm.ES256)
+    private fun jwsHeader() = JWSHeader.Builder(ES256)
         .type(JOSEObjectType("dpop+jwt"))
         .jwk(keyPair.toPublicJWK())
         .build()

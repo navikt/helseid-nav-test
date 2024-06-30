@@ -16,8 +16,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.*
 
@@ -45,7 +43,9 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor("Bearer",PDL, clientManager)
+    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
+        PDL,
+        clientManager)
 
     @Bean
     fun pdlHealthIndicator(a: PDLRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}

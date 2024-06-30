@@ -3,7 +3,6 @@ package no.nav.helseidnavtest.oppslag
 import no.nav.helseidnavtest.health.Pingable
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
@@ -104,14 +103,17 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
     }
 }
 
-class TokenExchangingRequestInterceptor(private val tokenType: String = "Bearer", private val shortName: String, private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : ClientHttpRequestInterceptor {
+class TokenExchangingRequestInterceptor(
+    private val shortName: String,
+    private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
+    private val tokenType: String = "Bearer") : ClientHttpRequestInterceptor {
     val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
        log.info("Token exchange for {}", shortName)
         clientManager.authorize(
             withClientRegistrationId(shortName)
-                .principal("ARBEIDS- OG VELFERDSETATEN - Meldingstjener SHP REST klient (NAV-HELSE-TEST1)")
+                .principal("dpop or whatever")
                 .build()
         )?.let { c ->
             // TODO Get and set the dpop proof here
@@ -119,7 +121,7 @@ class TokenExchangingRequestInterceptor(private val tokenType: String = "Bearer"
             .also {
                 log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
             }
-        } ?: log.error("Token exchange failed for {}", shortName)
+        } ?: log.error("No Authorized client for {}", shortName)
         return execution.execute(req, body)
     }
 
