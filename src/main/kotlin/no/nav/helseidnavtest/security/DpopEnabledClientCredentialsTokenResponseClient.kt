@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentia
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
+import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessTokenResponseConverter
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.web.client.RestClient
@@ -60,10 +61,11 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                 if (res2.statusCode.value() in 200..299) {
                                     log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
                                     try {
-                                        val m = jacksonObjectMapper().readValue(res2.body, Map::class.java)
+                                        val m = jacksonObjectMapper().readValue(res2.body, MutableMap::class.java)
                                         log.info("2 Converted response to map $m")
-                                        OAuth2AccessTokenResponse
-                                            .withToken(m["access_token"] as String).build()
+                                        DefaultMapOAuth2AccessTokenResponseConverter().convert(m as MutableMap<String, Any>).also {
+                                            log.info("2 Converted response to OAuth2AccessTokenResponse $it")
+                                        }
                                         //res2.bodyTo(OAuth2AccessTokenResponse::class.java)!!
                                     }
                                     catch (e: Exception) {
