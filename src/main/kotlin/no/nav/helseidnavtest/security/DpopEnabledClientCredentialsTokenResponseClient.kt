@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResp
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.core.OAuth2AccessToken.*
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessTokenResponseConverter
@@ -30,11 +31,11 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
     }
 
     private val restClient = RestClient.create(restOperations)
-    override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest): OAuth2AccessTokenResponse? =
+    override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
             log.info("Request converted to ${it.body} ${it.headers} ${it.url}")
             getResponse(it)
-        }
+        } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
     private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
         log.info("Requesting token from ${request.url} med headers ${request.headers}")
@@ -65,8 +66,10 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                                     try {
                                         val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
                                         log.info("2 Converted response to map $m")
-                                        OAuth2AccessTokenResponse.withToken(m["access_token"].toString())
-                                            .tokenType(OAuth2AccessToken.TokenType.BEARER) // TODO er jo feil
+                                        OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
+                                            .expiresIn(m["expires_in"] as Long)
+                                            .scopes(setOf(m["scope"] as String))
+                                            .tokenType(TokenType.BEARER) // TODO dette er jo feil
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -96,7 +99,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
     }
 
     companion object {
-        val STRING_OBJECT_MAP = object : TypeReference<MutableMap<String, Any>>() {}
+        val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)
     }
