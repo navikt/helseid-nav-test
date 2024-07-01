@@ -9,6 +9,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.temaReq
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.graphql.LoggingGraphQLInterceptor
 import no.nav.helseidnavtest.oppslag.person.PDLConfig.Companion.PDL
+import no.nav.helseidnavtest.security.DpopProofGenerator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.web.client.RestClientCustomizer
 import org.springframework.context.annotation.Bean
@@ -43,7 +44,8 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
+    fun pdlClientCredentialsRequestInterceptor(proofGenerator: DpopProofGenerator,clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
+      proofGenerator,
         PDL,
         clientManager)
 
