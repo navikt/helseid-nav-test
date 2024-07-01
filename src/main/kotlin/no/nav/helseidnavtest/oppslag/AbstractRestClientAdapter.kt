@@ -119,7 +119,7 @@ class TokenExchangingRequestInterceptor(
                 .principal("dpop or whatever")
                 .build()
         )?.let { c ->
-            if (tokenType == "dpdp")
+            if (tokenType == "dpop")
             proofGenerator.generate(req.method, req.uri.toString()).also {
                 log.info("DPoP proof: {}", it)
                 req.headers.set("DPoP", it)
