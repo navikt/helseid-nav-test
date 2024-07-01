@@ -132,7 +132,7 @@ open class TokenExchangingRequestInterceptor(
         }
     override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
 }
-class DPopEnabledTokenExchangingRequestInterceptor(private val generator: DPoPProofGenerator, shortName: String,
+class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPProofGenerator, shortName: String,
                                                    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
