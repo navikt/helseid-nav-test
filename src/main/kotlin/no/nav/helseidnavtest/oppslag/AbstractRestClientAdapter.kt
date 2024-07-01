@@ -1,5 +1,7 @@
 package no.nav.helseidnavtest.oppslag
 
+import com.nimbusds.oauth2.sdk.token.AccessTokenType
+import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.security.DpopEnabledClientCredentialsTokenResponseClient
 import no.nav.helseidnavtest.security.DpopProofGenerator
@@ -109,7 +111,8 @@ class TokenExchangingRequestInterceptor(
     private val proofGenerator: DpopProofGenerator,
     private val shortName: String,
     private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    private val tokenType: String = "Bearer") : ClientHttpRequestInterceptor {
+    private val tokenType: AccessTokenType = BEARER
+) : ClientHttpRequestInterceptor {
     val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
@@ -119,12 +122,12 @@ class TokenExchangingRequestInterceptor(
                 .principal("dpop or whatever")
                 .build()
         )?.let { c ->
-            if (tokenType == "dpop")
-            proofGenerator.generate(req.method, req.uri.toString()).also {
+            if (tokenType == DPOP)
+             proofGenerator.generate(req.method, req.uri.toString()).also {
                 log.info("DPoP proof: {}", it)
                 req.headers.set("DPoP", it)
             }
-            req.headers.set(AUTHORIZATION,tokenType + " " + c.accessToken.tokenValue)
+            req.headers.set(AUTHORIZATION,tokenType.value + " " + c.accessToken.tokenValue)
             .also {
                 log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
             }

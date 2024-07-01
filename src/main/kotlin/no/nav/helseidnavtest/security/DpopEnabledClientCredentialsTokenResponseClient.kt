@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
@@ -44,7 +45,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add("DPoP",generator.generate(POST, "${request.url}"))
+                it.add(DPOP.value,generator.generate(POST, "${request.url}"))
             }
             .body(request.body!!)
             .exchange { req, res ->
@@ -57,7 +58,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                             .uri(request.url)
                             .headers {
                                 it.addAll(request.headers)
-                                it.add("DPoP",nyttproof)
+                                it.add(DPOP.value,nyttproof)
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->
