@@ -12,7 +12,7 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
-import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.*
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
@@ -22,6 +22,8 @@ import org.springframework.web.client.RestTemplate
 
 
 class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DpopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+
+
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
         setRequestFactory(HttpComponentsClientHttpRequestFactory())
         errorHandler = OAuth2ErrorResponseErrorHandler()
@@ -48,6 +50,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
                     val nonce = res.headers["dpop-nonce"]!!.first()
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
                     val nyttproof = generator.generate(POST, "${req.uri}", nonce)
+                    dpopProof.set(nyttproof)
                     try {
                         restClient.method(POST)
                             .uri(request.url)
@@ -94,6 +97,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: Dpo
     }
 
     companion object {
+        val dpopProof = ThreadLocal<String>()
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)

@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag
 
 import no.nav.helseidnavtest.health.Pingable
+import no.nav.helseidnavtest.security.DpopEnabledClientCredentialsTokenResponseClient
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.*
@@ -116,6 +117,11 @@ class TokenExchangingRequestInterceptor(
                 .principal("dpop or whatever")
                 .build()
         )?.let { c ->
+            //if (tokenType == "dpdp")
+            DpopEnabledClientCredentialsTokenResponseClient.dpopProof.get().also {
+                log.info("DPoP proof: {}", it)
+                req.headers.set("DPoP", it)
+            }
             // TODO Get and set the dpop proof here
             req.headers.set(AUTHORIZATION,tokenType + " " + c.accessToken.tokenValue)
             .also {
