@@ -34,7 +34,7 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
         }
         tokenValue?.let {
             val hash = MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
-            claim("ath", Base64.getEncoder().withoutPadding().encodeToString(hash))
+            claim("ath", Base64.getUrlEncoder().withoutPadding().encodeToString(hash))
         }
     }.build()
 
