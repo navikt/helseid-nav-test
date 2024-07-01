@@ -47,14 +47,14 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add(DPOP.value,generator.generer(POST, "${request.url}"))
+                it.add(DPOP.value,generator.generer(POST, request.url))
             }
             .body(request.body!!)
             .exchange { req, res ->
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
                     val nonce = res.headers["dpop-nonce"]!!.first()
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
-                    val nyttproof = generator.generer(POST, "${req.uri}", nonce)
+                    val nyttproof = generator.generer(POST, req.uri, nonce)
                     try {
                         restClient.method(POST)
                             .uri(request.url)
