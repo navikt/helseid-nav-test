@@ -32,7 +32,7 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
             claim("jti", "${UUID.randomUUID()}")
         }
         tokenValue?.let {
-            val hash: ByteArray = MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
+            val hash = MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
             claim("ath", Base64.getEncoder().withoutPadding().encodeToString(hash))
         }
     }.build()
