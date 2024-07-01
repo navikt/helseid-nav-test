@@ -14,6 +14,7 @@ import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
+import java.net.URI
 import java.security.MessageDigest
 import java.time.Instant.now
 import java.util.*
@@ -21,12 +22,12 @@ import java.util.Date.from
 
 @Component
 class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: String, nonce: String? = null, tokenValue: String? = null) =
+    fun generer(method: HttpMethod, uri: URI, nonce: String? = null, tokenValue: String? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, tokenValue)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("Token value $tokenValue ga DPoP proof for $method $uri: $it")}
 
-    private fun claims(method: String, uri: String, nonce: String? = null, tokenValue: String? = null) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: URI,nonce: String? = null, tokenValue: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
             claim("nonce", it)
             claim("jti", "${UUID.randomUUID()}")
@@ -37,12 +38,14 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
         }
     }.build()
 
-    private fun claimsBuilder(method: String, uri: String) = JWTClaimsSet.Builder()
+    private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")
         .issueTime(from(now()))
         .claim("htm", method)
-        .claim("htu", uri)
+        .claim("htu", uri.stripQuery())
 
+
+    private fun URI.stripQuery() = URI(scheme, getAuthority(), getPath(), null, getFragment()).toString()
 
     private fun jwsHeader() = JWSHeader.Builder(ES256)
         .type(JOSEObjectType("dpop+jwt"))

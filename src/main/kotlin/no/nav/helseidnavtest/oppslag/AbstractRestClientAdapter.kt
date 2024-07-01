@@ -136,7 +136,7 @@ class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPPr
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         authorize(req)?.let { client ->
-            generator.generer(req.method, "${req.uri}", tokenValue = client.accessToken.tokenValue).also {
+            generator.generer(req.method, req.uri, tokenValue = client.accessToken.tokenValue).also {
                 req.headers.set(DPOP.value, it)
             }
         }
