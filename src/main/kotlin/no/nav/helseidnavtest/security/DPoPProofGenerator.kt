@@ -9,7 +9,6 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
-import com.nimbusds.jose.util.Base64
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
@@ -33,8 +32,8 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
             claim("jti", "${UUID.randomUUID()}")
         }
         tokenValue?.let {
-            val encodedHash: ByteArray = MessageDigest.getInstance("SHA-256").digest(it.encodeToByteArray())
-            claim("ath", Base64.encode(encodedHash).decodeToString())
+            val hash: ByteArray = MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
+            claim("ath", Base64.getEncoder().withoutPadding().encodeToString(hash))
         }
     }.build()
 
