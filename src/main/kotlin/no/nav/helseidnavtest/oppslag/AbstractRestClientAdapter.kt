@@ -122,12 +122,12 @@ class TokenExchangingRequestInterceptor(
                 .principal("dpop or whatever")
                 .build()
         )?.let { c ->
-            if (tokenType == DPOP)
+            if (tokenType == DPOP) {
              proofGenerator.generate(req.method, req.uri.toString()).also {
-                log.info("DPoP proof: {}", it)
-                req.headers.set("DPoP", it)
+                req.headers.set(DPOP.value, it)
+             }
             }
-            req.headers.set(AUTHORIZATION,tokenType.value + " " + c.accessToken.tokenValue)
+            req.headers.set(AUTHORIZATION, "${tokenType.value} ${c.accessToken.tokenValue}")
             .also {
                 log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
             }
