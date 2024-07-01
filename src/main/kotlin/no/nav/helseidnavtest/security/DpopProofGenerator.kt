@@ -13,17 +13,19 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
+import org.springframework.stereotype.Component
 import java.time.Instant.now
 import java.util.Date.from
 import java.util.UUID
 
+@Component
 class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
     fun generate(method: HttpMethod, uri: String, nonce: String? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
 
-    private fun claims(method: String, uri: String, nonce: String?) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: String, nonce: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
             claim("nonce", it)
             claim("jti", "${UUID.randomUUID()}")

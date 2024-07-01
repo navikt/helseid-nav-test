@@ -122,7 +122,19 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun traceRepo() = InMemoryHttpExchangeRepository()
 
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
+    fun clientCredentialsRequestEntityConverter() = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
+        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver()).apply {
+            setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
+        })
+        addParametersConverter {
+            LinkedMultiValueMap<String,String>().apply {
+                this[CLIENT_ID] = it.clientRegistration.clientId
+            }
+        }
+    }
+
+    @Bean
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(responseClient: DpopEnabledClientCredentialsTokenResponseClient,repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()
@@ -137,7 +149,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                                 }
                             }
                         }
-                        p.accessTokenResponseClient(DpopEnabledClientCredentialsTokenResponseClient(DpopProofGenerator(),requestEntityConverter))
+                        p.accessTokenResponseClient(responseClient)
                       //  p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
                       //      setRequestEntityConverter(requestEntityConverter)
                       //  })
