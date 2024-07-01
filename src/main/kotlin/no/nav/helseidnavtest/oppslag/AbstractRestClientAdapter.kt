@@ -3,7 +3,7 @@ package no.nav.helseidnavtest.oppslag
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.security.DPopProofGenerator
+import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.*
@@ -132,7 +132,7 @@ open class TokenExchangingRequestInterceptor(
         }
     override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
 }
-class DPopEnabledTokenExchangingRequestInterceptor(private val generator: DPopProofGenerator, shortName: String,
+class DPopEnabledTokenExchangingRequestInterceptor(private val generator: DPoPProofGenerator, shortName: String,
                                                    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {

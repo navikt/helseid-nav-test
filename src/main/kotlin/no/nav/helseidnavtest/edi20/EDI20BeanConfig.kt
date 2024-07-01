@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.oppslag.DPopEnabledTokenExchangingRequestInterceptor
-import no.nav.helseidnavtest.security.DPopProofGenerator
+import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -30,7 +30,7 @@ class EDI20BeanConfig {
 
     @Bean
     @Qualifier(EDI20)
-    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DPopProofGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = DPopEnabledTokenExchangingRequestInterceptor (
+    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DPoPProofGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = DPopEnabledTokenExchangingRequestInterceptor (
         proofGenerator, "$EDI20-1", clientManager)
 }
 

@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Component
-class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPopProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPoPProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
