@@ -3,7 +3,6 @@ package no.nav.helseidnavtest.oppslag.arbeid
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
-import no.nav.helseidnavtest.security.DpopProofGenerator
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -29,7 +28,5 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-        ARBEID,
-        clientManager)
+    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(clientManager, ARBEID)
 }

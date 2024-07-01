@@ -3,8 +3,7 @@ package no.nav.helseidnavtest.oppslag
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.security.DpopEnabledClientCredentialsTokenResponseClient
-import no.nav.helseidnavtest.security.DpopProofGenerator
+import no.nav.helseidnavtest.security.DPopProofGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.*
@@ -108,15 +107,15 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 }
 
 open class TokenExchangingRequestInterceptor(
-    private val shortName: String,
     private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
+    private val shortName: String,
     private val tokenType: AccessTokenType = BEARER
 ) : ClientHttpRequestInterceptor {
 
     protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        authorize(req) ?: log.error("No Authorized client for {}", shortName)
+        authorize(req) ?: log.error("No authorized client for {}", shortName)
         return execution.execute(req, body)
     }
 
@@ -133,17 +132,14 @@ open class TokenExchangingRequestInterceptor(
         }
     override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
 }
-class DPopEnabledTokenExchangingRequestInterceptor(
-    private val proofGenerator: DpopProofGenerator,
-    shortName: String,
-    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-) : TokenExchangingRequestInterceptor(shortName, clientManager, DPOP) {
+class DPopEnabledTokenExchangingRequestInterceptor(private val generator: DPopProofGenerator, shortName: String,
+                                                   clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        authorize(req)?.let { c ->
-                proofGenerator.generate(req.method, "${req.uri}").also {
-                    req.headers.set(DPOP.value, it)
-                }
+        authorize(req)?.let {
+            generator.generer(req.method, "${req.uri}").also {
+                req.headers.set(DPOP.value, it)
+            }
         }
         return execution.execute(req, body)
     }

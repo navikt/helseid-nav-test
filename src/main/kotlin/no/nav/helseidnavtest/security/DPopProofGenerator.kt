@@ -19,8 +19,8 @@ import java.util.Date.from
 import java.util.UUID
 
 @Component
-class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generate(method: HttpMethod, uri: String, nonce: String? = null) =
+class DPopProofGenerator(private val keyPair: ECKey = keyPair()) {
+    fun generer(method: HttpMethod, uri: String, nonce: String? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
@@ -45,7 +45,7 @@ class DpopProofGenerator(private val keyPair: ECKey = keyPair()) {
         .build()
 
     companion object {
-        private val log = LoggerFactory.getLogger(DpopProofGenerator::class.java)
+        private val log = LoggerFactory.getLogger(DPopProofGenerator::class.java)
         fun keyPair()=
             ECKeyGenerator(P_256)
                 .algorithm(Algorithm("EC"))
