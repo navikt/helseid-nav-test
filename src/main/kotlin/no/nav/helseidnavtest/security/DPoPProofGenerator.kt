@@ -24,7 +24,7 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
     fun generer(method: HttpMethod, uri: String, nonce: String? = null, tokenValue: String? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, tokenValue)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
-        }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
+        }.serialize().also { log.info("Token value $tokenValue ga DPoP proof for $method $uri: $it")}
 
     private fun claims(method: String, uri: String, nonce: String? = null, tokenValue: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
