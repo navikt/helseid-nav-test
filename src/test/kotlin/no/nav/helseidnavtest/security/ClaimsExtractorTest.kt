@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.oauth2.sdk.AccessTokenResponse
+import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.security.ClaimsExtractor.*
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.APPROVALS
@@ -19,6 +20,8 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.VALUE
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
+import kotlin.reflect.jvm.isAccessible
 
 class ClaimsExtractorTest   {
     @Test
@@ -56,9 +59,5 @@ class ClaimsExtractorTest   {
         {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc4NjY3RjkwREMxMUJGMDRCRDk0NjdEMUY5MTIwQzRBNDM0MEI0Q0YiLCJ4NXQiOiJlR1pfa053UnZ3UzlsR2ZSLVJJTVNrTkF0TTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2hlbHNlaWQtc3RzLnRlc3QubmhuLm5vIiwibmJmIjoxNzE5NTY1MjQwLCJpYXQiOjE3MTk1NjUyNDAsImV4cCI6MTcxOTU2NTg0MCwiYXVkIjoibmhuOm1zaCIsImNuZiI6eyJqa3QiOiI1eTZpN3k1OVU3eER5S3Z2emNZOE5weWxnWU9HRDFTNFVUSWVaQVZpREo4In0sInNjb3BlIjpbIm5objptc2gvYXBpIl0sImNsaWVudF9pZCI6IjBlODUwODk4LTA1ZWMtNGFkMi1hMDI4LTViNTk4OGNlNzVkZCIsImNsaWVudF9hbXIiOiJwcml2YXRlX2tleV9qd3QiLCJoZWxzZWlkOi8vY2xhaW1zL2NsaWVudC9jbGFpbXMvb3JnbnJfcGFyZW50IjoiODg5NjQwNzgyIiwiaGVsc2VpZDovL2NsYWltcy9jbGllbnQvYW1yIjoicnNhX3ByaXZhdGVfa2V5IiwibmhuOm1zaC9jbGllbnQvY2xhaW1zL2hlcmlkIjoiODE0MjUxOSIsImhlbHNlaWQ6Ly9jbGFpbXMvY2xpZW50L2NsaWVudF9uYW1lIjoiQVJCRUlEUy0gT0cgVkVMRkVSRFNFVEFURU4gLSBNZWxkaW5nc3RqZW5lciBTSFAgUkVTVCBrbGllbnQgKE5BVi1IRUxTRS1URVNUMSkiLCJqdGkiOiJGOEM3NjNBMTVCQ0UxQjcwNjdBMDQ5Q0FENUYxNjFFNSJ9.MTQZBxVnY4Dvjc1z2PxPH-D6CFxMX8wTEG0y5AMA-Oyuq-qJD_stbbKOPXJUfyxGNwct_LuUp60PsaammWtL9ObE9fHrdKS4BIh1uGhq0iAJDUlhyuoWH_Bg1wDszOsjGC4WTOaCyDW-b6Qe-_Cwaxwn-A6OmZyyr3cfQlLlbcmo43pNqrmKi6-Ozsij3RZnFjVnLlGOLUL5xXbn14Di7DOWyo_5Zsolv9O2yYBhCFzdvchTe7UORrPJD8AECJmwdws2gogFe_7iNjZ-wcbj4X4FXZBxIPIScjJcYnmOxUPc5mEdzO6xtVsjZVVncAmVGQ7eXlIHxpqP-e3NlnMsBzvPvgSVZWbT3-KDEDpFkL6WTSase6FD6PA9VaJwMwT-KLfOqAyB6k-vKOHECVxsslmoy-I4gcPRKhdpXnS-Sl0ST1ebox4Yn_UTKtjb_zhd7dpZwEnF3WjhbRLp4uGSMpF3iJ2IbXvpJsApKL3ocd79WB1CHJB1sghgzkZECdwN","expires_in":600,"token_type":"DPoP","scope":"nhn:msh/api"}
     """.trimIndent()
 
-   // @Test
-    fun ser() {
-        jacksonObjectMapper().readValue(x, AccessTokenResponse::class.java)
-    }
 }
 

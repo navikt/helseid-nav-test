@@ -13,6 +13,7 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
+import kotlin.reflect.jvm.isAccessible
 
 
 @Component
@@ -70,7 +72,7 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                                         OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
                                             .expiresIn((m["expires_in"] as Int).toLong())
                                             .scopes(setOf(m["scope"] as String))
-                                            .tokenType(BEARER) // TODO dette er jo feil?
+                                            .tokenType(dpopTokenType())
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -97,6 +99,13 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                 }
             }
     }
+
+    private fun dpopTokenType()=
+        TokenType::class.constructors.single().run {
+            isAccessible = true
+            call(DPOP.value)
+        }
+
 
     companion object {
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
