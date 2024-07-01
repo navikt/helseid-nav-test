@@ -15,24 +15,26 @@ import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
+import java.security.MessageDigest
 import java.time.Instant.now
+import java.util.*
 import java.util.Date.from
-import java.util.UUID
 
 @Component
 class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: String, nonce: String? = null, ath: String? = null) =
-        SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, ath)).apply {
+    fun generer(method: HttpMethod, uri: String, nonce: String? = null, tokenValue: String? = null) =
+        SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, tokenValue)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
 
-    private fun claims(method: String, uri: String, nonce: String? = null, ath: String? = null) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: String, nonce: String? = null, tokenValue: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
             claim("nonce", it)
             claim("jti", "${UUID.randomUUID()}")
         }
-        ath?.let {
-            claim("ath", Base64.encode(it))
+        tokenValue?.let {
+            val encodedHash: ByteArray = MessageDigest.getInstance("SHA-256").digest(it.encodeToByteArray())
+            claim("ath", Base64.encode(encodedHash))
         }
     }.build()
 
