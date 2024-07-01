@@ -107,33 +107,44 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
     }
 }
 
-class TokenExchangingRequestInterceptor(
-    private val proofGenerator: DpopProofGenerator,
+open class TokenExchangingRequestInterceptor(
     private val shortName: String,
     private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
     private val tokenType: AccessTokenType = BEARER
 ) : ClientHttpRequestInterceptor {
-    val log = getLogger(TokenExchangingRequestInterceptor::class.java)
+
+    protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-       log.info("Token exchange for {}", shortName)
-        clientManager.authorize(
-            withClientRegistrationId(shortName)
-                .principal("dpop or whatever")
-                .build()
-        )?.let { c ->
-            if (tokenType == DPOP) {
-             proofGenerator.generate(req.method, req.uri.toString()).also {
-                req.headers.set(DPOP.value, it)
-             }
-            }
-            req.headers.set(AUTHORIZATION, "${tokenType.value} ${c.accessToken.tokenValue}")
-            .also {
-                log.info("Token {} exchanged for {}", c.accessToken.tokenValue,c.clientRegistration.registrationId)
-            }
-        } ?: log.error("No Authorized client for {}", shortName)
+        authorize(req) ?: log.error("No Authorized client for {}", shortName)
         return execution.execute(req, body)
     }
 
+    protected fun authorize(req: HttpRequest) =
+        clientManager.authorize(
+            withClientRegistrationId(shortName)
+                .principal("whatever")
+                .build()
+        )?.apply {  ->
+            req.headers.set(AUTHORIZATION, "${tokenType.value} ${accessToken.tokenValue}")
+                .also {
+                    log.info("Token {} exchanged for {}", accessToken.tokenValue,clientRegistration.registrationId)
+                }
+        }
     override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
+}
+class DPopEnabledTokenExchangingRequestInterceptor(
+    private val proofGenerator: DpopProofGenerator,
+    shortName: String,
+    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
+) : TokenExchangingRequestInterceptor(shortName, clientManager, DPOP) {
+
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+        authorize(req)?.let { c ->
+                proofGenerator.generate(req.method, "${req.uri}").also {
+                    req.headers.set(DPOP.value, it)
+                }
+        }
+        return execution.execute(req, body)
+    }
 }

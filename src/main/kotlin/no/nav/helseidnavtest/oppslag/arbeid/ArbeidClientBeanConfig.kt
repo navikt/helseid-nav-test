@@ -29,8 +29,7 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun arbeidClientCredentialsRequestInterceptor(proofGenerator: DpopProofGenerator,clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-       proofGenerator,
+    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
         ARBEID,
         clientManager)
 }

@@ -44,8 +44,7 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(proofGenerator: DpopProofGenerator,clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-      proofGenerator,
+    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
         PDL,
         clientManager)
 

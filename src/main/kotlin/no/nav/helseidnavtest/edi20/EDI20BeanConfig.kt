@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.edi20
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.oppslag.DPopEnabledTokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DpopProofGenerator
 import org.slf4j.LoggerFactory.getLogger
@@ -32,9 +33,8 @@ class EDI20BeanConfig {
 
     @Bean
     @Qualifier(EDI20)
-    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DpopProofGenerator,clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-        proofGenerator, "$EDI20-1", clientManager, DPOP
-    )
+    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DpopProofGenerator,clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = DPopEnabledTokenExchangingRequestInterceptor (
+        proofGenerator, "$EDI20-1", clientManager)
 }
 
 
