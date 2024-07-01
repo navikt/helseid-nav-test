@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResp
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
-import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
@@ -26,7 +25,7 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPoPProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPoPProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
@@ -110,6 +109,6 @@ class DpopEnabledClientCredentialsTokenResponseClient(private val generator: DPo
     companion object {
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
-        private val log = LoggerFactory.getLogger(DpopEnabledClientCredentialsTokenResponseClient::class.java)
+        private val log = LoggerFactory.getLogger(DPoPEnabledClientCredentialsTokenResponseClient::class.java)
     }
 }
