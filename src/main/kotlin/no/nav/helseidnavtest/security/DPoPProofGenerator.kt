@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
+import com.nimbusds.jose.util.Base64
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
@@ -20,15 +21,18 @@ import java.util.UUID
 
 @Component
 class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: String, nonce: String? = null) =
-        SignedJWT(jwsHeader(), claims(method.name(), uri, nonce)).apply {
+    fun generer(method: HttpMethod, uri: String, nonce: String? = null, ath: String? = null) =
+        SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, ath)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize().also { log.info("DPoP proof for $method $uri: $it")}
 
-    private fun claims(method: String, uri: String, nonce: String? = null) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: String, nonce: String? = null, ath: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
             claim("nonce", it)
             claim("jti", "${UUID.randomUUID()}")
+        }
+        ath?.let {
+            claim("ath", Base64.encode(ath))
         }
     }.build()
 

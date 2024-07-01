@@ -130,14 +130,13 @@ open class TokenExchangingRequestInterceptor(
                     log.info("Token {} exchanged for {}", accessToken.tokenValue,clientRegistration.registrationId)
                 }
         }
-    override fun toString() = "TokenExchangingRequestInterceptor(shortName=$shortName)"
 }
 class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPProofGenerator, shortName: String,
                                                    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        authorize(req)?.let {
-            generator.generer(req.method, "${req.uri}").also {
+        authorize(req)?.let { client ->
+            generator.generer(req.method, "${req.uri}", ath = client.accessToken.tokenValue).also {
                 req.headers.set(DPOP.value, it)
             }
         }
