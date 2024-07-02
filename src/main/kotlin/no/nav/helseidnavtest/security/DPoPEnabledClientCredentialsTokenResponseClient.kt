@@ -50,31 +50,33 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                 it.add(DPOP.value,generator.bevisFor(POST, request.url))
             }
             .body(request.body!!)
-            .exchange { req, res ->
-                if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
-                    val nonce = res.headers[DPOP_NONCE]?.let {
-                        Nonce(it.single())
-                    }
-                    try {
-                        restClient.method(POST)
-                            .uri(request.url)
-                            .headers {
-                                it.addAll(request.headers)
-                                it.add(DPOP.value, generator.bevisFor(POST, req.uri, nonce = nonce))
-                            }
-                            .body(request.body!!)
-                            .exchange(exchangeEtterNonce())
-                    }
-                    catch (e: Exception) {
-                        log.info("Unexpected response from second shot token endpoint: ${res.statusCode}",e)
-                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
-                    }
-                }
-                else  {
-                    log.info("Unexpected response from first shot token endpoint: ${res.statusCode}")
-                    throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
-                }
+            .exchange(førNonce(request))
+
+    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res:  ClientHttpResponse->
+        if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
+            val nonce = res.headers[DPOP_NONCE]?.let {
+                Nonce(it.single())
             }
+            try {
+                tryAgainWithNonce(request, req, nonce)
+            } catch (e: Exception) {
+                if (e is OAuth2AuthorizationException) throw e
+                throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+            }
+        } else {
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+        }
+    }
+
+    private fun tryAgainWithNonce(request: RequestEntity<*>, req: HttpRequest, nonce: Nonce?) =
+        restClient.method(POST)
+            .uri(request.url)
+            .headers {
+                it.addAll(request.headers)
+                it.add(DPOP.value, generator.bevisFor(POST, req.uri, nonce = nonce))
+            }
+            .body(request.body!!)
+            .exchange(exchangeEtterNonce())
 
     private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
         if (!res.statusCode.is2xxSuccessful) {
@@ -90,7 +92,6 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                 .additionalParameters(m)
                 .build()
         } catch (e: Exception) {
-            log.info("2 Failed to convert response to OAuth2AccessTokenResponse", e)
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()))
         }
     }
