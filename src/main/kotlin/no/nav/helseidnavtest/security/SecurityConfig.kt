@@ -141,9 +141,10 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
                     .clientCredentials {
                         it.accessTokenResponseClient(dPopClient)
                     }
+                    /*
                     .clientCredentials {
                         it.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient())
-                    }
+                    }*/
                     .build()
             )
         }
