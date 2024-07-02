@@ -3,7 +3,7 @@ package no.nav.helseidnavtest.oppslag
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.health.Pingable
-import no.nav.helseidnavtest.security.DPoPProofGenerator
+import no.nav.helseidnavtest.security.DPoPBevisGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.*
@@ -131,12 +131,12 @@ open class TokenExchangingRequestInterceptor(
                 }
         }
 }
-class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPProofGenerator, shortName: String,
+class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPBevisGenerator, shortName: String,
                                                    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         authorize(req)?.let { client ->
-            generator.generer(req.method, req.uri, client.accessToken).also {
+            generator.bevisFor(req.method, req.uri, client.accessToken).also {
                 req.headers.set(DPOP.value, it)
             }
         }

@@ -26,7 +26,7 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPoPProofGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
@@ -47,7 +47,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add(DPOP.value,generator.generer(POST, request.url))
+                it.add(DPOP.value,generator.bevisFor(POST, request.url))
             }
             .body(request.body!!)
             .exchange { req, res ->
@@ -61,7 +61,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                             .uri(request.url)
                             .headers {
                                 it.addAll(request.headers)
-                                it.add(DPOP.value, generator.generer(POST, req.uri, nonce = nonce))
+                                it.add(DPOP.value, generator.bevisFor(POST, req.uri, nonce = nonce))
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->

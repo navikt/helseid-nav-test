@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.Algorithm
-import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.JWSAlgorithm.ES256
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.ECDSASigner
@@ -9,10 +8,8 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
-import com.nimbusds.jwt.JWTClaimNames.JWT_ID
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory
 import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.*
 import com.nimbusds.openid.connect.sdk.Nonce
 import com.nimbusds.openid.connect.sdk.claims.HashClaim.*
@@ -28,8 +25,8 @@ import java.util.Base64.*
 import java.util.Date.from
 
 @Component
-class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: URI, token: OAuth2AccessToken? = null, nonce: Nonce? = null) =
+class DPoPBevisGenerator(private val keyPair: ECKey = keyPair()) {
+    fun bevisFor(method: HttpMethod, uri: URI, token: OAuth2AccessToken? = null, nonce: Nonce? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, token, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize()
@@ -37,7 +34,6 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
     private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: Nonce? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
            claim(NONCE_CLAIM_NAME, it.value)
-           // claim(JWT_ID, "${UUID.randomUUID()}")
         }
         token?.let {
             claim("ath", it.hash())
@@ -61,7 +57,7 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
         .build()
 
     companion object {
-        private val log = LoggerFactory.getLogger(DPoPProofGenerator::class.java)
+        private val log = LoggerFactory.getLogger(DPoPBevisGenerator::class.java)
         fun keyPair()=
             ECKeyGenerator(P_256)
                 .algorithm(Algorithm("EC"))
