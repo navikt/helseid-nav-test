@@ -134,12 +134,15 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     }
 
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(responseClient: DPoPEnabledClientCredentialsTokenResponseClient, repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(dPopClient: DPoPClientCredentialsTokenResponseClient, repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()
                     .clientCredentials {
-                        it.accessTokenResponseClient(responseClient)
+                        it.accessTokenResponseClient(dPopClient)
+                    }
+                    .clientCredentials {
+                        it.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient())
                     }
                     .build()
             )

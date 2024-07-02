@@ -28,7 +28,7 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
     private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
@@ -107,6 +107,6 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
         const val DPOP_NONCE = "dpop-nonce"
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
-        private val log = LoggerFactory.getLogger(DPoPEnabledClientCredentialsTokenResponseClient::class.java)
+        private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
     }
 }
