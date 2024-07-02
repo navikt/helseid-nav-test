@@ -13,30 +13,33 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
+import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.security.MessageDigest
 import java.time.Instant.now
 import java.util.*
+import java.util.Base64.*
 import java.util.Date.from
 
 @Component
 class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: URI, nonce: String? = null, tokenValue: String? = null) =
-        SignedJWT(jwsHeader(), claims(method.name(), uri, nonce, tokenValue)).apply {
+    fun generer(method: HttpMethod, uri: URI, token: OAuth2AccessToken? = null, nonce: String? = null) =
+        SignedJWT(jwsHeader(), claims(method.name(), uri, token, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
-        }.serialize().also { log.info("Token value $tokenValue ga DPoP proof for $method $uri: $it")}
+        }.serialize()
 
-    private fun claims(method: String, uri: URI,nonce: String? = null, tokenValue: String? = null) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
             claim("nonce", it)
             claim("jti", "${UUID.randomUUID()}")
         }
-        tokenValue?.let {
-            val hash = MessageDigest.getInstance("SHA-256").digest(it.toByteArray())
-            claim("ath", Base64.getUrlEncoder().withoutPadding().encodeToString(hash))
+        token?.let {
+            claim("ath", it.hash())
         }
     }.build()
+
+    private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
 
     private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")

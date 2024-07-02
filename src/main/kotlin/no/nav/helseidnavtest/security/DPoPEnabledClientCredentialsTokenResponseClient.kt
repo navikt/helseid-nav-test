@@ -53,13 +53,12 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
                     val nonce = res.headers["dpop-nonce"]!!.first()
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
-                    val nyttproof = generator.generer(POST, req.uri, nonce)
                     try {
                         restClient.method(POST)
                             .uri(request.url)
                             .headers {
                                 it.addAll(request.headers)
-                                it.add(DPOP.value,nyttproof)
+                                it.add(DPOP.value, generator.generer(POST, req.uri, nonce = nonce))
                             }
                             .body(request.body!!)
                             .exchange { _, res2 ->
@@ -71,7 +70,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                                         OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
                                             .expiresIn((m["expires_in"] as Int).toLong())
                                             .scopes(setOf(m["scope"] as String))
-                                            .tokenType(dpopTokenType())
+                                            .tokenType(dPoPTokenType())
                                             .additionalParameters(m)
                                             .build().also {
                                             log.info("2 Converted response to OAuth2AccessTokenResponse $it")
@@ -99,7 +98,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             }
     }
 
-    private fun dpopTokenType()=
+    private fun dPoPTokenType()=
         TokenType::class.constructors.single().run {
             isAccessible = true
             call(DPOP.value)
