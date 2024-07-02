@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.security
 
+import com.nimbusds.openid.connect.sdk.claims.PersonClaims.*
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.error.IrrecoverableException
@@ -15,7 +16,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val hprNumber = HprId(claim(HPR_NUMBER))
     val securityLevel = claim(SECURITY_LEVEL)
-    val navn = Navn(claim("given_name"), claim("middle_name"), claim("family_name"))
+    val navn = Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME))
 
     val assuranceLevel = claim(ASSURANCE_LEVEL)
     val fnr = Fødselsnummer(claim(PID))
