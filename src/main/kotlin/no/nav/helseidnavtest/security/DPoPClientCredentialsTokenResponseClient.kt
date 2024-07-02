@@ -51,10 +51,10 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
     private fun getVanillaResponse(request: RequestEntity<*>): ResponseEntity<OAuth2AccessTokenResponse> {
-        try {
+        runCatching {
             return restOperations.exchange(request, OAuth2AccessTokenResponse::class.java)
-        } catch (e: RestClientException) {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${e.message}", null), e)
+        }.getOrElse {
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}", null), it)
         }
     }
 
@@ -76,8 +76,8 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
                 }
                 medNonce(request, req, nonce)
             }.getOrElse{
-                if (it is OAuth2AuthorizationException) throw e
-                throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+                if (it is OAuth2AuthorizationException) throw it
+                throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()),it)
             }
         } else {
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
@@ -98,7 +98,7 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
         if (!res.statusCode.is2xxSuccessful) {
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
         }
-        try {
+        runCatching {
             val m = jacksonObjectMapper().readValue(res.body, STRING_OBJECT_MAP)
             OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
                 .expiresIn((m["expires_in"] as Int).toLong())
@@ -106,8 +106,8 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
                 .tokenType(dPoPTokenType())
                 .additionalParameters(m)
                 .build()
-        } catch (e: Exception) {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()))
+        }.getOrElse{
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()),it)
         }
     }
 
