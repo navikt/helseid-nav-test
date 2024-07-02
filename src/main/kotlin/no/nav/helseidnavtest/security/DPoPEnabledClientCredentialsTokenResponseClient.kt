@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.security
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
+import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
@@ -51,7 +52,9 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             .body(request.body!!)
             .exchange { req, res ->
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
-                    val nonce = res.headers["dpop-nonce"]!!.first()
+                    val nonce = res.headers["dpop-nonce"]?.let {
+                        Nonce(it.first())
+                    }
                     log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
                     try {
                         restClient.method(POST)

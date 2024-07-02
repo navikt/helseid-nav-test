@@ -14,6 +14,7 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory
 import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.*
+import com.nimbusds.openid.connect.sdk.Nonce
 import com.nimbusds.openid.connect.sdk.claims.HashClaim.*
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.NONCE_CLAIM_NAME
 import org.slf4j.LoggerFactory
@@ -28,14 +29,14 @@ import java.util.Date.from
 
 @Component
 class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
-    fun generer(method: HttpMethod, uri: URI, token: OAuth2AccessToken? = null, nonce: String? = null) =
+    fun generer(method: HttpMethod, uri: URI, token: OAuth2AccessToken? = null, nonce: Nonce? = null) =
         SignedJWT(jwsHeader(), claims(method.name(), uri, token, nonce)).apply {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize()
 
-    private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: String? = null) = claimsBuilder(method, uri).apply {
+    private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: Nonce? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
-            claim(NONCE_CLAIM_NAME, it)
+            claim(NONCE_CLAIM_NAME, it.value)
             claim(JWT_ID, "${UUID.randomUUID()}")
         }
         token?.let {
