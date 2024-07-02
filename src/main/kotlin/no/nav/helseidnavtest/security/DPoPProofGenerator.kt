@@ -9,9 +9,13 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.ECKey
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
+import com.nimbusds.jwt.JWTClaimNames.JWT_ID
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory
+import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.*
 import com.nimbusds.openid.connect.sdk.claims.HashClaim.*
+import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.NONCE_CLAIM_NAME
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.security.oauth2.core.OAuth2AccessToken
@@ -31,8 +35,8 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
 
     private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: String? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
-            claim("nonce", it)
-            claim("jti", "${UUID.randomUUID()}")
+            claim(NONCE_CLAIM_NAME, it)
+            claim(JWT_ID, "${UUID.randomUUID()}")
         }
         token?.let {
             claim("ath", it.hash())
@@ -53,7 +57,7 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
     private fun URI.stripQuery() = URI(scheme, getAuthority(), getPath(), null, getFragment()).toString()
 
     private fun jwsHeader() = JWSHeader.Builder(ES256)
-        .type(JOSEObjectType("dpop+jwt"))
+        .type(TYPE)
         .jwk(keyPair.toPublicJWK())
         .build()
 

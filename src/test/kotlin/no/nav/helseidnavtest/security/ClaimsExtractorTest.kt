@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.security
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.jose.JWSAlgorithm.ES256
 import com.nimbusds.jose.jwk.Curve.P_256
+import com.nimbusds.jose.util.Base64URL
 import com.nimbusds.oauth2.sdk.AccessTokenResponse
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.claims.HashClaim
