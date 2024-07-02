@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpRequest
@@ -31,10 +30,10 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DPoPClientCredentialsTokenResponseClient(builder: RestTemplateBuilder,private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
-    private val restOperations = builder.additionalMessageConverters(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter()).build().apply {
+    private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
         setRequestFactory(HttpComponentsClientHttpRequestFactory())
         errorHandler = OAuth2ErrorResponseErrorHandler()
     }
@@ -69,15 +68,15 @@ class DPoPClientCredentialsTokenResponseClient(builder: RestTemplateBuilder,priv
             .body(request.body!!)
             .exchange(førNonce(request))
 
-    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res:  ClientHttpResponse->
+    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res:  ClientHttpResponse ->
         if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
-            val nonce = res.headers[DPOP_NONCE]?.let {
-                Nonce(it.single())
-            }
-            try {
+            runCatching {
+                val nonce = res.headers[DPOP_NONCE]?.let {
+                    Nonce(it.single())
+                }
                 medNonce(request, req, nonce)
-            } catch (e: Exception) {
-                if (e is OAuth2AuthorizationException) throw e
+            }.getOrElse{
+                if (it is OAuth2AuthorizationException) throw e
                 throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
             }
         } else {
