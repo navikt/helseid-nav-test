@@ -45,6 +45,7 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
                 log.info("1 Requesting edi 2.0 token from ${it.url}")
                 getDPoPResponse(it)
             } else {
+                log.info("1 Requesting vanilla token from ${it.url}")
                 getVanillaResponse(it).body
               }
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
