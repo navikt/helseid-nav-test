@@ -7,6 +7,7 @@ import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
@@ -40,8 +41,8 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             getResponse(it)
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
-    private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
-        return restClient.method(POST)
+    private fun getResponse(request: RequestEntity<*>) =
+        restClient.method(POST)
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
@@ -49,10 +50,9 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             }
             .body(request.body!!)
             .exchange { req, res ->
-                if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
-                    log.info("WWW-Authenticate er ${res.headers["WWW-Authenticate"]}")
-                    val nonce = res.headers["dpop-nonce"]?.let {
-                        Nonce(it.first())
+                if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
+                    val nonce = res.headers[DPOP_NONCE]?.let {
+                        Nonce(it.single())
                     }
                     try {
                         restClient.method(POST)
@@ -74,8 +74,8 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                                             .tokenType(dPoPTokenType())
                                             .additionalParameters(m)
                                             .build().also {
-                                            log.info("2 Converted response to OAuth2AccessTokenResponse $it")
-                                        }
+                                                log.info("2 Converted response to OAuth2AccessTokenResponse $it")
+                                            }
                                     }
                                     catch (e: Exception) {
                                         log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
@@ -97,7 +97,6 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                     throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                 }
             }
-    }
 
     private fun dPoPTokenType()=
         TokenType::class.constructors.single().run {
@@ -107,6 +106,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
 
 
     companion object {
+        const val DPOP_NONCE = "dpop-nonce"
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPEnabledClientCredentialsTokenResponseClient::class.java)
