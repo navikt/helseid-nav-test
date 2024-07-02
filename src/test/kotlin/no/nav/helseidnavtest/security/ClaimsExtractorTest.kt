@@ -1,8 +1,11 @@
 package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.nimbusds.jose.JWSAlgorithm.ES256
+import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.oauth2.sdk.AccessTokenResponse
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
+import com.nimbusds.openid.connect.sdk.claims.HashClaim
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.security.ClaimsExtractor.*
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.APPROVALS
@@ -19,6 +22,7 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.SPECIALITIES
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.VALUE
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
 import java.security.MessageDigest
@@ -64,7 +68,8 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc4NjY3RjkwREMxMUJGMDRCRDk0NjdEMUY5MTIwQzRBNDM0MEI0
        val hash = MessageDigest.getInstance("SHA-256").digest(token.toByteArray())
        val encoded = Base64.getUrlEncoder().encodeToString(hash)
        println("Encoded er $encoded")
+       val hash1 = HashClaim.getMessageDigestInstance(ES256, P_256).digest(token.toByteArray())
+       val encoded1 = Base64.getUrlEncoder().encodeToString(hash1)
+       assertEquals(encoded, encoded1)
     }
 }
-//aqyOYZ853TVjpFCNCckNX//YC/X8cccQmGOSCWkgugE=
-//aqyOYZ853TVjpFCNCckNX//YC/X8cccQmGOSCWkgugE

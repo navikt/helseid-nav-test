@@ -11,12 +11,12 @@ import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import com.nimbusds.openid.connect.sdk.claims.HashClaim.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import java.net.URI
-import java.security.MessageDigest
 import java.time.Instant.now
 import java.util.*
 import java.util.Base64.*
@@ -37,9 +37,11 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
         token?.let {
             claim("ath", it.hash())
         }
+       getMessageDigestInstance(ES256, P_256)
     }.build()
 
-    private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
+    private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(getMessageDigestInstance(ES256, P_256).digest(tokenValue.toByteArray())
+    )
 
     private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")
