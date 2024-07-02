@@ -37,12 +37,10 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
     private val restClient = RestClient.create(restOperations)
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
-            log.info("Request converted to ${it.body} ${it.headers} ${it.url}")
             getResponse(it)
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
     private fun getResponse(request: RequestEntity<*>): OAuth2AccessTokenResponse {
-        log.info("Requesting token from ${request.url}")
         return restClient.method(POST)
             .uri(request.url)
             .headers {
@@ -52,10 +50,10 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
             .body(request.body!!)
             .exchange { req, res ->
                 if (res.statusCode.value() == BAD_REQUEST.value() && res.headers["dpop-nonce"] != null) {
+                    log.info("WWW-Authenticate er ${res.headers["WWW-Authenticate"]}")
                     val nonce = res.headers["dpop-nonce"]?.let {
                         Nonce(it.first())
                     }
-                    log.info("Token require nonce $nonce from token endpoint: ${res.statusCode}")
                     try {
                         restClient.method(POST)
                             .uri(request.url)
