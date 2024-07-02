@@ -36,13 +36,12 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
 
     private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: Nonce? = null) = claimsBuilder(method, uri).apply {
         nonce?.let {
-            claim(NONCE_CLAIM_NAME, it.value)
+           // claim(NONCE_CLAIM_NAME, it.value)
             claim(JWT_ID, "${UUID.randomUUID()}")
         }
         token?.let {
             claim("ath", it.hash())
         }
-       getMessageDigestInstance(ES256, P_256)
     }.build()
 
     private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(getMessageDigestInstance(ES256, P_256).digest(tokenValue.toByteArray())
@@ -53,7 +52,6 @@ class DPoPProofGenerator(private val keyPair: ECKey = keyPair()) {
         .issueTime(from(now()))
         .claim("htm", method)
         .claim("htu", uri.stripQuery())
-
 
     private fun URI.stripQuery() = URI(scheme, getAuthority(), getPath(), null, getFragment()).toString()
 
