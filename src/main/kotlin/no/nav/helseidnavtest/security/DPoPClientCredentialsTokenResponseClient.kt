@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
+import org.springframework.http.ResponseEntity
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
@@ -23,6 +24,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import kotlin.reflect.jvm.isAccessible
 
@@ -39,10 +41,23 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
     private val restClient = RestClient.create(restOperations)
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
-            getResponse(it)
+            if (request.clientRegistration.registrationId.startsWith("edi20")) {
+                log.info("1 Requesting edi 2.0 token from ${it.url}")
+                getDPoPResponse(it)
+            } else {
+                getVanillaResponse(it).body
+              }
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
-    private fun getResponse(request: RequestEntity<*>) =
+    private fun getVanillaResponse(request: RequestEntity<*>): ResponseEntity<OAuth2AccessTokenResponse> {
+        try {
+            return restOperations.exchange(request, OAuth2AccessTokenResponse::class.java)
+        } catch (e: RestClientException) {
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${e.message}", null), e)
+        }
+    }
+
+    private fun getDPoPResponse(request: RequestEntity<*>) =
         restClient.method(POST)
             .uri(request.url)
             .headers {
