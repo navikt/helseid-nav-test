@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpRequest
@@ -30,10 +31,10 @@ import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class DPoPClientCredentialsTokenResponseClient(builder: RestTemplateBuilder,private val generator: DPoPBevisGenerator, val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
 
-    private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
+    private val restOperations = builder.additionalMessageConverters(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter()).build().apply {
         setRequestFactory(HttpComponentsClientHttpRequestFactory())
         errorHandler = OAuth2ErrorResponseErrorHandler()
     }
@@ -74,7 +75,7 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
                 Nonce(it.single())
             }
             try {
-                tryAgainWithNonce(request, req, nonce)
+                medNonce(request, req, nonce)
             } catch (e: Exception) {
                 if (e is OAuth2AuthorizationException) throw e
                 throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
@@ -84,7 +85,7 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
         }
     }
 
-    private fun tryAgainWithNonce(request: RequestEntity<*>, req: HttpRequest, nonce: Nonce?) =
+    private fun medNonce(request: RequestEntity<*>, req: HttpRequest, nonce: Nonce?) =
         restClient.method(POST)
             .uri(request.url)
             .headers {
@@ -100,7 +101,6 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
         }
         try {
             val m = jacksonObjectMapper().readValue(res.body, STRING_OBJECT_MAP)
-            log.info("2 Converted response to map $m")
             OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
                 .expiresIn((m["expires_in"] as Int).toLong())
                 .scopes(setOf(m["scope"] as String))
