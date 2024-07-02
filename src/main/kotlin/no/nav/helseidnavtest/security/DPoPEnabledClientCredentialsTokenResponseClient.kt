@@ -7,9 +7,10 @@ import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
@@ -62,30 +63,7 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                                 it.add(DPOP.value, generator.bevisFor(POST, req.uri, nonce = nonce))
                             }
                             .body(request.body!!)
-                            .exchange { _, res2 ->
-                                if (res2.statusCode.value() in 200..299) {
-                                    log.info("Got token sucessfully from second shot token endpoint ${res2.statusCode}")
-                                    try {
-                                        val m = jacksonObjectMapper().readValue(res2.body, STRING_OBJECT_MAP)
-                                        log.info("2 Converted response to map $m")
-                                        OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
-                                            .expiresIn((m["expires_in"] as Int).toLong())
-                                            .scopes(setOf(m["scope"] as String))
-                                            .tokenType(dPoPTokenType())
-                                            .additionalParameters(m)
-                                            .build().also {
-                                                log.info("2 Converted response to OAuth2AccessTokenResponse $it")
-                                            }
-                                    }
-                                    catch (e: Exception) {
-                                        log.info("2 Failed to convert response to OAuth2AccessTokenResponse",e)
-                                        throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
-                                    }
-                                } else {
-                                    log.info("Unexpected response ${res2.statusCode} from second shot token endpoint")
-                                    throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res2.statusCode} ${res2.body}", req.uri.toString()))
-                                }
-                            }
+                            .exchange(exchangeEtterNonce())
                     }
                     catch (e: Exception) {
                         log.info("Unexpected response from second shot token endpoint: ${res.statusCode}",e)
@@ -97,6 +75,25 @@ class DPoPEnabledClientCredentialsTokenResponseClient(private val generator: DPo
                     throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
                 }
             }
+
+    private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
+        if (!res.statusCode.is2xxSuccessful) {
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+        }
+        try {
+            val m = jacksonObjectMapper().readValue(res.body, STRING_OBJECT_MAP)
+            log.info("2 Converted response to map $m")
+            OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
+                .expiresIn((m["expires_in"] as Int).toLong())
+                .scopes(setOf(m["scope"] as String))
+                .tokenType(dPoPTokenType())
+                .additionalParameters(m)
+                .build()
+        } catch (e: Exception) {
+            log.info("2 Failed to convert response to OAuth2AccessTokenResponse", e)
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()))
+        }
+    }
 
     private fun dPoPTokenType()=
         TokenType::class.constructors.single().run {

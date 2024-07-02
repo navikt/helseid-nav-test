@@ -138,21 +138,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()
-                    .clientCredentials { p ->
-                        val requestEntityConverter = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
-                            addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver()).apply {
-                                setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
-                            })
-                            addParametersConverter {
-                                LinkedMultiValueMap<String,String>().apply {
-                                    this[CLIENT_ID] = it.clientRegistration.clientId
-                                }
-                            }
-                        }
-                        p.accessTokenResponseClient(responseClient)
-                      //  p.accessTokenResponseClient(DefaultClientCredentialsTokenResponseClient().apply {
-                      //      setRequestEntityConverter(requestEntityConverter)
-                      //  })
+                    .clientCredentials {
+                        it.accessTokenResponseClient(responseClient)
                     }
                     .build()
             )
