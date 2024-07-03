@@ -39,7 +39,7 @@ class DPoPClientCredentialsTokenResponseClient(
     private val restOperations =
         RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
             setRequestFactory(HttpComponentsClientHttpRequestFactory())
-            errorHandler = OAuth2ErrorResponseErrorHandler()
+            errorHandler = MyErrorHandler()
         }
 
     private val restClient = RestClient.create(restOperations)
