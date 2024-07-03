@@ -23,6 +23,8 @@ import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
+import org.springframework.web.client.DefaultResponseErrorHandler
+import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import kotlin.reflect.jvm.isAccessible
@@ -33,7 +35,7 @@ class DPoPClientCredentialsTokenResponseClient(
     private val generator: DPoPBevisGenerator,
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>
 ) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
-    
+
     private val restOperations =
         RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
             setRequestFactory(HttpComponentsClientHttpRequestFactory())
@@ -45,7 +47,8 @@ class DPoPClientCredentialsTokenResponseClient(
         requestEntityConverter.convert(request)?.let {
             if (request.clientRegistration.registrationId.startsWith("edi20")) {
                 log.info("Requesting edi 2.0 token from ${it.url}")
-                dPoPTokenResponse(it)
+              //  dPoPTokenResponse(it)
+                vanillaTokenResponse(it).body
             } else {
                 log.info("Requesting vanilla token from ${it.url}")
                 vanillaTokenResponse(it).body
@@ -58,7 +61,7 @@ class DPoPClientCredentialsTokenResponseClient(
         }.getOrElse {
             throw OAuth2AuthorizationException(
                 OAuth2Error(
-                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    INVALID_RESPONSE,
                     "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}",
                     null
                 ), it
@@ -87,7 +90,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 if (it is OAuth2AuthorizationException) throw it
                 throw OAuth2AuthorizationException(
                     OAuth2Error(
-                        INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                        INVALID_RESPONSE,
                         "Error response from token endpoint: ${res.statusCode} ${res.body}",
                         req.uri.toString()
                     ), it
@@ -96,7 +99,7 @@ class DPoPClientCredentialsTokenResponseClient(
         } else {
             throw OAuth2AuthorizationException(
                 OAuth2Error(
-                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    INVALID_RESPONSE,
                     "Error response from first shot token endpoint: ${res.statusCode} ${res.body}",
                     req.uri.toString()
                 )
@@ -118,7 +121,7 @@ class DPoPClientCredentialsTokenResponseClient(
         if (!res.statusCode.is2xxSuccessful) {
             throw OAuth2AuthorizationException(
                 OAuth2Error(
-                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    INVALID_RESPONSE,
                     "Unexpected response from token endpoint: ${res.statusCode} ${res.body}",
                     req.uri.toString()
                 )
@@ -136,7 +139,7 @@ class DPoPClientCredentialsTokenResponseClient(
         }.getOrElse {
             throw OAuth2AuthorizationException(
                 OAuth2Error(
-                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    INVALID_RESPONSE,
                     "Error response from token endpoint: ${res.statusCode}",
                     req.uri.toString()
                 ), it
@@ -156,7 +159,17 @@ class DPoPClientCredentialsTokenResponseClient(
         private val MAPPER = jacksonObjectMapper()
         const val DPOP_NONCE = "dpop-nonce"
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
-        private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
+        private const val INVALID_RESPONSE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
+    }
+}
+
+class MyErrorHandler: DefaultResponseErrorHandler() {
+    private val log = LoggerFactory.getLogger(MyErrorHandler::class.java)
+
+
+    override fun handleError(response: ClientHttpResponse) {
+        log.info("XXXXXXXX")
+        return super.handleError(response)
     }
 }
