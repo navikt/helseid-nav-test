@@ -99,26 +99,30 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
         }
         runCatching {
-            val m = jacksonObjectMapper().readValue(res.body, STRING_OBJECT_MAP)
-            OAuth2AccessTokenResponse.withToken(m["access_token"] as String)
-                .expiresIn((m["expires_in"] as Int).toLong())
-                .scopes(setOf(m["scope"] as String))
-                .tokenType(dPoPTokenType())
-                .additionalParameters(m)
-                .build()
-        }.getOrElse{
+            MAPPER.readValue(res.body, STRING_OBJECT_MAP).run {
+                OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
+                    .expiresIn((this["expires_in"] as Int).toLong())
+                    .scopes(setOf(this["scope"] as String))
+                    .tokenType(dPoPTokenType())
+                    .additionalParameters(this)
+                    .build()
+            }
+        }.getOrElse {
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()),it)
         }
     }
 
-    private fun dPoPTokenType()=
-        TokenType::class.constructors.single().run {
-            isAccessible = true
-            call(DPOP.value)
-        }
+
 
 
     companion object {
+        @JvmStatic
+        private fun dPoPTokenType()=
+            TokenType::class.constructors.single().run {
+                isAccessible = true
+                call(DPOP.value)
+            }
+        private val MAPPER = jacksonObjectMapper()
         const val DPOP_NONCE = "dpop-nonce"
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response"
