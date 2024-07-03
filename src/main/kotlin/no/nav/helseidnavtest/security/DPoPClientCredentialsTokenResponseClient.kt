@@ -24,7 +24,6 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.client.DefaultResponseErrorHandler
-import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import kotlin.reflect.jvm.isAccessible
@@ -39,10 +38,9 @@ class DPoPClientCredentialsTokenResponseClient(
     private val restOperations =
         RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
             setRequestFactory(HttpComponentsClientHttpRequestFactory())
-            errorHandler = MyErrorHandler()
         }
 
-    private val restClient = RestClient.create(restOperations)
+    private val restClient = RestClient.builder(restOperations).defaultStatusHandler(MyErrorHandler()).build()
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
             if (request.clientRegistration.registrationId.startsWith("edi20")) {
