@@ -24,63 +24,83 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import kotlin.reflect.jvm.isAccessible
 
 
 @Component
-class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisGenerator, private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
-
-
-    private val restOperations = RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
-        setRequestFactory(HttpComponentsClientHttpRequestFactory())
-        errorHandler = OAuth2ErrorResponseErrorHandler()
-    }
+class DPoPClientCredentialsTokenResponseClient(
+    private val generator: DPoPBevisGenerator,
+    private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>
+) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+    
+    private val restOperations =
+        RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
+            setRequestFactory(HttpComponentsClientHttpRequestFactory())
+            errorHandler = OAuth2ErrorResponseErrorHandler()
+        }
 
     private val restClient = RestClient.create(restOperations)
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
             if (request.clientRegistration.registrationId.startsWith("edi20")) {
                 log.info("Requesting edi 2.0 token from ${it.url}")
-                getDPoPResponse(it)
+                dPoPTokenResponse(it)
             } else {
                 log.info("Requesting vanilla token from ${it.url}")
-                getVanillaResponse(it).body
-              }
+                vanillaTokenResponse(it).body
+            }
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
-    private fun getVanillaResponse(request: RequestEntity<*>): ResponseEntity<OAuth2AccessTokenResponse> {
+    private fun vanillaTokenResponse(request: RequestEntity<*>): ResponseEntity<OAuth2AccessTokenResponse> {
         runCatching {
             return restOperations.exchange(request, OAuth2AccessTokenResponse::class.java)
         }.getOrElse {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}", null), it)
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}",
+                    null
+                ), it
+            )
         }
     }
 
-    private fun getDPoPResponse(request: RequestEntity<*>) =
+    private fun dPoPTokenResponse(request: RequestEntity<*>) =
         restClient.method(POST)
             .uri(request.url)
             .headers {
                 it.addAll(request.headers)
-                it.add(DPOP.value,generator.bevisFor(POST, request.url))
+                it.add(DPOP.value, generator.bevisFor(POST, request.url))
             }
             .body(request.body!!)
             .exchange(førNonce(request))
 
-    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res:  ClientHttpResponse ->
+    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
             runCatching {
                 val nonce = res.headers[DPOP_NONCE]?.let {
                     Nonce(it.single())
                 }
                 medNonce(request, req, nonce)
-            }.getOrElse{
+            }.getOrElse {
                 if (it is OAuth2AuthorizationException) throw it
-                throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()),it)
+                throw OAuth2AuthorizationException(
+                    OAuth2Error(
+                        INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                        "Error response from token endpoint: ${res.statusCode} ${res.body}",
+                        req.uri.toString()
+                    ), it
+                )
             }
         } else {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    "Error response from first shot token endpoint: ${res.statusCode} ${res.body}",
+                    req.uri.toString()
+                )
+            )
         }
     }
 
@@ -96,7 +116,13 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
 
     private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
         if (!res.statusCode.is2xxSuccessful) {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    "Unexpected response from token endpoint: ${res.statusCode} ${res.body}",
+                    req.uri.toString()
+                )
+            )
         }
         runCatching {
             MAPPER.readValue(res.body, STRING_OBJECT_MAP).run {
@@ -108,20 +134,25 @@ class DPoPClientCredentialsTokenResponseClient(private val generator: DPoPBevisG
                     .build()
             }
         }.getOrElse {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()),it)
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_TOKEN_RESPONSE_ERROR_CODE,
+                    "Error response from token endpoint: ${res.statusCode}",
+                    req.uri.toString()
+                ), it
+            )
         }
     }
 
 
-
-
     companion object {
         @JvmStatic
-        private fun dPoPTokenType()=
+        private fun dPoPTokenType() =
             TokenType::class.constructors.single().run {
                 isAccessible = true
                 call(DPOP.value)
             }
+
         private val MAPPER = jacksonObjectMapper()
         const val DPOP_NONCE = "dpop-nonce"
         val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
