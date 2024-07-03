@@ -38,16 +38,14 @@ class DPoPClientCredentialsTokenResponseClient(
     private val restOperations =
         RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
             setRequestFactory(HttpComponentsClientHttpRequestFactory())
-            errorHandler = MyErrorHandler()
         }
 
-    private val restClient = RestClient.builder(restOperations).defaultStatusHandler(MyErrorHandler()).build()
+    private val restClient = RestClient.builder(restOperations).defaultStatusHandler(OAuth2ErrorResponseErrorHandler()).build()
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let {
             if (request.clientRegistration.registrationId.startsWith("edi20")) {
                 log.info("Requesting edi 2.0 token from ${it.url}")
-              //  dPoPTokenResponse(it)
-                vanillaTokenResponse(it).body
+                dPoPTokenResponse(it)
             } else {
                 log.info("Requesting vanilla token from ${it.url}")
                 vanillaTokenResponse(it).body
@@ -76,7 +74,9 @@ class DPoPClientCredentialsTokenResponseClient(
                 it.add(DPOP.value, generator.bevisFor(POST, request.url))
             }
             .body(request.body!!)
-            .exchange(førNonce(request))
+           // .retrieve()
+           // .toEntity(OAuth2AccessTokenResponse::class.java).body
+           .exchange(førNonce(request))
 
     private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
@@ -84,6 +84,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 val nonce = res.headers[DPOP_NONCE]?.let {
                     Nonce(it.single())
                 }
+                log.trace("Received nonce: $nonce")
                 medNonce(request, req, nonce)
             }.getOrElse {
                 if (it is OAuth2AuthorizationException) throw it
