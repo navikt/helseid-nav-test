@@ -20,10 +20,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
     }
 
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
-    val hprNumber =  (claims[HPR_DETAILS] as? Map<*,*>)?.let {
-        HprId(it[HPR_NUMBER].toString())
-    }?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $HPR_NUMBER", HPR_NUMBER)
-
+    val hprNumber =  HprId(claim(HPR_NUMBER))
     val securityLevel = claim(SECURITY_LEVEL)
     val navn = Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME))
 
@@ -69,7 +66,7 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
         internal const val AUTHORIZATION = "authorization"
         internal const val REQUISITION_RIGHTS = "requisition_rights"
         internal const val SPECIALITIES = "specialities"
-        internal const val HPR_NUMBER = /*HPR_CLAIM +*/ "hpr_number"
+        internal const val HPR_NUMBER = HPR_CLAIM  + "hpr_number"
         internal const val HPR_DETAILS = HPR_CLAIM + "hpr_details"
         internal const val ASSURANCE_LEVEL = IDENTITY_CLAIM +"assurance_level"
         internal const val SECURITY_LEVEL =IDENTITY_CLAIM +"security_level"
