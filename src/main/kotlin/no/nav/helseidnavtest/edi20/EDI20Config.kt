@@ -16,6 +16,8 @@ class EDI20Config(baseUri: URI,
 
     private val log = getLogger(EDI20Config::class.java)
 
+    fun messagesPostURI(b: UriBuilder) = b.path(messagesPath).build().also { log.info("messagesPostURI: $it")}
+
     fun messagesURI(b: UriBuilder) = b
         .path(messagesPath)
         .queryParam("IncludeAppRec", FALSE)
