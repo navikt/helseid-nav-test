@@ -15,7 +15,7 @@ class FastlegeClient(private val fastlegeAdapter: FastlegeCXFAdapter, private va
     fun kontorForPasient(pasient: Fødselsnummer) = fastlegeAdapter.kontorViaPasient(pasient.verdi).apply {
         adresseClient.herIdForOrgnummer(orgnummer).let {
             herId = it
-            partnerId = partnerClient.partnerId(it, this)
+         // TODO Trengs ikke for EDI 2.0 partnerId = partnerClient.partnerId(it, this)
         }
     }
 
