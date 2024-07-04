@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import org.slf4j.LoggerFactory
@@ -116,7 +117,7 @@ class DPoPClientCredentialsTokenResponseClient(
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
         }
         runCatching {
-            MAPPER.readValue(res.body, STRING_OBJECT_MAP).run {
+            MAPPER.readValue<Map<String,Any>>(res.body).run {
                 OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
                     .expiresIn((this["expires_in"] as Int).toLong())
                     .scopes(setOf(this["scope"] as String))
@@ -140,7 +141,6 @@ class DPoPClientCredentialsTokenResponseClient(
 
         private val MAPPER = jacksonObjectMapper()
         const val DPOP_NONCE = "dpop-nonce"
-        val STRING_OBJECT_MAP = object : TypeReference<Map<String, Any>>() {}
         private const val INVALID_RESPONSE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
     }
