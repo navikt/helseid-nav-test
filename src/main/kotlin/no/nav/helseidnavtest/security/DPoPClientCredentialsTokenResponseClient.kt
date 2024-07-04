@@ -12,7 +12,6 @@ import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
-import org.springframework.http.ResponseEntity
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
@@ -40,18 +39,19 @@ class DPoPClientCredentialsTokenResponseClient(
     private val restOperations =
         RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
             setRequestFactory(HttpComponentsClientHttpRequestFactory())
+            errorHandler = OAuth2ErrorResponseErrorHandler()
         }
 
     private val restClient = RestClient.builder(restOperations)
-        .defaultStatusHandler(OAuth2ErrorResponseErrorHandler())
+        //.defaultStatusHandler(OAuth2ErrorResponseErrorHandler())
         .build()
 
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
-        requestEntityConverter.convert(request)?.let { e ->
+        requestEntityConverter.convert(request)?.let { r ->
             if (request.isDPoP()) {
-                dPoPTokenResponse(e)
+                dPoPTokenResponse(r)
             } else {
-                vanillaTokenResponse(e)
+                vanillaTokenResponse(r)
             }.also {
                 log.info("Received token response for : ${request.clientRegistration.registrationId}")
             }
