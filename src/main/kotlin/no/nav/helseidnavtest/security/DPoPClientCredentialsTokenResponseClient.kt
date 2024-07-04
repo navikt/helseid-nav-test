@@ -47,30 +47,31 @@ class DPoPClientCredentialsTokenResponseClient(
         .build()
 
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
-        requestEntityConverter.convert(request)?.let {
+        requestEntityConverter.convert(request)?.let { e ->
             if (request.isDPoP()) {
-                log.info("Requesting DPoP token from ${it.url}")
-                dPoPTokenResponse(it)
+                dPoPTokenResponse(e)
             } else {
-                log.info("Requesting vanilla token from ${it.url}")
-                vanillaTokenResponse(it).body
+                vanillaTokenResponse(e)
+            }.also {
+                log.info("Received token response for : ${request.clientRegistration.registrationId}")
             }
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
 
     private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith("edi20")
 
-    private fun vanillaTokenResponse(request: RequestEntity<*>): ResponseEntity<OAuth2AccessTokenResponse> {
+    private fun vanillaTokenResponse(request: RequestEntity<*>) =
         runCatching {
-            return restOperations.exchange(request, OAuth2AccessTokenResponse::class.java)
+            log.info("Requesting vanilla token from ${request.url}")
+            restOperations.exchange(request, OAuth2AccessTokenResponse::class.java).body!!
         }.getOrElse {
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}", null), it)
         }
-    }
 
     private fun dPoPTokenResponse(request: RequestEntity<*>) =
         with(request) {
             body?.let {
+                log.info("Requesting DPoP token from ${request.url}")
                 restClient.method(POST)
                     .uri(url)
                     .headers {
@@ -134,7 +135,6 @@ class DPoPClientCredentialsTokenResponseClient(
                 .additionalParameters(this)
                 .build()
         }
-
 
     companion object {
         private fun dPoPTokenType() =
