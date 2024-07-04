@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 
-class EDI20DTOs {
+object EDI20DTOs {
 
     data class EbxmlOverrides(
         val cpaId: String ?= null,
