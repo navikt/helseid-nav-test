@@ -134,7 +134,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                     XMLDialogmelding::class.java,
                     XMLMsgHead::class.java)
             }.createMarshaller().marshal(hodemelding, writer)
-            log.info("XML {}", writer.toString())
+            log.info("XML {}", xml)
             val b64 = Base64.getEncoder().encodeToString(xml.toByteArray())
             val bd = EDI20DTOs.BusinessDocument(b64, EDI20DTOs.Properties(EDI20DTOs.System("HelseIdNavTest", "1.0.0")))
             a.postMessage(bd)
