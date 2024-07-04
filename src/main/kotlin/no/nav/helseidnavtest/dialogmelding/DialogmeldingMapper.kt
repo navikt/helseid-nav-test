@@ -28,8 +28,8 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
                 add(hodemelding(melding, arbeidstaker))
-                add(mottakenhetBlokk(melding))
-                add(sporinformasjonBlokk())
+              //  add(mottakenhetBlokk(melding))
+              //  add(sporinformasjonBlokk())
             }
         }
 
