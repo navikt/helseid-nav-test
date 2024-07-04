@@ -6,12 +6,18 @@ import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor.HPRApproval.*
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
 @Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims : Map<String,Any>) {
+
+    private val log = getLogger(ClaimsExtractor::class.java)
+    init {
+        log.info("Claims: $claims")
+    }
 
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val hprNumber = HprId(claim(HPR_NUMBER))

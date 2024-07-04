@@ -43,7 +43,6 @@ class DPoPClientCredentialsTokenResponseClient(
         }
 
     private val restClient = RestClient.builder(restOperations)
-        //.defaultStatusHandler(OAuth2ErrorResponseErrorHandler())
         .build()
 
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =

@@ -66,7 +66,6 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         }
 
     private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        //addHeadersConverter(HeaderConverter())
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             when (it.registrationId) {
                 "helse-id" -> jwk

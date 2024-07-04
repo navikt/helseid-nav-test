@@ -21,7 +21,8 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
-                mapper.fellesFormat(dialogmelding(with(ClaimsExtractor(auth.principal.attributes)) {
+                mapper.fellesFormat(dialogmelding(
+                    with(ClaimsExtractor(auth.principal.attributes)) {
                     behandler(navn, fastlege.herIdForLegeViaPasient(pasient), hprNumber, fnr, fastlege.kontorForPasient(pasient))
             },uuid), arbeidstaker(pasient))
         }
