@@ -125,7 +125,7 @@ class DPoPClientCredentialsTokenResponseClient(
         }
     }
 
-    private fun deserialize(res: ClientHttpResponse) {
+    private fun deserialize(res: ClientHttpResponse) =
         mapper.readValue<Map<String, Any>>(res.body).run {
             OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
                 .expiresIn((this["expires_in"] as Int).toLong())
@@ -134,11 +134,9 @@ class DPoPClientCredentialsTokenResponseClient(
                 .additionalParameters(this)
                 .build()
         }
-    }
 
 
     companion object {
-        @JvmStatic
         private fun dPoPTokenType() =
             TokenType::class.constructors.single().run {
                 isAccessible = true
