@@ -1,11 +1,12 @@
 package no.nav.helseidnavtest.edi20
-import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
+import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -23,9 +24,11 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         val msg =  generator.genererDialogmelding(pasient, UUID.randomUUID())
         val writer = StringWriter()
-        val context: JAXBContext = JAXBContext.newInstance(XMLEIFellesformat::class.java)
-        val m: Marshaller = context.createMarshaller()
-        m.marshal(msg, writer)
+        val marshaller = Jaxb2Marshaller().apply {
+            setMarshallerProperties(mapOf(Marshaller.JAXB_FORMATTED_OUTPUT to true))
+            setClassesToBeBound(XMLEIFellesformat::class.java,XMLMsgHead::class.java)
+        }
+        marshaller.createMarshaller().marshal(msg,writer)
         log.info("Dialogmelding for pasient $pasient: $writer")
         return "OK"
     }
