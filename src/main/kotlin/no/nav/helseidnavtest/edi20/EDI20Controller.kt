@@ -3,6 +3,7 @@ import jakarta.xml.bind.Marshaller
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.slf4j.LoggerFactory.getLogger
@@ -26,7 +27,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
         val writer = StringWriter()
         val marshaller = Jaxb2Marshaller().apply {
             setMarshallerProperties(mapOf(Marshaller.JAXB_FORMATTED_OUTPUT to true))
-            setClassesToBeBound(XMLEIFellesformat::class.java,XMLMsgHead::class.java)
+            setClassesToBeBound(XMLEIFellesformat::class.java, XMLDialogmelding::class.java,XMLMsgHead::class.java)
         }
         marshaller.createMarshaller().marshal(msg,writer)
         log.info("Dialogmelding for pasient $pasient: $writer")
