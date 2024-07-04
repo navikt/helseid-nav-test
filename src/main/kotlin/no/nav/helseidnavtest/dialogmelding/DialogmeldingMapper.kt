@@ -28,8 +28,8 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
                 add(hodemelding(melding, arbeidstaker))
-              //  add(mottakenhetBlokk(melding))
-              //  add(sporinformasjonBlokk())
+                add(mottakenhetBlokk(melding))
+                add(sporinformasjonBlokk())     
             }
         }
 
@@ -46,7 +46,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
             FFOF.createXMLMottakenhetBlokk().apply {
                 ebRole = EBROLE
-                partnerReferanse = melding.behandler.kontor.partnerId!!.value
+                //partnerReferanse = melding.behandler.kontor.partnerId!!.value
                 ebService =  EBSERVICE
                 ebAction = EBACTION
             }
