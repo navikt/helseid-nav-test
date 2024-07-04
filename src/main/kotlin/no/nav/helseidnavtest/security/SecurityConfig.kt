@@ -47,7 +47,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
         authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
             if (authority is OidcUserAuthority) {
-                with(ClaimsExtractor(authority.idToken.claims + authority.userInfo.claims)) {
+                with(ClaimsExtractor(authority.userInfo.claims + authority.idToken.claims)) {
                     professions.map { p ->
                         SimpleGrantedAuthority("${p}_${securityLevel}").also {
                             log.info("La til rolle: $it")
