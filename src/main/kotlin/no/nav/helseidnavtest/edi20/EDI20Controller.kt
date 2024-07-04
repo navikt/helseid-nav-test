@@ -31,11 +31,9 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
             setClassesToBeBound(XMLEIFellesformat::class.java, XMLBase64Container::class.java,XMLDialogmelding::class.java,XMLMsgHead::class.java)
         }
         marshaller.createMarshaller().marshal(msg,writer)
-        log.info("Dialogmelding for pasient $pasient: $writer")
+        val b64 = Base64.getEncoder().encodeToString(writer.toString().toByteArray())
+        val bd = EDI20DTOs.BusinessDocument(b64,EDI20DTOs.Properties(EDI20DTOs.System("HelseIdNavTest","1.0.0")))
+        a.postMessage(bd)
         return "OK"
     }
-
-
-
-
 }

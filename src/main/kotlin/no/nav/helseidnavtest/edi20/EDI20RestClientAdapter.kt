@@ -14,8 +14,22 @@ import org.springframework.web.client.body
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config) : AbstractRestClientAdapter(restClient,cf) {
 
 
+    fun postMessage(dok: EDI20DTOs.BusinessDocument) =
+        if (cf.isEnabled) {
+            restClient
+                .post()
+                .uri(cf::messagesURI)
+                .accept(APPLICATION_JSON)
+                .body(dok)
+                .retrieve()
+                .toBodilessEntity()
+                .also { log.trace("Response {}", it.statusCode) }
+        }
+        else  throw NotImplementedError("Messages not available")
 
-    @Retryable(include = [RecoverableException::class])
+
+
+        @Retryable(include = [RecoverableException::class])
     fun messages() =
         if (cf.isEnabled) {
             restClient
