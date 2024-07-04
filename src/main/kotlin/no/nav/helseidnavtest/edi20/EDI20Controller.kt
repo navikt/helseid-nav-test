@@ -26,6 +26,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         val msg = generator.genererDialogmelding(pasient, UUID.randomUUID())
         val writer = StringWriter()
+        log.trace("Marshalling XML")
         Jaxb2Marshaller().apply {
             setMarshallerProperties(mapOf(Marshaller.JAXB_FORMATTED_OUTPUT to true))
             setClassesToBeBound(
