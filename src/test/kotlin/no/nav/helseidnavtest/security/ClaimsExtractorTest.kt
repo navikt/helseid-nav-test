@@ -46,7 +46,7 @@ class ClaimsExtractorTest   {
                     "hpr_number" to "123456"
             ),
             PID to "12345678901",
-            HPR_NUMBER to "123456", SECURITY_LEVEL to "4",
+            HPR_NUMBER to 123456, SECURITY_LEVEL to "4",
             ASSURANCE_LEVEL to "high",
             "given_name" to "Ola",
             "middle_name" to "mellom",
