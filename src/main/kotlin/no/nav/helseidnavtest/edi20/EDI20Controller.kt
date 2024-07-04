@@ -1,12 +1,12 @@
 package no.nav.helseidnavtest.edi20
-import jakarta.xml.bind.Marshaller
 import jakarta.xml.bind.Marshaller.*
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
+import no.nav.helseidnavtest.edi20.BusinessDocument.*
+import no.nav.helseidnavtest.edi20.BusinessDocument.Properties.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
-import no.nav.helseopplysninger.fellesformat2.XMLEIFellesformat
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.io.StringWriter
-import java.util.*
-
+import java.util.UUID
+import java.util.Base64.getEncoder
 
 @RestController(EDI20)
 class EDI20Controller(private val a: EDI20RestClientAdapter, private val generator: DialogmeldingGenerator) {
@@ -60,7 +60,6 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                         </ns4:Address>
                         <ns4:HealthcareProfessional>
                             <ns4:FamilyName>VITS</ns4:FamilyName>
-                            <ns4:MiddleName></ns4:MiddleName>
                             <ns4:GivenName>GRØNN</ns4:GivenName>
                             <ns4:Ident>
                                 <ns4:Id>05898597468</ns4:Id>
@@ -114,7 +113,8 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
             </ns4:Document>
         </ns4:MsgHead>
     """.trimIndent()
-    protected val log = getLogger(EDI20Controller::class.java)
+
+    private val log = getLogger(EDI20Controller::class.java)
 
     @GetMapping("/messages") fun messages() = a.messages()
 
@@ -135,8 +135,8 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                     XMLMsgHead::class.java)
             }.createMarshaller().marshal(hodemelding, writer)
             log.info("XML {}", xml)
-            val b64 = Base64.getEncoder().encodeToString(xml.toByteArray())
-            val bd = EDI20DTOs.BusinessDocument(b64, EDI20DTOs.Properties(EDI20DTOs.System("HelseIdNavTest", "1.0.0")))
+            val b64 = getEncoder().encodeToString(xml.toByteArray())
+            val bd = BusinessDocument(b64, Properties(System("HelseIdNavTest", "1.0.0")))
             a.postMessage(bd)
             return "OK"
         }
@@ -144,6 +144,5 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
             log.error("Feil ved generering av dialogmelding", e)
             return "NOT OK"
         }
-
     }
 }

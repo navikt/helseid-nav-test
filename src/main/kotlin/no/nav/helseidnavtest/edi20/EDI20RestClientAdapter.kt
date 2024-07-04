@@ -13,7 +13,7 @@ import org.springframework.web.client.body
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun postMessage(dok: EDI20DTOs.BusinessDocument) =
+    fun postMessage(dok: BusinessDocument) =
         if (cf.isEnabled) {
             restClient
                 .post()
