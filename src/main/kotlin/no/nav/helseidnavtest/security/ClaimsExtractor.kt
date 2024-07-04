@@ -16,11 +16,12 @@ class ClaimsExtractor(private val claims : Map<String,Any>) {
 
     private val log = getLogger(ClaimsExtractor::class.java)
     init {
-        log.info("Claims: $claims")
+        log.info("Claims: $claims ${claims[HPR_NUMBER]}")
     }
 
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
-    val hprNumber = HprId(claim(HPR_NUMBER))
+    val hprNumber =  (claims[HPR_DETAILS] as? Map<*,*>)?.let { HprId(it[HPR_NUMBER] as String)}?: throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $HPR_NUMBER", HPR_NUMBER)
+
     val securityLevel = claim(SECURITY_LEVEL)
     val navn = Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME))
 
