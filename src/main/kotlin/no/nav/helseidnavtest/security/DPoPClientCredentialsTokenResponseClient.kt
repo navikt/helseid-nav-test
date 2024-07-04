@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
@@ -32,7 +33,8 @@ import kotlin.reflect.jvm.isAccessible
 @Component
 class DPoPClientCredentialsTokenResponseClient(
     private val generator: DPoPBevisGenerator,
-    private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>
+    private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
+    private val mapper: ObjectMapper
 ) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
     private val restOperations =
@@ -117,7 +119,7 @@ class DPoPClientCredentialsTokenResponseClient(
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
         }
         runCatching {
-            MAPPER.readValue<Map<String,Any>>(res.body).run {
+            mapper.readValue<Map<String,Any>>(res.body).run {
                 OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
                     .expiresIn((this["expires_in"] as Int).toLong())
                     .scopes(setOf(this["scope"] as String))
