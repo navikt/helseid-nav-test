@@ -17,8 +17,9 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
 
     @GetMapping("/messages") fun messages() = a.messages()
 
-    @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): XMLEIFellesformat {
-        return generator.genererDialogmelding(pasient, UUID.randomUUID())
+    @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
+        log.info("XXX " + generator.genererDialogmelding(pasient, UUID.randomUUID()))
+        return "OK"
     }
 
 

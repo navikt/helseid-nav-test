@@ -29,7 +29,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             with(any) {
                 add(hodemelding(melding, arbeidstaker))
                 add(mottakenhetBlokk(melding))
-                add(sporinformasjonBlokk())     
+                add(sporinformasjonBlokk())
             }
         }
 
