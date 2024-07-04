@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20DTOs.*
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
@@ -14,7 +13,7 @@ import org.springframework.web.client.body
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun postMessage(dok: BusinessDocument) =
+    fun postMessage(dok: EDI20DTOs.BusinessDocument) =
         if (cf.isEnabled) {
             restClient
                 .post()
