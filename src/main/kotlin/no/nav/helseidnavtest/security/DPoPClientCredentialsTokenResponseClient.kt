@@ -119,16 +119,20 @@ class DPoPClientCredentialsTokenResponseClient(
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
         }
         runCatching {
-            mapper.readValue<Map<String,Any>>(res.body).run {
-                OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
-                    .expiresIn((this["expires_in"] as Int).toLong())
-                    .scopes(setOf(this["scope"] as String))
-                    .tokenType(dPoPTokenType())
-                    .additionalParameters(this)
-                    .build()
-            }
+            deserialize(res)
         }.getOrElse {
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()), it)
+        }
+    }
+
+    private fun deserialize(res: ClientHttpResponse) {
+        mapper.readValue<Map<String, Any>>(res.body).run {
+            OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
+                .expiresIn((this["expires_in"] as Int).toLong())
+                .scopes(setOf(this["scope"] as String))
+                .tokenType(dPoPTokenType())
+                .additionalParameters(this)
+                .build()
         }
     }
 
