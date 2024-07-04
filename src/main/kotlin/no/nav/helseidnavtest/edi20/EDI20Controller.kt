@@ -26,11 +26,11 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
 
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         try {
-            log.trace("Genererer melding")
+            log.info("Genererer melding")
             val msg = generator.genererDialogmelding(pasient, UUID.randomUUID())
-            log.trace("Generert melding OK")
+            log.info("Generert melding OK")
             val writer = StringWriter()
-            log.trace("Marshalling XML")
+            log.info("Marshalling XML")
             Jaxb2Marshaller().apply {
                 setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))
                 setClassesToBeBound(
@@ -39,7 +39,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                     XMLDialogmelding::class.java,
                     XMLMsgHead::class.java)
             }.createMarshaller().marshal(msg, writer)
-            log.trace("XML {}", writer.toString())
+            log.info("XML {}", writer.toString())
             val b64 = Base64.getEncoder().encodeToString(writer.toString().toByteArray())
             val bd = EDI20DTOs.BusinessDocument(b64, EDI20DTOs.Properties(EDI20DTOs.System("HelseIdNavTest", "1.0.0")))
             a.postMessage(bd)
