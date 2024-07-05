@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.edi20
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.BusinessDocument.Properties
 import no.nav.helseidnavtest.edi20.BusinessDocument.Properties.System
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
@@ -26,11 +27,12 @@ import java.util.Base64.getEncoder
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
     @Retryable(include = [RecoverableException::class])
-    fun poll() =
+    fun poll(herId: HerId) =
         if (cf.isEnabled) {
             restClient
                 .get()
                 .uri(cf::messagesURI)
+                .headers { it.add("herId", herId.verdi) }
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .body<List<MessageDTO>>().also { log.trace("Messages response {}", it) }
@@ -69,7 +71,6 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     }
 
     companion object {
-
         val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <ns4:MsgHead xmlns="http://www.kith.no/xmlstds/base64container" xmlns:ns5="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:ns4="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns3="http://www.kith.no/xmlstds/felleskomponent1">
             <ns4:MsgInfo>
