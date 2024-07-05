@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import java.net.URI
+import java.security.MessageDigest
 import java.time.Instant.now
 import java.util.*
 import java.util.Base64.*
@@ -40,7 +41,7 @@ class DPoPBevisGenerator(private val keyPair: ECKey = keyPair()) {
         }
     }.build()
 
-    private fun OAuth2AccessToken.hash() =  getEncoder().withoutPadding().encodeToString(getMessageDigestInstance(ES256).digest(tokenValue.toByteArray()))
+    private fun OAuth2AccessToken.hash() =  getEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
 
     private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")
