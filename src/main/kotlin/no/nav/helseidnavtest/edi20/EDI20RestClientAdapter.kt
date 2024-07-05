@@ -44,7 +44,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
 
     fun send(pasient: Fødselsnummer): Any {
-        val encoded = XML.encode() 
+        val encoded = XML.encode()
         val dok = BusinessDocument(encoded, Properties(System("HelseIdNavTest", "1.0.0")))
         return restClient
             .post()
@@ -72,8 +72,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 
     companion object {
 
-        val XML = """
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <ns4:MsgHead xmlns="http://www.kith.no/xmlstds/base64container" xmlns:ns5="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:ns4="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns3="http://www.kith.no/xmlstds/felleskomponent1">
             <ns4:MsgInfo>
                 <ns4:Type V="DIALOG_NOTAT" DN="Notat"/>
