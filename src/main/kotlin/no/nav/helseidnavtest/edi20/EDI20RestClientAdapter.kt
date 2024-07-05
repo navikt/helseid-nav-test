@@ -44,7 +44,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
 
     fun send(pasient: Fødselsnummer): Any {
-        val encoded = XML.encode() // marshal().encode()
+        val encoded = XML.encode() 
         val dok = BusinessDocument(encoded, Properties(System("HelseIdNavTest", "1.0.0")))
         return restClient
             .post()
