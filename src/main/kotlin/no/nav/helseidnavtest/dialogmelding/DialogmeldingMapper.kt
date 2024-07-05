@@ -140,6 +140,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
 
     private fun avsenderNAV() =
         HMOF.createXMLSender().apply {
+
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "NAV"
                 ident.add(HMOF.createXMLIdent().apply {
@@ -154,7 +155,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         HMOF.createXMLPatient().apply {
             with(arbeidstaker) {
                 familyName = navn.etternavn
-                middleName = navn.mellomnavn
+                navn.mellomnavn?.let { middleName = it }
                 givenName = navn.fornavn
                 ident.add(ident(id))
             }
