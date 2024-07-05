@@ -21,6 +21,7 @@ import org.springframework.web.client.body
 import java.io.StringWriter
 import java.util.*
 import java.util.Base64.getEncoder
+import java.util.Base64.getUrlEncoder
 
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
@@ -55,7 +56,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .also { log.trace("Response {}", it.statusCode) }
     }
 
-    private fun String.encode() = getEncoder().encodeToString(toByteArray())
+    private fun String.encode() = getUrlEncoder().encodeToString(toByteArray())
     private fun marshal() : String {
         val xml = StringWriter()
         Jaxb2Marshaller().apply {
