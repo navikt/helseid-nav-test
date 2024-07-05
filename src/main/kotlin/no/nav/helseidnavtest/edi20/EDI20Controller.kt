@@ -9,6 +9,8 @@ import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.MediaType.APPLICATION_XML
+import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -118,7 +120,8 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
 
     @GetMapping("/messages") fun messages() = a.messages()
 
-    @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
+
+    @GetMapping("/dialogmelding", produces = [APPLICATION_XML_VALUE]) fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         try {
             log.info("Genererer melding")
             val hodemelding = generator.hodemeldng(pasient, UUID.randomUUID()).also {
@@ -141,7 +144,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
         }
         catch (e: Exception) {
             log.error("Feil ved generering av dialogmelding", e)
-            return "NOT OK"
+            return xml
         }
     }
 }
