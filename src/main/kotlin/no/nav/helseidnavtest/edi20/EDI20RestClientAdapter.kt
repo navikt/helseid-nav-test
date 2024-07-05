@@ -43,7 +43,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
 
     fun send(pasient: Fødselsnummer): Any {
-        val encoded = marshal().encode()
+        val encoded = XML.encode() // marshal().encode()
         val dok = BusinessDocument(encoded, Properties(System("HelseIdNavTest", "1.0.0")))
         return restClient
             .post()
@@ -79,54 +79,38 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
                 <ns4:MIGversion>v1.2 2006-05-24</ns4:MIGversion>
                 <ns4:GenDate>2024-07-04T16:55:43.904207659</ns4:GenDate>
                 <ns4:MsgId>ce3de801-9cae-4cb6-aa4e-b682cb6de3c9</ns4:MsgId>
-                <ns4:Sender>
-                    <ns4:Organisation>
-                        <ns4:OrganisationName>NAV</ns4:OrganisationName>
-                        <ns4:Ident>
-                            <ns4:Id>889640782</ns4:Id>
-                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregister"/>
-                        </ns4:Ident>
-                        <ns4:Ident>
-                            <ns4:Id>8142519</ns4:Id>
-                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                        </ns4:Ident>
-                    </ns4:Organisation>
-                </ns4:Sender>
-                <ns4:Receiver>
-                    <ns4:Organisation>
-                        <ns4:OrganisationName>SMESTAD LEGESENTER AS</ns4:OrganisationName>
-                        <ns4:Ident>
-                            <ns4:Id>8142520</ns4:Id>
-                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                        </ns4:Ident>
-                        <ns4:Ident>
-                            <ns4:Id>997671694</ns4:Id>
-                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregister"/>
-                        </ns4:Ident>
-                        <ns4:Address>
-                            <ns4:Type V="RES" DN="Besøksadresse"/>
-                            <ns4:StreetAdr>Sørkedalsveien 90b</ns4:StreetAdr>
-                            <ns4:PostalCode>0377</ns4:PostalCode>
-                            <ns4:City>OSLO</ns4:City>
-                        </ns4:Address>
-                        <ns4:HealthcareProfessional>
-                            <ns4:FamilyName>VITS</ns4:FamilyName>
-                            <ns4:GivenName>GRØNN</ns4:GivenName>
-                            <ns4:Ident>
-                                <ns4:Id>05898597468</ns4:Id>
-                                <ns4:TypeId V="FNR" S="2.16.578.1.12.4.1.1.8116" DN="Fødselsnummer"/>
-                            </ns4:Ident>
-                            <ns4:Ident>
-                                <ns4:Id>565501872</ns4:Id>
-                                <ns4:TypeId V="HPR" S="2.16.578.1.12.4.1.1.8116" DN="HPR-nummer"/>
-                            </ns4:Ident>
-                            <ns4:Ident>
-                                <ns4:Id>96588</ns4:Id>
-                                <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.8116" DN="HER-id"/>
-                            </ns4:Ident>
-                        </ns4:HealthcareProfessional>
-                    </ns4:Organisation>
-                </ns4:Receiver>
+               <ns4:Sender>
+			<ns4:Organisation>
+				<ns4:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns4:OrganisationName>
+				<ns4:Ident>
+					<ns4:Id>90128</ns4:Id>
+					<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+				</ns4:Ident>
+				<ns4:Organisation>
+					<ns4:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns4:OrganisationName>
+					<ns4:Ident>
+						<ns4:Id>8142519</ns4:Id>
+						<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+					</ns4:Ident>
+				</ns4:Organisation>
+			</ns4:Organisation>
+		</ns4:Sender>
+		<ns4:Receiver>
+			<ns4:Organisation>
+				<ns4:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns4:OrganisationName>
+				<ns4:Ident>
+					<ns4:Id>90128</ns4:Id>
+					<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+				</ns4:Ident>
+				<ns4:Organisation>
+					<ns4:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns4:OrganisationName>
+					<ns4:Ident>
+						<ns4:Id>8142520</ns4:Id>
+						<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+					</ns4:Ident>
+				</ns4:Organisation>
+			</ns4:Organisation>
+		</ns4:Receiver>
                 <ns4:Patient>
                     <ns4:FamilyName>KONTROLL</ns4:FamilyName>
                     <ns4:GivenName>FIRKANTET</ns4:GivenName>

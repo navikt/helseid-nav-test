@@ -14,16 +14,13 @@ class EDI20Controller(private val a: EDI20Service) {
 
     @GetMapping("/messages") fun messages() = a.poll()
 
-
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
-        try {
-            log.info("Genererer melding")
+        runCatching {
             a.send(pasient)
             return "OK"
-        }
-        catch (e: Exception) {
+        }.getOrElse { e ->
             log.error("Feil ved generering av dialogmelding", e)
-            return "NOK OK"
+            return "NOT OK"
         }
     }
 }
