@@ -121,11 +121,10 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         try {
             log.info("Genererer melding")
-            val msg = generator.genererDialogmelding(pasient, UUID.randomUUID()).also {
+            val hodemelding = generator.hodemeldng(pasient, UUID.randomUUID()).also {
                 log.info("Melding generert: {}", it)
             }
             val writer = StringWriter()
-            val hodemelding = msg.any.first { it is XMLMsgHead } as XMLMsgHead
             log.info("Marshalling XML ")
             Jaxb2Marshaller().apply {
                 setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))

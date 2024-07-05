@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.*
 import no.nav.helseidnavtest.security.ClaimsExtractor
+import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.access.prepost.PreAuthorize
@@ -18,6 +19,10 @@ import java.util.UUID.*
 class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
 
     @PreAuthorize("hasAuthority('LE_4')")
+    fun hodemeldng(pasient: Fødselsnummer, uuid: UUID) {
+        genererDialogmelding(pasient, uuid).any.first { it is XMLMsgHead } as XMLMsgHead
+    }
+
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
