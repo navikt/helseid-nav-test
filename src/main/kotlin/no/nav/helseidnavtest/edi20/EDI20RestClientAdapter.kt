@@ -56,7 +56,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .also { log.trace("Response {}", it.statusCode) }
     }
 
-    private fun String.encode() = getUrlEncoder().withoutPadding().encodeToString(toByteArray())
+    private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
     private fun marshal() : String {
         val xml = StringWriter()
         Jaxb2Marshaller().apply {
