@@ -41,7 +41,7 @@ class DPoPBevisGenerator(private val keyPair: ECKey = keyPair()) {
         }
     }.build()
 
-    private fun OAuth2AccessToken.hash() =  getEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
+    private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
 
     private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")
