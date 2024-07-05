@@ -33,11 +33,11 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                         <ns4:OrganisationName>NAV</ns4:OrganisationName>
                         <ns4:Ident>
                             <ns4:Id>889640782</ns4:Id>
-                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregisteret"/>
+                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregister"/>
                         </ns4:Ident>
                         <ns4:Ident>
                             <ns4:Id>8142519</ns4:Id>
-                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="Identifikator fra Helsetjenesteenhetsregisteret"/>
+                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
                         </ns4:Ident>
                     </ns4:Organisation>
                 </ns4:Sender>
@@ -46,11 +46,11 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                         <ns4:OrganisationName>SMESTAD LEGESENTER AS</ns4:OrganisationName>
                         <ns4:Ident>
                             <ns4:Id>8142520</ns4:Id>
-                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="Identifikator fra Helsetjenesteenhetsregisteret"/>
+                            <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
                         </ns4:Ident>
                         <ns4:Ident>
                             <ns4:Id>997671694</ns4:Id>
-                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregisteret"/>
+                            <ns4:TypeId V="ENH" S="2.16.578.1.12.4.1.1.9051" DN="Organisasjonsnummeret i Enhetsregister"/>
                         </ns4:Ident>
                         <ns4:Address>
                             <ns4:Type V="RES" DN="Besøksadresse"/>
@@ -71,7 +71,7 @@ class EDI20Controller(private val a: EDI20RestClientAdapter, private val generat
                             </ns4:Ident>
                             <ns4:Ident>
                                 <ns4:Id>96588</ns4:Id>
-                                <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.8116" DN="Identifikator fra Helsetjenesteenhetsregisteret"/>
+                                <ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.8116" DN="HER-id"/>
                             </ns4:Ident>
                         </ns4:HealthcareProfessional>
                     </ns4:Organisation>
