@@ -39,6 +39,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
     private val jwk = JWK.parse(assertion)
     private val edi20_1_jwk = JWK.parse(jwk1)
+    private val edi20_2_jwk = JWK.parse(jwk2)
+
 
 
     private val log = getLogger(SecurityConfig::class.java)
