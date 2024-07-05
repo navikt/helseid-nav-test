@@ -21,21 +21,19 @@ import org.springframework.web.client.body
 import java.io.StringWriter
 import java.util.*
 import java.util.Base64.getEncoder
-import java.util.Base64.getUrlEncoder
 
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
-        @Retryable(include = [RecoverableException::class])
-    fun messages() =
+    @Retryable(include = [RecoverableException::class])
+    fun poll() =
         if (cf.isEnabled) {
             restClient
                 .get()
                 .uri(cf::messagesURI)
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .body<String>().also { log.trace("Messages response {}", it) }
-                .also { log.trace("Response {}", it) }
+                .body<List<MessageDTO>>().also { log.trace("Messages response {}", it) }
         }
     else  throw NotImplementedError("Messages not available")
 

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service
 @Service
 class EDI20Service(val a: EDI20RestClientAdapter, val b: EDI20Config) {
 
-    fun poll() = a.messages()
+    fun poll() = a.poll()
     fun send(pasient: Fødselsnummer) = a.send(pasient)
 }

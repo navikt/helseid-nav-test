@@ -33,12 +33,12 @@ import java.time.Instant.*
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
-class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@Value("\${helse-id.test1.jwk}") private val test1: String) {
+class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@Value("\${helse-id.test1.jwk}") private val jwk1: String,@Value("\${helse-id.test2.jwk}") private val jwk2: String) {
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val jwk = JWK.parse(assertion)
-    private val jwk1 = JWK.parse(test1)
+    private val edi20_1_jwk = JWK.parse(jwk1)
 
 
     private val log = getLogger(SecurityConfig::class.java)
@@ -147,7 +147,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     private fun jwkResolver(): (ClientRegistration) -> JWK = {
         if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
             when (it.registrationId) {
-                "edi20-1" -> jwk1.also { log.info("Klient: edi20-1") }
+                "edi20-1" -> edi20_1_jwk.also { log.info("Klient: edi20-1") }
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         } else {

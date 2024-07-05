@@ -1,6 +1,8 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
+import java.util.*
 
 data class BusinessDocument(val businessDocument: String, val properties: Properties) {
     data class Properties(
@@ -29,3 +31,5 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
         )
     }
 }
+
+data class MessageDTO(val herId: HerId,val messageIds: List<UUID>)
