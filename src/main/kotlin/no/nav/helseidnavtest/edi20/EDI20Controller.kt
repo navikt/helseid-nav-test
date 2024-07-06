@@ -14,7 +14,7 @@ class EDI20Controller(private val a: EDI20Service) {
 
     private val log = getLogger(EDI20Controller::class.java)
 
-    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf("8142519","8142519"))) @RequestParam herId: String) = a.poll(HerId(herId))
+    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf("8142519","8142520"))) @RequestParam herId: String) = a.poll(HerId(herId))
 
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         runCatching {
