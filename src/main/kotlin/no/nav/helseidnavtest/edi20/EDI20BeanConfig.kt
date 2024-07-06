@@ -30,8 +30,7 @@ class EDI20BeanConfig {
 
     @Bean
     @Qualifier(EDI20)
-    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DPoPBevisGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = DPoPEnabledTokenExchangingRequestInterceptor (
-        proofGenerator, "$EDI20-1", clientManager)
+    fun edi20ClientCredentialsRequestInterceptor(proofGenerator: DPoPBevisGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = DPoPEnabledTokenExchangingRequestInterceptor (proofGenerator, clientManager)
 }
 
 

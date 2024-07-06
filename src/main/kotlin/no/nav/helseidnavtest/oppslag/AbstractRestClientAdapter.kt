@@ -109,8 +109,9 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
 
 open class TokenExchangingRequestInterceptor(
     private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    defaultShortName: String?,
-    private val tokenType: AccessTokenType = BEARER) : ClientHttpRequestInterceptor {
+    private val tokenType: AccessTokenType = BEARER,
+    defaultShortName: String? = null
+) : ClientHttpRequestInterceptor {
     private val resolver = HerIdToShortNameMapper(defaultShortName)
     protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
@@ -143,8 +144,10 @@ open class TokenExchangingRequestInterceptor(
             }
     }
 }
-class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPBevisGenerator, shortName: String,
-                                                   clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
+class DPoPEnabledTokenExchangingRequestInterceptor(
+    private val generator: DPoPBevisGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
+    shortName: String?= null
+) : TokenExchangingRequestInterceptor(clientManager, DPOP, shortName) {
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
         with(req){
             authorize(this)?.let { client ->
