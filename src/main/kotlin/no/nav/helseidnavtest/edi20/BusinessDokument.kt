@@ -4,9 +4,9 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import java.util.*
 
-data class BusinessDocument(val businessDocument: String, val properties: Properties) {
+data class BusinessDocument(val businessDocument: String, val properties: Properties = Properties()) {
     data class Properties(
-        val system: System,
+        val system: System = System(),
         val contentTransferEncoding: String = "base64",
         val contentType: String = APPLICATION_XML_VALUE,
         val ebxmlOverrides: EbxmlOverrides? = null
@@ -24,8 +24,8 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
         )
 
         data class System(
-            val applicationName: String,
-            val applicationVersion: String,
+            val applicationName: String = "HelseIdNavTest",
+            val applicationVersion: String = "1.0.0",
             val middlewareName: String? = null,
             val middlewareVersion: String? = null
         )

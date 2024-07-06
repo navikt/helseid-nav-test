@@ -18,9 +18,9 @@ class EDI20Controller(private val a: EDI20Service) {
 
     @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf(SENDER_ID, MOTTAKER_ID))) @RequestParam herId: String) = a.poll(HerId(herId))
 
-    @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
+    @GetMapping("/dialogmelding") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(SENDER_ID, MOTTAKER_ID))) @RequestParam herId: String): String {
         runCatching {
-            a.send(pasient)
+            a.send(HerId(herId))
             return "OK"
         }.getOrElse {
             log.error("Feil ved generering av dialogmelding", it)

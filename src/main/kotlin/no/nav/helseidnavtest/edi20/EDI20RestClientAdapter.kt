@@ -8,6 +8,8 @@ import no.nav.helseidnavtest.edi20.BusinessDocument.Properties
 import no.nav.helseidnavtest.edi20.BusinessDocument.Properties.System
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAKER_ID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER_ID
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
@@ -29,32 +31,35 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 
     @Retryable(include = [RecoverableException::class])
     fun poll(herId: HerId) =
-        if (cf.isEnabled) {
-            restClient
-                .get()
-                .uri { b -> cf.messagesURI(b,herId) }
-                .headers { it.add(HERID, herId.verdi) }
-                .accept(APPLICATION_JSON)
-                .retrieve()
-                .body<List<MessageDTO>>().also { log.trace("Messages response {}", it) }
-        }
-    else  throw NotImplementedError("Messages not available")
+        restClient
+            .get()
+            .uri { b -> cf.messagesURI(b,herId) }
+            .headers { it.add(HERID, herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .body<List<MessageDTO>>().also { log.trace("Messages response {}", it) }
 
 
-    override fun toString() =
-        "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
-
-    fun send(pasient: Fødselsnummer): Any {
-        val encoded = XML.encode()
-        val dok = BusinessDocument(encoded, Properties(System("HelseIdNavTest", "1.0.0")))
+    fun send(herId: HerId): Any {
+        val substituted = String.format(XML, herId.verdi,other(herId))
+        log.trace("Substituted {}", substituted)
+        val encoded = substituted.encode()
+        val dok = BusinessDocument(encoded)
         return restClient
             .post()
             .uri(cf::messagesPostURI)
+            .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .body(dok)
             .retrieve()
             .toBodilessEntity()
-            .also { log.trace("Response {}", it.statusCode) }
+    }
+
+    private fun other(herId: HerId) =
+         when(herId.verdi) {
+            SENDER_ID ->  MOTTAKER_ID
+            MOTTAKER_ID ->  SENDER_ID
+            else -> throw IllegalArgumentException("Unknown herId $herId")
     }
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
@@ -70,6 +75,10 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         log.info("XML {}", xml.toString())
         return xml.toString()
     }
+
+
+    override fun toString() =
+        "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
 
     companion object {
         val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -89,7 +98,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 				<ns4:Organisation>
 					<ns4:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns4:OrganisationName>
 					<ns4:Ident>
-						<ns4:Id>8142519</ns4:Id>
+						<ns4:Id>%s</ns4:Id>
 						<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
 					</ns4:Ident>
 				</ns4:Organisation>
@@ -105,7 +114,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 				<ns4:Organisation>
 					<ns4:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns4:OrganisationName>
 					<ns4:Ident>
-						<ns4:Id>8142520</ns4:Id>
+						<ns4:Id>%s</ns4:Id>
 						<ns4:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
 					</ns4:Ident>
 				</ns4:Organisation>
