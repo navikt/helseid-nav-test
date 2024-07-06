@@ -1,4 +1,6 @@
 package no.nav.helseidnavtest.edi20
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
@@ -12,7 +14,7 @@ class EDI20Controller(private val a: EDI20Service) {
 
     private val log = getLogger(EDI20Controller::class.java)
 
-    @GetMapping("/messages") fun messages(@RequestParam herId: HerId) = a.poll(herId)
+    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(implementation = HerIds::class)) @RequestParam herId: HerId) = a.poll(herId)
 
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         runCatching {
@@ -23,6 +25,7 @@ class EDI20Controller(private val a: EDI20Service) {
             return "NOT OK"
         }
     }
+    @Schema(name = "HerId", description = "HerId for sender and mottager")
     enum class HerIds(val herId: HerId) {
         SENDER(EDI20Config.SENDER.first),
         MOTTAGER(EDI20Config.MOTTAGER.first)
