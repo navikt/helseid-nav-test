@@ -56,7 +56,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun markRead(id:UUID, herId: HerId) =
         restClient
             .put()
-            .uri { b -> b.path("/messages/$id/read/${herId.verdi}").build() }
+            .uri { b -> cf.markReadURI(b,id,herId) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()

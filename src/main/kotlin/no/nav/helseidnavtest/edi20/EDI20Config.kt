@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.web.util.UriBuilder
 import java.lang.Boolean.FALSE
+import java.util.*
 
 @ConfigurationProperties(EDI20)
 class EDI20Config(baseUri: URI,
@@ -24,6 +25,10 @@ class EDI20Config(baseUri: URI,
         .queryParam("IncludeAppRec", FALSE)
         .queryParam("ToHerIds",herId.verdi)
         .build().also { log.info("messagesURI: $it")}
+
+    fun markReadURI(b: UriBuilder, id: UUID, herId: HerId) = b
+        .path("/messages/$id/read/${herId.verdi}")
+        .build().also { log.info("markReadUrl: $it")}
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
