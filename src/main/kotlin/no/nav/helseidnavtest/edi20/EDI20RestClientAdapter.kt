@@ -4,12 +4,10 @@ import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.BusinessDocument.Properties
-import no.nav.helseidnavtest.edi20.BusinessDocument.Properties.System
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAKER_ID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER_ID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
@@ -57,8 +55,8 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 
     private fun other(herId: HerId) =
          when(herId.verdi) {
-            SENDER_ID ->  MOTTAKER_ID
-            MOTTAKER_ID ->  SENDER_ID
+            EDI1_ID ->  EDI2_ID
+            EDI2_ID ->  EDI1_ID
             else -> throw IllegalArgumentException("Unknown herId $herId")
     }
 

@@ -28,10 +28,10 @@ class EDI20Config(baseUri: URI,
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        const val SENDER_ID = "8142519"
-        const val MOTTAKER_ID = "8142520"
-        val SENDER  = HerId(SENDER_ID) to "edi20-1"
-        val MOTTAGER = HerId(MOTTAKER_ID) to "edi20-2"
+        const val EDI1_ID = "8142519"
+        const val EDI2_ID = "8142520"
+        val EDI_1  = HerId(EDI1_ID) to "edi20-1"
+        val EDI_2 = HerId(EDI2_ID) to "edi20-2"
         const val DEFAULT_MESSAGES_PATH = "/messages"
         const val EDI20 = "edi20"
         const val HERID = "herId"

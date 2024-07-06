@@ -3,8 +3,8 @@ package no.nav.helseidnavtest.oppslag
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAGER
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.security.DPoPBevisGenerator
 import org.slf4j.LoggerFactory.getLogger
@@ -139,8 +139,8 @@ open class TokenExchangingRequestInterceptor(
 
         private fun shortNameFromHeader(req: HttpRequest) =
             when (val herId = req.headers[HERID]?.single()) {
-                SENDER.first.verdi   -> SENDER.second
-                MOTTAGER.first.verdi -> MOTTAGER.second
+                EDI_1.first.verdi   -> EDI_1.second
+                EDI_2.first.verdi -> EDI_2.second
                 null -> throw IllegalArgumentException("No herId in request header")
                 else -> throw IllegalArgumentException("Unknown herId  $herId in request header")
             }.also {

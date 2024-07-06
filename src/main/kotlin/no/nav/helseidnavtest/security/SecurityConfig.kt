@@ -1,8 +1,8 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAGER
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -151,8 +151,8 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     private fun jwkResolver(): (ClientRegistration) -> JWK = {
         if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
             when (it.registrationId) {
-                SENDER.second -> edi20_1_jwk.also { log.info("Klient: edi20-1") }
-                MOTTAGER.second -> edi20_2_jwk.also { log.info("Klient: edi20-2") }
+                EDI_1.second -> edi20_1_jwk.also { log.info("Klient: edi20-1") }
+                EDI_2.second -> edi20_2_jwk.also { log.info("Klient: edi20-2") }
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         } else {
