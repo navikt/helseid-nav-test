@@ -14,7 +14,7 @@ class EDI20Controller(private val a: EDI20Service) {
 
     private val log = getLogger(EDI20Controller::class.java)
 
-    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf("8142519","8142519"), implementation = HerId::class)) @RequestParam herId: HerId) = a.poll(herId)
+    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf("8142519","8142519"))) @RequestParam herId: String) = a.poll(HerId(herId))
 
     @GetMapping("/dialogmelding") fun dialogmelding(@RequestParam pasient: Fødselsnummer): String {
         runCatching {
@@ -24,10 +24,5 @@ class EDI20Controller(private val a: EDI20Service) {
             log.error("Feil ved generering av dialogmelding", it)
             return "NOT OK"
         }
-    }
-    @Schema(name = "HerId", description = "HerId for sender and mottager")
-    enum class HerIds(val herId: HerId) {
-        SENDER(EDI20Config.SENDER.first),
-        MOTTAGER(EDI20Config.MOTTAGER.first)
     }
 }
