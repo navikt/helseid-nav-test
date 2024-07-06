@@ -136,8 +136,8 @@ open class TokenExchangingRequestInterceptor(
 
         private fun shortNameFromHeader(req: HttpRequest) =
             when (val herId = req.headers[HERID]?.single()) {
-                SENDER.first   -> SENDER.second
-                MOTTAGER.first -> MOTTAGER.second
+                SENDER.first.verdi   -> SENDER.second
+                MOTTAGER.first.verdi -> MOTTAGER.second
                 null -> throw IllegalArgumentException("No herId in request header")
                 else -> throw IllegalArgumentException("Unknown herId  $herId in request header")
             }

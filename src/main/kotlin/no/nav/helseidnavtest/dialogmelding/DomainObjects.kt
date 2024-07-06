@@ -129,6 +129,9 @@ value class PartnerId(val value: String) {
 @JvmInline
 value class HerId(val verdi : String)  {
     constructor(verdi: Int) : this("$verdi")
+    companion object {
+        val SENDER = HerId
+    }
 }
 
 @JvmInline
