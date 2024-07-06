@@ -53,6 +53,15 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .toBodilessEntity()
     }
 
+    fun markRead(id:UUID, herId: HerId) =
+        restClient
+            .put()
+            .uri { b -> b.path("/messages/$id/read/${herId.verdi}").build() }
+            .headers { it.add(HERID, herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .toBodilessEntity()
+
     private fun other(herId: HerId) =
          when(herId.verdi) {
             EDI1_ID ->  EDI2_ID
