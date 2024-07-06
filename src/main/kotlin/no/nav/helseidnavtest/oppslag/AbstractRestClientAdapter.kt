@@ -123,7 +123,7 @@ open class TokenExchangingRequestInterceptor(
 
     protected fun authorize(req: HttpRequest) =
         clientManager.authorize(
-            withClientRegistrationId(resolver.resolve(req))
+            withClientRegistrationId(resolver.map(req))
                 .principal("whatever")
                 .build()
         )?.apply {  ->
@@ -133,7 +133,9 @@ open class TokenExchangingRequestInterceptor(
                 }
         }
     private class HerIdToShortNameMapper(private val defaultShortName: String?)  {
-        fun resolve(req : HttpRequest) = defaultShortName ?: shortNameFromHeader(req)
+        private val log = getLogger(HerIdToShortNameMapper::class.java)
+
+        fun map(req : HttpRequest) = defaultShortName ?: shortNameFromHeader(req)
 
         private fun shortNameFromHeader(req: HttpRequest) =
             when (val herId = req.headers[HERID]?.single()) {
@@ -141,19 +143,18 @@ open class TokenExchangingRequestInterceptor(
                 MOTTAGER.first.verdi -> MOTTAGER.second
                 null -> throw IllegalArgumentException("No herId in request header")
                 else -> throw IllegalArgumentException("Unknown herId  $herId in request header")
+            }.also {
+                log.info("Mapped to shortName $it from header")
             }
     }
 }
 class DPoPEnabledTokenExchangingRequestInterceptor(
     private val generator: DPoPBevisGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    shortName: String?= null
-) : TokenExchangingRequestInterceptor(clientManager, DPOP, shortName) {
+    shortName: String? = null) : TokenExchangingRequestInterceptor(clientManager, DPOP, shortName) {
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
         with(req){
-            authorize(this)?.let { client ->
-                generator.bevisFor(method, uri, client.accessToken).also {
-                    headers.set(DPOP.value, it)
-                }
+            authorize(this)?.let {
+                headers.set(DPOP.value, generator.bevisFor(method, uri, it.accessToken))
             }
             execution.execute(this, body)
         }
