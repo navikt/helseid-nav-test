@@ -31,6 +31,9 @@ class EDI20Controller(private val a: EDI20Service) {
         }
     }
     @PutMapping("/messages/{uuid}/read/{herId}")
-    fun markRead(@PathVariable uuid: UUID, @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
+    fun markRead(@PathVariable uuid: UUID, @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) {
+        log.info("XXXXXXXXXXXX")
         a.markRead(uuid, HerId(herId))
+
+    }
 }
