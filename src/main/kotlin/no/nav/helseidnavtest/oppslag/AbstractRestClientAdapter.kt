@@ -2,7 +2,9 @@ package no.nav.helseidnavtest.oppslag
 
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
-import no.nav.helseidnavtest.edi20.EDI20RestClientAdapter
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAGER
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.security.DPoPBevisGenerator
 import org.slf4j.LoggerFactory.getLogger
@@ -14,7 +16,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
 import org.springframework.web.client.RestClient
@@ -102,28 +103,26 @@ abstract class AbstractRestClientAdapter(protected open val restClient : RestCli
             toMDC(NAV_CONSUMER_ID, defaultValue)
             defaultValue
         }
-
         private fun toMDC(key : String, value : String?, defaultValue : String? = null) = MDC.put(key, value ?: defaultValue)
     }
 }
 
 open class TokenExchangingRequestInterceptor(
     private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    private val shortName: String,
-    private val tokenType: AccessTokenType = BEARER
-) : ClientHttpRequestInterceptor {
-
+    defaultShortName: String?,
+    private val tokenType: AccessTokenType = BEARER) : ClientHttpRequestInterceptor {
+    private val resolver = HerIdToShortNameMapper(defaultShortName)
     protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
-    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        authorize(req) ?: log.error("No authorized client for {}", shortName)
-        return execution.execute(req, body)
-    }
-
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
+        with(req) {
+            authorize(this)
+            execution.execute(this, body)
+        }
 
     protected fun authorize(req: HttpRequest) =
         clientManager.authorize(
-            withClientRegistrationId(shortName)
+            withClientRegistrationId(resolver.resolve(req))
                 .principal("whatever")
                 .build()
         )?.apply {  ->
@@ -132,18 +131,28 @@ open class TokenExchangingRequestInterceptor(
                     log.info("Token {} exchanged for {}", accessToken.tokenValue,clientRegistration.registrationId)
                 }
         }
+    private class HerIdToShortNameMapper(private val defaultShortName: String?)  {
+        fun resolve(req : HttpRequest) = defaultShortName ?: shortNameFromHeader(req)
+
+        private fun shortNameFromHeader(req: HttpRequest) =
+            when (val herId = req.headers[HERID]?.single()) {
+                SENDER.first   -> SENDER.second
+                MOTTAGER.first -> MOTTAGER.second
+                null -> throw IllegalArgumentException("No herId in request header")
+                else -> throw IllegalArgumentException("Unknown herId  $herId in request header")
+            }
+    }
 }
 class DPoPEnabledTokenExchangingRequestInterceptor(private val generator: DPoPBevisGenerator, shortName: String,
                                                    clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) : TokenExchangingRequestInterceptor(clientManager, shortName, DPOP) {
-    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
-        authorize(req)?.let { client ->
-            req.headers["herId"]?.let { shortName ->
-                log.info("herId fra header in interceptor $shortName")
+    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
+        with(req){
+            authorize(this)?.let { client ->
+                generator.bevisFor(method, uri, client.accessToken).also {
+                    headers.set(DPOP.value, it)
+                }
             }
-            generator.bevisFor(req.method, req.uri, client.accessToken).also {
-                req.headers.set(DPOP.value, it)
-            }
+            execution.execute(this, body)
         }
-        return execution.execute(req, body)
-    }
 }
+

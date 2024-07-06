@@ -27,8 +27,11 @@ class EDI20Config(baseUri: URI,
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        val SENDER  = "8142519" to "edi20-1"
+        val MOTTAGER = "8142520" to "edi20-2"
         const val DEFAULT_MESSAGES_PATH = "/messages"
         const val EDI20 = "edi20"
+        const val HERID = "herId"
         private const val DEFAULT_PING_PATH = ""
     }
 }
