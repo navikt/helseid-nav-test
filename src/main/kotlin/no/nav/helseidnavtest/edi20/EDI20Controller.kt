@@ -27,7 +27,7 @@ class EDI20Controller(private val a: EDI20Service) {
     }
     @Schema(name = "HerId", description = "HerId for sender and mottager")
     enum class HerIds(val herId: HerId) {
-        SENDER_19(EDI20Config.SENDER.first),
-        MOTTAGER_20(EDI20Config.MOTTAGER.first)
+        SENDER(EDI20Config.SENDER.first),
+        MOTTAGER(EDI20Config.MOTTAGER.first)
     }
 }
