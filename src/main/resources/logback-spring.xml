@@ -7,7 +7,7 @@
     <springProfile name="dev">
         <logger name="com.ibm.mq" level="info"/>
         <logger name="org.springframework.jms" level="info"/>
-        <logger name="org.springframework.security" level="info"/>
+        <logger name="org.springframework.security" level="trace"/>
         <logger name="reactor.netty.http.client.HttpClient" level="info"/>
         <logger name="no.nav.helse" level="trace"/>
         <logger name="org.springframework.web.client" level="trace"/>
