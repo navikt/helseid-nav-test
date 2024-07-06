@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MOTTAGER
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.SENDER
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -27,7 +29,7 @@ class EDI20Controller(private val a: EDI20Service) {
     }
     @Schema(name = "HerId", description = "HerId for sender and mottager")
     enum class HerIds(val herId: HerId) {
-        SENDER(EDI20Config.SENDER.first),
-        MOTTAGER(EDI20Config.MOTTAGER.first)
+        _8142519(SENDER.first),
+        _8142520(MOTTAGER.first)
     }
 }
