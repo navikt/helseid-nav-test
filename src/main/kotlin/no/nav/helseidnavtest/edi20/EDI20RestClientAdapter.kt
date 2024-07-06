@@ -32,7 +32,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         if (cf.isEnabled) {
             restClient
                 .get()
-                .uri(cf::messagesURI)
+                .uri { b -> cf.messagesURI(b,herId) }
                 .headers { it.add(HERID, herId.verdi) }
                 .accept(APPLICATION_JSON)
                 .retrieve()
