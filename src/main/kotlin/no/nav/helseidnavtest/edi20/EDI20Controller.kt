@@ -20,7 +20,7 @@ class EDI20Controller(private val a: EDI20Service) {
     @GetMapping("/dialogmelding") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
         a.send(HerId(herId))
 
-    @PutMapping(path = ["/mark/{uuid}/read/{herId}"])
+    @GetMapping(path = ["/mark/{uuid}/read/{herId}"])
     fun markRead(@PathVariable uuid: UUID, @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
         a.markRead(uuid, HerId(herId))
 
