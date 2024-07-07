@@ -21,8 +21,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.io.StringWriter
+import java.lang.String.format
 import java.util.*
 import java.util.Base64.getEncoder
+import kotlin.text.*
 
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
@@ -39,10 +41,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 
 
     fun send(herId: HerId): Any {
-        val substituted = String.format(XML, herId.verdi,other(herId))
-        log.trace("Substituted {}", substituted)
-        val encoded = substituted.encode()
-        val dok = BusinessDocument(encoded)
+        val dok = BusinessDocument(format(XML, herId.verdi, other(herId)).encode())
         return restClient
             .post()
             .uri(cf::messagesPostURI)
@@ -66,7 +65,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
          when(herId.verdi) {
             EDI1_ID ->  EDI2_ID
             EDI2_ID ->  EDI1_ID
-            else -> throw IllegalArgumentException("Unknown herId $herId")
+            else -> throw IllegalArgumentException("Ikke støttet herId $herId")
     }
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
