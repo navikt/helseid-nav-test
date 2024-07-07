@@ -14,6 +14,7 @@ import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.retry.annotation.Retryable
@@ -37,7 +38,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<String>()
-    
+
     fun poll(herId: HerId) =
         restClient
             .get()

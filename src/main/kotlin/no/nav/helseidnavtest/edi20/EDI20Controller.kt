@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
+import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -24,7 +25,7 @@ class EDI20Controller(private val a: EDI20Service) {
                  @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
         a.markRead(uuid, HerId(herId))
 
-    @GetMapping("/messages/{uuid}/")
+    @GetMapping("/messages/{uuid}/", produces = [APPLICATION_XML_VALUE])
     fun hentDokument(@PathVariable uuid: UUID,
                      @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
         a.hent(uuid, HerId(herId))
