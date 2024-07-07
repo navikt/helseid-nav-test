@@ -26,11 +26,16 @@ class EDI20Config(baseUri: URI,
         .queryParam("ToHerIds",herId.verdi)
         .build().also { log.info("messagesURI: $it")}
 
+    fun messagesURI(b: UriBuilder, uuid: UUID) =
+        b.path(DOK_PATH).build(uuid.toString())
+
+
     fun markReadURI(b: UriBuilder, id: UUID, herId: HerId) = b
         .path("/messages/$id/read/${herId.verdi}")
         .build().also { log.info("markReadUrl: $it")}
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+
 
     companion object {
         const val EDI1_ID = "8142519"
@@ -38,6 +43,7 @@ class EDI20Config(baseUri: URI,
         val EDI_1  = HerId(EDI1_ID) to "edi20-1"
         val EDI_2 = HerId(EDI2_ID) to "edi20-2"
         const val DEFAULT_MESSAGES_PATH = "/messages"
+        const val DOK_PATH  = DEFAULT_MESSAGES_PATH + "/{uuid}"
         const val EDI20 = "edi20"
         const val HERID = "herId"
         private const val DEFAULT_PING_PATH = ""

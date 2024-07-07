@@ -29,7 +29,15 @@ import kotlin.text.*
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
-    @Retryable(include = [RecoverableException::class])
+    fun hent(uuid: UUID,herId: HerId) =
+        restClient
+            .get()
+            .uri { b -> cf.messagesURI(b,uuid) }
+            .headers { it.add(HERID, herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .body<String>()
+    
     fun poll(herId: HerId) =
         restClient
             .get()
@@ -37,7 +45,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .body<List<MessageDTO>>().also { log.trace("Messages response {}", it) }
+            .body<List<MessageDTO>>()
 
 
     fun send(herId: HerId): Any {
