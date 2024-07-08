@@ -15,7 +15,7 @@ class EDI20Controller(private val a: EDI20Service) {
 
     @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String,
                                           @RequestParam(defaultValue = "false") apprec: Boolean) =
-        a.poll(HerId(herId))
+        a.poll(HerId(herId),apprec)
 
     @PostMapping("/messages") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
         a.send(HerId(herId))

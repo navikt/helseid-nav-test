@@ -8,16 +8,13 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
-import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -30,28 +27,28 @@ import kotlin.text.*
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun status(uuid: UUID,herId: HerId) =
+    fun status(id: UUID, herId: HerId) =
         restClient
             .get()
-            .uri { b -> cf.statusURI(b,uuid) }
+            .uri { b -> cf.statusURI(b,id) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .body<Map<String,Any>>()
+            .body<Any>()
 
-    fun hent(uuid: UUID,herId: HerId) =
+    fun hent(id: UUID, herId: HerId) =
         restClient
             .get()
-            .uri { b -> cf.messagesURI(b,uuid) }
+            .uri { b -> cf.messagesURI(b,id) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<String>()
 
-    fun poll(herId: HerId) =
+    fun poll(herId: HerId, appRec:  Boolean) =
         restClient
             .get()
-            .uri { b -> cf.messagesURI(b,herId) }
+            .uri { b -> cf.messagesURI(b,herId, appRec) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
