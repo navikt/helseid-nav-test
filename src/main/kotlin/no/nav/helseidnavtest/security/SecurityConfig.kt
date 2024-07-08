@@ -87,6 +87,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
     @Bean
     fun securityFilterChain(http: HttpSecurity, repo: ClientRegistrationRepository, successHandler: LogoutSuccessHandler): SecurityFilterChain {
         http {
+            csrf { disable() }
             oauth2Login {
                 authorizationEndpoint {
                     baseUri = authorizationEndpoint
