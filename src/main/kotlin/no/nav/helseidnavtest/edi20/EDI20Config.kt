@@ -34,6 +34,10 @@ class EDI20Config(baseUri: URI,
         .path("/messages/$id/read/${herId.verdi}")
         .build().also { log.info("markReadUrl: $it")}
 
+    fun statusURI(b: UriBuilder, id: UUID) =
+        b.path("/messages/$id/status")
+            .build(id.toString())
+
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
 

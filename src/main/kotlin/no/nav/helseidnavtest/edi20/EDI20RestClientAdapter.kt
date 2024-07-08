@@ -30,6 +30,15 @@ import kotlin.text.*
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
+    fun status(uuid: UUID,herId: HerId) =
+        restClient
+            .get()
+            .uri { b -> cf.statusURI(b,uuid) }
+            .headers { it.add(HERID, herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .body<Map<String,Any>>()
+
     fun hent(uuid: UUID,herId: HerId) =
         restClient
             .get()
