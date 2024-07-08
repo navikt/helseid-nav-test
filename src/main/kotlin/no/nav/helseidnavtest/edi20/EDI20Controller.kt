@@ -17,10 +17,10 @@ class EDI20Controller(private val a: EDI20Service) {
                                           @RequestParam(defaultValue = "false") apprec: Boolean) =
         a.poll(HerId(herId))
 
-    @GetMapping("/dialogmelding") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
+    @PostMapping("/messages") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
         a.send(HerId(herId))
 
-    @GetMapping("/mark/{uuid}/read/{herId}")
+    @PutMapping("/messages/{uuid}/read/{herId}")
     fun markRead(@PathVariable uuid: UUID,
                  @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
         a.markRead(uuid, HerId(herId))
