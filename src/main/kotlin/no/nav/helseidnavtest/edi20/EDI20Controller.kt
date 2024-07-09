@@ -30,7 +30,7 @@ class EDI20Controller(private val a: EDI20Service) {
                      @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
         a.hent(uuid, HerId(herId))
 
-    @GetMapping("/messages/{uuid}/status", produces = [APPLICATION_XML_VALUE])
+    @GetMapping("/messages/{uuid}/status")
     fun status(@PathVariable uuid: UUID,
                      @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
         a.status(uuid, HerId(herId))
