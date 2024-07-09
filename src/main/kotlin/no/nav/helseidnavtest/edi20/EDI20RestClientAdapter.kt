@@ -4,6 +4,7 @@ import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.edi20.Apprec.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
@@ -28,13 +29,14 @@ import kotlin.text.*
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
     fun kvittering(id: UUID, herId: HerId) =
-         restClient
-            .get()
+        restClient
+            .post()
             .uri { b -> cf.kvitteringURI(b,id, other(herId)) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
+            .body(Apprec(0, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0"))))
             .retrieve()
-            .body<Apprec>()
+            .body<String>()
 
     fun status(id: UUID, herId: HerId) =
         restClient
@@ -64,17 +66,14 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .body<List<Messages>>()
 
 
-    fun send(herId: HerId): Any {
-        val dok = BusinessDocument(format(XML, herId.verdi, other(herId)).encode())
-        return restClient
-            .post()
-            .uri(cf::messagesPostURI)
-            .headers { it.add(HERID, herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .body(dok)
-            .retrieve()
-            .toBodilessEntity()
-    }
+    fun send(herId: HerId) = restClient
+        .post()
+        .uri(cf::messagesPostURI)
+        .headers { it.add(HERID, herId.verdi) }
+        .accept(APPLICATION_JSON)
+        .body(BusinessDocument(format(XML, herId.verdi, other(herId)).encode()))
+        .retrieve()
+        .toBodilessEntity()
 
     fun lest(id:UUID, herId: HerId) =
         restClient

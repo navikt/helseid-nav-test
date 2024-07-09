@@ -34,7 +34,11 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
 
 data class Messages(val herId: HerId, val messageIds: List<UUID>)
 
-data class Apprec(val result: Int, val errorList: List<ApprecErrorDetail> = emptyList(), val properties: ApprecProperties) {
+data class Apprec(
+    val result: Int,
+    val properties: ApprecProperties,
+    val errorList: List<ApprecErrorDetail> = emptyList()
+) {
     data class ApprecProperties(val system: ApprecSystem)
     data class ApprecSystem(val applicationName: String, val applicationVersion: String, val middlewareName: String? = null,
                             val middlewareVersion: String? = null)
