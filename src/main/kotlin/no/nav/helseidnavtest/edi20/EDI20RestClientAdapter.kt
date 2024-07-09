@@ -34,7 +34,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .uri { b -> cf.kvitteringURI(b,id, other(herId)) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(Apprec(0, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0"))))
+            .body(Apprec(1, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0"))))
             .retrieve()
             .body<String>()
 
