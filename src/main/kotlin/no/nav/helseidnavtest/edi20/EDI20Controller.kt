@@ -13,26 +13,21 @@ import java.util.UUID
 @RequestMapping("/$EDI20")
 class EDI20Controller(private val a: EDI20Service) {
 
-    @GetMapping("/messages") fun messages(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String,
-                                          @RequestParam(defaultValue = "false") apprec: Boolean) =
+    @GetMapping("/messages") fun poll(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String, @RequestParam(defaultValue = "false") apprec: Boolean) =
         a.poll(HerId(herId),apprec)
 
-    @PostMapping("/messages") fun dialogmelding(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
+    @PostMapping("/messages") fun send(@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @RequestParam herId: String) =
         a.send(HerId(herId))
 
-    @PutMapping("/messages/{uuid}/read/{herId}")
-    fun markRead(@PathVariable uuid: UUID,
-                 @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
-        a.markRead(uuid, HerId(herId))
+    @PutMapping("/messages/{id}/read/{herId}")
+    fun lest(@PathVariable id: UUID, @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) @PathVariable herId: String) =
+        a.lest(id, HerId(herId))
 
-    @GetMapping("/messages/{uuid}/", produces = [APPLICATION_XML_VALUE])
-    fun hentDokument(@PathVariable uuid: UUID,
-                     @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
-        a.hent(uuid, HerId(herId))
+    @GetMapping("/messages/{id}/", produces = [APPLICATION_XML_VALUE])
+    fun les(@PathVariable id: UUID, @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
+        a.les(id, HerId(herId))
 
-    @GetMapping("/messages/{uuid}/status")
-    fun status(@PathVariable uuid: UUID,
-                     @Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
-        a.status(uuid, HerId(herId))
-
+    @GetMapping("/messages/{id}/status")
+    fun status(@PathVariable id: UUID,@Parameter(schema = Schema(allowableValues = arrayOf(EDI1_ID, EDI2_ID))) herId: String) =
+        a.status(id, HerId(herId))
 }

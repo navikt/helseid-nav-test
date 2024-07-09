@@ -36,7 +36,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .retrieve()
             .body<List<Status>>()
 
-    fun hent(id: UUID, herId: HerId) =
+    fun les(id: UUID, herId: HerId) =
         restClient
             .get()
             .uri { b -> cf.messagesURI(b,id) }
@@ -67,7 +67,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .toBodilessEntity()
     }
 
-    fun markRead(id:UUID, herId: HerId) =
+    fun lest(id:UUID, herId: HerId) =
         restClient
             .put()
             .uri { b -> cf.markReadURI(b,id,herId) }

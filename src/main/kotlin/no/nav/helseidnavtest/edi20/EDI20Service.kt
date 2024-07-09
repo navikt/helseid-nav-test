@@ -8,8 +8,8 @@ import java.util.UUID
 class EDI20Service(val a: EDI20RestClientAdapter, val b: EDI20Config) {
 
     fun status(id: UUID, herId: HerId) = a.status(id,herId)
-    fun hent(id: UUID, herId: HerId) = a.hent(id,herId)
+    fun les(id: UUID, herId: HerId) = a.les(id,herId)
     fun poll(herId: HerId, appRec: Boolean) = a.poll(herId, appRec)
     fun send(herId: HerId) = a.send(herId)
-    fun markRead(id: UUID, herId: HerId) = a.markRead(id, herId)
+    fun lest(id: UUID, herId: HerId) = a.lest(id, herId)
 }
