@@ -27,6 +27,15 @@ import kotlin.text.*
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
+    fun kvittering(id: UUID, herId: HerId) =
+         restClient
+            .get()
+            .uri { b -> cf.kvitteringURI(b,id, other(herId)) }
+            .headers { it.add(HERID, herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .body<Apprec>()
+
     fun status(id: UUID, herId: HerId) =
         restClient
             .get()
@@ -100,6 +109,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
+
 
     companion object {
         val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

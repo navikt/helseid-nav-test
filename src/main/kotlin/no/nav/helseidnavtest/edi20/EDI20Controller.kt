@@ -11,23 +11,26 @@ import java.util.UUID
 
 @RestController(EDI20)
 @RequestMapping("/$EDI20")
-class EDI20Controller(private val a: EDI20Service) {
+class EDI20Controller(private val service: EDI20Service) {
+
+    @PostMapping("/messages/{id}/Apprec") fun apprec(@PathVariable id: UUID,@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) @RequestParam herId: String) =
+        service.apprec(id,HerId(herId))
 
     @GetMapping("/messages") fun poll(@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) @RequestParam herId: String, @RequestParam(defaultValue = "false") apprec: Boolean) =
-        a.poll(HerId(herId),apprec)
+        service.poll(HerId(herId),apprec)
 
     @PostMapping("/messages") fun send(@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) @RequestParam herId: String) =
-        a.send(HerId(herId))
+        service.send(HerId(herId))
 
     @PutMapping("/messages/{id}/read/{herId}")
     fun lest(@PathVariable id: UUID, @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) @PathVariable herId: String) =
-        a.lest(id, HerId(herId))
+        service.lest(id, HerId(herId))
 
     @GetMapping("/messages/{id}/", produces = [APPLICATION_XML_VALUE])
     fun les(@PathVariable id: UUID, @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) herId: String) =
-        a.les(id, HerId(herId))
+        service.les(id, HerId(herId))
 
     @GetMapping("/messages/{id}/status")
     fun status(@PathVariable id: UUID,@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID])) herId: String) =
-        a.status(id, HerId(herId))
+        service.status(id, HerId(herId))
 }
