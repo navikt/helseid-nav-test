@@ -38,7 +38,7 @@ class EDI20Config(baseUri: URI,
 
     fun kvitteringURI(b: UriBuilder, id: UUID, other: String) =
         b.path("$DOK_PATH/Apprec/$other")
-            .build("$id")
+            .build("$id").also { log.info("kvitteringURI: $it")}
 
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
