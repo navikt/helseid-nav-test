@@ -32,4 +32,20 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
     }
 }
 
-data class MessageDTO(val herId: HerId,val messageIds: List<UUID>)
+data class Messages(val herId: HerId, val messageIds: List<UUID>)
+
+
+
+data class Status(
+    val herId: Int,
+    val acknowledged: Boolean,
+    val appRecReceived: Boolean,
+    val appRecResult: Int,
+    val appRecErrorList: List<ErrorDetail>)
+{
+    data class ErrorDetail(
+        val errorCode: String,
+        val description: String,
+        val oid: String,
+        val details: String)
+}

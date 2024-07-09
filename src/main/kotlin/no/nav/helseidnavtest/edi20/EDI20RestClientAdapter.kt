@@ -34,7 +34,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .body<Any>()
+            .body<Status>()
 
     fun hent(id: UUID, herId: HerId) =
         restClient
@@ -52,7 +52,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .body<List<MessageDTO>>()
+            .body<List<Messages>>()
 
 
     fun send(herId: HerId): Any {
