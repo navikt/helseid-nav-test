@@ -32,11 +32,11 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun kvittering(id: UUID, herId: HerId) =
         restClient
             .post()
-            .uri { b -> cf.kvitteringURI(b,id, other(herId)) }
+            .uri { b -> cf.kvitteringURI(b,id, herId.verdi) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
             .body(Apprec(1, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0")))
-                .also { log.info("Apprec{}", jacksonObjectMapper().writeValueAsString(it)) }
+                .also { log.info("Apprec {}", jacksonObjectMapper().writeValueAsString(it)) }
             )
             .retrieve()
             .body<String>()
