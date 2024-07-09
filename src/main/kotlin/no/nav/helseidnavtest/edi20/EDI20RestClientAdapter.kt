@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
@@ -34,84 +35,86 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .uri { b -> cf.kvitteringURI(b,id, other(herId)) }
             .headers { it.add(HERID, herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(Apprec(1, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0"))))
+            .body(Apprec(1, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0"))).also {
+                log.info("Apprec {}", jacksonObjectMapper().writeValueAsString(it))
+            })
             .retrieve()
             .body<String>()
 
-    fun status(id: UUID, herId: HerId) =
-        restClient
-            .get()
-            .uri { b -> cf.statusURI(b,id) }
-            .headers { it.add(HERID, herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .retrieve()
-            .body<List<Status>>()
+                    fun status(id: UUID, herId: HerId) =
+                        restClient
+                            .get()
+                            .uri { b -> cf.statusURI(b,id) }
+                            .headers { it.add(HERID, herId.verdi) }
+                            .accept(APPLICATION_JSON)
+                            .retrieve()
+                            .body<List<Status>>()
 
-    fun les(id: UUID, herId: HerId) =
-        restClient
-            .get()
-            .uri { b -> cf.messagesURI(b,id) }
-            .headers { it.add(HERID, herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .retrieve()
-            .body<String>()
+                    fun les(id: UUID, herId: HerId) =
+                        restClient
+                            .get()
+                            .uri { b -> cf.messagesURI(b,id) }
+                            .headers { it.add(HERID, herId.verdi) }
+                            .accept(APPLICATION_JSON)
+                            .retrieve()
+                            .body<String>()
 
-    fun poll(herId: HerId, appRec:  Boolean) =
-        restClient
-            .get()
-            .uri { b -> cf.messagesURI(b,herId, appRec) }
-            .headers { it.add(HERID, herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .retrieve()
-            .body<List<Messages>>()
-
-
-    fun send(herId: HerId) = restClient
-        .post()
-        .uri(cf::messagesPostURI)
-        .headers { it.add(HERID, herId.verdi) }
-        .accept(APPLICATION_JSON)
-        .body(BusinessDocument(format(XML, herId.verdi, other(herId)).encode()))
-        .retrieve()
-        .toBodilessEntity()
-
-    fun lest(id:UUID, herId: HerId) =
-        restClient
-            .put()
-            .uri { b -> cf.markReadURI(b,id,herId) }
-            .headers { it.add(HERID, herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .retrieve()
-            .toBodilessEntity()
-
-    private fun other(herId: HerId) =
-         when(herId.verdi) {
-            EDI1_ID ->  EDI2_ID
-            EDI2_ID ->  EDI1_ID
-            else -> throw IllegalArgumentException("Ikke støttet herId $herId")
-    }
-
-    private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
-    private fun marshal() : String {
-        val xml = StringWriter()
-        Jaxb2Marshaller().apply {
-            setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))
-            setClassesToBeBound(
-                XMLBase64Container::class.java,
-                XMLDialogmelding::class.java,
-                XMLMsgHead::class.java)
-        }.createMarshaller().marshal(generator.hodemeldng(Fødselsnummer("12345678901"), UUID.randomUUID()), xml)
-        log.info("XML {}", xml.toString())
-        return xml.toString()
-    }
+                    fun poll(herId: HerId, appRec:  Boolean) =
+                        restClient
+                            .get()
+                            .uri { b -> cf.messagesURI(b,herId, appRec) }
+                            .headers { it.add(HERID, herId.verdi) }
+                            .accept(APPLICATION_JSON)
+                            .retrieve()
+                            .body<List<Messages>>()
 
 
-    override fun toString() =
-        "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
+                    fun send(herId: HerId) = restClient
+                        .post()
+                        .uri(cf::messagesPostURI)
+                        .headers { it.add(HERID, herId.verdi) }
+                        .accept(APPLICATION_JSON)
+                        .body(BusinessDocument(format(XML, herId.verdi, other(herId)).encode()))
+                        .retrieve()
+                        .toBodilessEntity()
+
+                    fun lest(id:UUID, herId: HerId) =
+                        restClient
+                            .put()
+                            .uri { b -> cf.markReadURI(b,id,herId) }
+                            .headers { it.add(HERID, herId.verdi) }
+                            .accept(APPLICATION_JSON)
+                            .retrieve()
+                            .toBodilessEntity()
+
+                                private fun other(herId: HerId) =
+                            when(herId.verdi) {
+                                EDI1_ID ->  EDI2_ID
+                                EDI2_ID ->  EDI1_ID
+                                else -> throw IllegalArgumentException("Ikke støttet herId $herId")
+                            }
+
+                                    private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
+                                    private fun marshal() : String {
+                                val xml = StringWriter()
+                                Jaxb2Marshaller().apply {
+                                    setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))
+                                    setClassesToBeBound(
+                                        XMLBase64Container::class.java,
+                                        XMLDialogmelding::class.java,
+                                        XMLMsgHead::class.java)
+                                }.createMarshaller().marshal(generator.hodemeldng(Fødselsnummer("12345678901"), UUID.randomUUID()), xml)
+                                log.info("XML {}", xml.toString())
+                                return xml.toString()
+                            }
 
 
-    companion object {
-        val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                                    override fun toString() =
+                                "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
+
+
+                                        companion object {
+                                    val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <ns4:MsgHead xmlns="http://www.kith.no/xmlstds/base64container" xmlns:ns5="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:ns4="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns3="http://www.kith.no/xmlstds/felleskomponent1">
             <ns4:MsgInfo>
                 <ns4:Type V="DIALOG_NOTAT" DN="Notat"/>
@@ -176,5 +179,6 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             </ns4:Document>
         </ns4:MsgHead>
     """.trimIndent()
-    }
+                                }
+            }
 }
