@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class EDI20Service(val a: EDI20RestClientAdapter, val b: EDI20Config) {
+class EDI20Service(val adapter: EDI20RestClientAdapter) {
 
-    fun status(id: UUID, herId: HerId) = a.status(id,herId)
-    fun les(id: UUID, herId: HerId) = a.les(id,herId)
-    fun poll(herId: HerId, appRec: Boolean) = a.poll(herId, appRec)
-    fun send(herId: HerId) = a.send(herId)
-    fun lest(id: UUID, herId: HerId) = a.lest(id, herId)
-    fun apprec(id: UUID, herId: HerId) = a.kvittering(id,herId)
+    fun status(herId: HerId, id: UUID) = adapter.status(herId.verdi, id)
+    fun les(herId: HerId, id: UUID) = adapter.les(herId.verdi, id)
+    fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId.verdi, appRec)
+    fun send(herId: HerId) = adapter.send(herId.verdi)
+    fun lest(herId: HerId, id: UUID) = adapter.lest(herId.verdi, id)
+    fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId.verdi, id)
 
 }

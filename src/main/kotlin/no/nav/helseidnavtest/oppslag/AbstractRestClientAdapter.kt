@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.oppslag
 
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.*
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
@@ -9,6 +10,7 @@ import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.security.DPoPBevisGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
@@ -18,6 +20,7 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.util.*
 
@@ -147,16 +150,5 @@ open class TokenExchangingRequestInterceptor(
                 log.info("Mapped to shortName $it from header")
             }
     }
-}
-class DPoPEnabledTokenExchangingRequestInterceptor(
-    private val generator: DPoPBevisGenerator, clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    shortName: String? = null) : TokenExchangingRequestInterceptor(clientManager, DPOP, shortName) {
-    override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
-        with(req){
-            authorize(this)?.let {
-                headers.set(DPOP.value, generator.bevisFor(method, uri, it.accessToken))
-            }
-            execution.execute(this, body)
-        }
 }
 

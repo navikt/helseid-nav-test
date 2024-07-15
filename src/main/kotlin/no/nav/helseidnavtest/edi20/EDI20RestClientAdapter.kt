@@ -1,11 +1,8 @@
 package no.nav.helseidnavtest.edi20
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
-import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.Apprec.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
@@ -15,6 +12,7 @@ import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
@@ -29,66 +27,65 @@ import kotlin.text.*
 @Component
 class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun kvittering(id: UUID, herId: HerId) =
+    fun apprec(herId: String, id: UUID) =
         restClient
             .post()
-            .uri { b -> cf.kvitteringURI(b,id, herId.verdi) }
-            .headers { it.add(HERID, herId.verdi) }
+            .uri { cf.apprecURI(it,id, herId) }
+            .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
-            .body(Apprec(1, ApprecProperties(ApprecSystem("HelseIdNavTest", "1.0.0")))
-                .also { log.info("Apprec {}", jacksonObjectMapper().writeValueAsString(it)) }
-            )
+            .body(Apprec.OK)
             .retrieve()
             .body<String>()
 
-    fun status(id: UUID, herId: HerId) =
+    fun status(herId: String, id: UUID) =
         restClient
             .get()
-            .uri { b -> cf.statusURI(b,id) }
-            .headers { it.add(HERID, herId.verdi) }
+            .uri { cf.statusURI(it,id) }
+            .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Status>>()
 
-    fun les(id: UUID, herId: HerId) =
+    fun les(herId: String, id: UUID) =
         restClient
             .get()
-            .uri { b -> cf.messagesURI(b,id) }
-            .headers { it.add(HERID, herId.verdi) }
+            .uri { cf.lesURI(it,id) }
+            .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<String>()
 
-    fun poll(herId: HerId, appRec:  Boolean) =
+    fun poll(herId: String, appRec: Boolean) =
         restClient
             .get()
-            .uri { b -> cf.messagesURI(b,herId, appRec) }
-            .headers { it.add(HERID, herId.verdi) }
+            .uri { cf.pollURI(it,herId, appRec) }
+            .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Messages>>()
 
 
-    fun send(herId: HerId) = restClient
-        .post()
-        .uri(cf::messagesPostURI)
-        .headers { it.add(HERID, herId.verdi) }
-        .accept(APPLICATION_JSON)
-        .body(BusinessDocument(format(XML, herId.verdi, other(herId)).encode()))
-        .retrieve()
-        .toBodilessEntity()
+    fun send(herId: String) =
+        restClient
+            .post()
+            .uri(cf::sendURI)
+            .headers { herIdHeader(it, herId) }
+            .accept(APPLICATION_JSON)
+            .body(BusinessDocument(format(XML, herId, other(herId)).encode()))
+            .retrieve()
+            .toBodilessEntity()
 
-    fun lest(id:UUID, herId: HerId) =
+    fun lest(herId: String, id: UUID) =
         restClient
             .put()
-            .uri { b -> cf.markReadURI(b,id,herId) }
-            .headers { it.add(HERID, herId.verdi) }
+            .uri { cf.lestURI(it,id,herId) }
+            .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .toBodilessEntity()
 
-    private fun other(herId: HerId) =
-        when(herId.verdi) {
+    private fun other(herId: String) =
+        when(herId) {
             EDI1_ID ->  EDI2_ID
             EDI2_ID ->  EDI1_ID
             else -> throw IllegalArgumentException("Ikke støttet herId $herId")
@@ -107,6 +104,8 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         log.info("XML {}", xml.toString())
         return xml.toString()
     }
+
+    private fun herIdHeader(headers: HttpHeaders, herId: String) = headers.add(HERID, herId)
 
 
     override fun toString() =

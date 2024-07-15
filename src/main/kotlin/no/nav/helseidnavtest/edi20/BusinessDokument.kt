@@ -4,6 +4,9 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import java.util.*
 
+private const val APP_NAVN = "HelseIdNavTest"
+private const val VERSJON = "1.0.0"
+
 data class BusinessDocument(val businessDocument: String, val properties: Properties = Properties()) {
     data class Properties(
         val system: System = System(),
@@ -24,8 +27,8 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
         )
 
         data class System(
-            val applicationName: String = "HelseIdNavTest",
-            val applicationVersion: String = "1.0.0",
+            val applicationName: String = APP_NAVN,
+            val applicationVersion: String = VERSJON,
             val middlewareName: String? = null,
             val middlewareVersion: String? = null
         )
@@ -34,15 +37,15 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
 
 data class Messages(val herId: HerId, val messageIds: List<UUID>)
 
-data class Apprec(
-    val result: Int,
-    val properties: ApprecProperties,
-    val errorList: List<ApprecErrorDetail> = emptyList()
+data class Apprec(val result: Int, val properties: ApprecProperties = ApprecProperties(), val errorList: List<ApprecErrorDetail> = emptyList()
 ) {
-    data class ApprecProperties(val system: ApprecSystem)
-    data class ApprecSystem(val applicationName: String, val applicationVersion: String, val middlewareName: String? = null,
+    data class ApprecProperties(val system: ApprecSystem = ApprecSystem())
+    data class ApprecSystem(val applicationName: String = APP_NAVN, val applicationVersion: String = VERSJON, val middlewareName: String? = null,
                             val middlewareVersion: String? = null)
     data class ApprecErrorDetail(val errorCode: String? = null,  val details: String? = null)
+    companion object  {
+        val OK = Apprec(1)
+    }
 }
 
 data class ErrorDetail(
@@ -57,6 +60,3 @@ data class Status(
     val appRecReceived: Boolean,
     val appRecResult: Int,
     val appRecErrorList: List<ErrorDetail> = emptyList())
-{
-
-}
