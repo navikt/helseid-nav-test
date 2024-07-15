@@ -62,7 +62,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .body<List<Messages>>()
+            .body<List<Meldinger>>()
 
 
     fun send(herId: String) =
