@@ -4,6 +4,7 @@ import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal.body
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpEntity
@@ -26,7 +27,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             contentType = MULTIPART_FORM_DATA
         }
          val body = LinkedMultiValueMap<String, Any>().apply {
-            add("file",  InputStreamResource(stream))
+            add("file",  ByteArrayResource(stream.readAllBytes()))
         }
 
         val requestEntity = HttpEntity<MultiValueMap<String, Any>>(body, headers)
