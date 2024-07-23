@@ -18,9 +18,6 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestClient
 import java.io.InputStream
 import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Path
-
 
 @Component
 class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, private val cf: EDI20DeftConfig) : AbstractRestClientAdapter(restClient,cf) {
@@ -31,11 +28,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             contentType = MULTIPART_FORM_DATA
         }
          val body = LinkedMultiValueMap<String, Any>().apply {
-            add("file",  getTestFile())
+            add("file",  stream.readAllBytes())
         }
-
-        val requestEntity = HttpEntity<MultiValueMap<String, Any>>(body, headers)
-
+        
         return restClient
             .post()
             .uri { cf.uploadURI(it,herId) }
@@ -46,17 +41,10 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
                     .build()
                 it.herIdHeader(herId)
             }
-            .body(requestEntity)
+            .body(body)
             .retrieve()
             .toBodilessEntity()
             .headers.location
-    }
-
-
-    fun getTestFile() : Resource {
-        val testFile = Files.createTempFile("test-file", ".txt")
-        Files.write(testFile, "Hello World !!, This is a test file.".toByteArray())
-        return  FileSystemResource(testFile.toFile())
     }
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
