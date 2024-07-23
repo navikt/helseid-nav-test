@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.client.HttpSyncGraphQlClient
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.*
@@ -54,6 +55,7 @@ class PDLClientBeanConfig {
     @Bean
     fun restClientCustomizer() = RestClientCustomizer {
         it.requestInterceptor(correlatingRequestInterceptor(HELSE))
+        it.requestFactory(HttpComponentsClientHttpRequestFactory())
     }
 }
 

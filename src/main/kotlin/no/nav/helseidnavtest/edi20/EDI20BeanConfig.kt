@@ -21,12 +21,6 @@ import org.springframework.web.client.RestClient.*
 class EDI20BeanConfig {
 
     @Bean
-    fun restClientCustomizer() =
-        RestClientCustomizer {
-            it.requestFactory(HttpComponentsClientHttpRequestFactory())
-        }
-
-    @Bean
     @Qualifier(EDI20)
     fun edi20RestClient(b: Builder, cfg: EDI20Config, @Qualifier(EDI20) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
         b.baseUrl("${cfg.baseUri}")
