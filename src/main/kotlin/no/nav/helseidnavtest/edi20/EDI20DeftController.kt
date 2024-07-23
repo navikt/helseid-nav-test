@@ -13,5 +13,5 @@ class EDI20DeftController(private val deft: EDI20DeftService) {
 
     @PostMapping(OBJECT_PATH, consumes = [MULTIPART_FORM_DATA_VALUE])
     fun upload(@RequestParam("file") file: MultipartFile,@Herid @RequestParam herId: String) =
-       deft.upload(file.bytes, of(herId)).also { println("Uploaded $file")}
+       deft.upload(file.inputStream, of(herId)).also { println("Uploaded $file")}
 }
