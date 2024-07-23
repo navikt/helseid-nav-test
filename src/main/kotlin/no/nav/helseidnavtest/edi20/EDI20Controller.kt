@@ -1,25 +1,21 @@
 package no.nav.helseidnavtest.edi20
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
+
 import no.nav.helseidnavtest.dialogmelding.HerId.Companion.of
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import kotlin.annotation.AnnotationRetention.*
-import kotlin.annotation.AnnotationTarget.*
 
 
 @RestController(EDI20)
 @RequestMapping("/$EDI20/")
 class EDI20Controller(private val edi: EDI20Service) {
 
-    @PostMapping("${DOK_PATH}Apprec")
+
+    @PostMapping("${DOK_PATH}/Apprec")
     fun apprec(@Herid @RequestParam herId: String,
                @PathVariable id: UUID) =
         edi.apprec(of(herId), id)
@@ -33,7 +29,7 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun send(@Herid @RequestParam herId: String) =
         edi.send(of(herId))
 
-    @PutMapping("${DOK_PATH}read/{herId}")
+    @PutMapping("${DOK_PATH}/read/{herId}")
     fun lest(@Herid @PathVariable herId: String,
              @PathVariable id: UUID) =
         edi.lest(of(herId), id)
@@ -43,13 +39,8 @@ class EDI20Controller(private val edi: EDI20Service) {
             @PathVariable id: UUID) =
         edi.les(of(herId), id)
 
-    @GetMapping("${DOK_PATH}status")
+    @GetMapping("${DOK_PATH}/status")
     fun status(@Herid herId: String,
                @PathVariable id: UUID) =
         edi.status(of(herId), id)
-
-    @Target(VALUE_PARAMETER)
-    @Retention(RUNTIME)
-    @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID]))
-    annotation class Herid
 }

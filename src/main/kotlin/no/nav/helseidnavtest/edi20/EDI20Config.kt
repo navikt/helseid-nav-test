@@ -42,7 +42,7 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         val EDI_1  = HerId(EDI1_ID) to "$EDI20-1"
         val EDI_2 = HerId(EDI2_ID) to  "$EDI20-2"
         const val MESSAGES_PATH = "messages"
-        const val DOK_PATH  = "$MESSAGES_PATH/{id}/"
+        const val DOK_PATH  = "$MESSAGES_PATH/{id}"
         const val HERID = "herId"
         private const val DEFAULT_PING_PATH = ""
     }
