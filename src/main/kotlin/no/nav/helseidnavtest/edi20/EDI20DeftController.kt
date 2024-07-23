@@ -12,6 +12,6 @@ import org.springframework.web.multipart.MultipartFile
 class EDI20DeftController(private val deft: EDI20DeftService) {
 
     @PostMapping(OBJECT_PATH, consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun upload(@RequestParam("file") file: MultipartFile,@Herid @RequestParam herId: String) =
-       deft.upload(file.inputStream, of(herId)).also { println("Uploaded $file")}
+    fun upload(@RequestPart("file") file: MultipartFile,@Herid @RequestParam herId: String) =
+       deft.upload(file, of(herId)).also { println("Uploaded $file")}
 }
