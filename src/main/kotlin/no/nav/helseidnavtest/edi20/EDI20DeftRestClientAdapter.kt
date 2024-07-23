@@ -7,17 +7,18 @@ import org.springframework.http.ContentDisposition
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestClient
+import java.net.URI
 
 
 @Component
 class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20DeftConfig) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun upload(bytes: ByteArray, herId: String) {
+    fun upload(bytes: ByteArray, herId: String): URI? {
 
-        var parts = LinkedMultiValueMap<String, Any>().apply {
+        val parts = LinkedMultiValueMap<String, Any>().apply {
             add("file", bytes)
         }
-        restClient
+        return restClient
             .post()
             .uri { cf.uploadURI(it,herId) }
             .headers {
@@ -25,8 +26,12 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, priva
                     .attachment()
                     .filename("Filename")
                     .build()
+
             }
             .body(parts)
+            .retrieve()
+            .toBodilessEntity()
+            .headers.location
     }
 
 
