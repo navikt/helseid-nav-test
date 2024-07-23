@@ -32,7 +32,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .post()
             .uri { cf.apprecURI(it,id, herId) }
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .body(Apprec.OK)
             .retrieve()
@@ -42,7 +42,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .get()
             .uri { cf.statusURI(it,id) }
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Status>>()
@@ -51,7 +51,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .get()
             .uri { cf.lesURI(it,id) }
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<String>()
@@ -60,7 +60,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .get()
             .uri { cf.pollURI(it,herId, appRec) }
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Meldinger>>()
@@ -70,7 +70,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .body(BusinessDocument(format(XML, herId, herId.other()).encode()))
             .retrieve()
@@ -80,7 +80,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         restClient
             .put()
             .uri { cf.lestURI(it,id,herId) }
-            .headers { herIdHeader(it, herId) }
+            .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .toBodilessEntity()
@@ -99,7 +99,6 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
         return xml.toString()
     }
 
-    private fun herIdHeader(headers: HttpHeaders, herId: String) = headers.add(HERID, herId)
 
 
     override fun toString() =

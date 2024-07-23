@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
+import org.springframework.http.HttpHeaders
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
@@ -19,3 +21,5 @@ object EDI20Utils {
 @Retention(RUNTIME)
 @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID]))
 annotation class Herid
+
+fun HttpHeaders.herIdHeader(herId: String) = add(HERID, herId)

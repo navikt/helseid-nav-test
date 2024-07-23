@@ -26,7 +26,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, priva
                     .attachment()
                     .filename("Filename")
                     .build()
-
+                it.herIdHeader(herId)
             }
             .body(parts)
             .retrieve()
