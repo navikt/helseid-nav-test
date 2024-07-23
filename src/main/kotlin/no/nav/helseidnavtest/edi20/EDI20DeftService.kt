@@ -6,5 +6,5 @@ import java.util.UUID
 
 @Service
 class EDI20DeftService(val adapter: EDI20DeftRestClientAdapter) {
-   fun upload(id: HerId) = adapter.upload(id.verdi)
+   fun upload(bytes: ByteArray, id: HerId) = adapter.upload(bytes,id.verdi)
 }

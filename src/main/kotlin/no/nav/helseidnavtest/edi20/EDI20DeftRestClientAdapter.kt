@@ -6,16 +6,17 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ContentDisposition
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestClient
 
 
 @Component
 class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20DeftConfig) : AbstractRestClientAdapter(restClient,cf) {
 
-    fun upload(herId: String) {
+    fun upload(bytes: ByteArray, herId: String) {
 
-        var parts: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        var parts = LinkedMultiValueMap<String, Any>().apply {
+            add("file", bytes)
+        }
         restClient
             .post()
             .uri { cf.uploadURI(it,herId) }
@@ -25,6 +26,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, priva
                     .filename("Filename")
                     .build()
             }
+            .body(parts)
     }
 
 
