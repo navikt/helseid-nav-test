@@ -70,21 +70,23 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun dPoPTokenResponse(request: RequestEntity<*>) =
         with(request) {
-            body?.let {
+            body?.let {b ->
                 log.info("Requesting DPoP token from ${request.url}")
                 restClient.method(POST)
                     .uri(url)
                     .headers {
-                        it.addAll(headers)
-                        it.add(DPOP.value, generator.bevisFor(POST, url))
+                        it.apply {
+                            addAll(headers)
+                            add(DPOP.value, generator.bevisFor(POST, url))
+                        }
                     }
-                    .body(it)
+                    .body(b)
                     .exchange(førNonce(this))
             } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No body in request", request.url.toString()))
         }
 
     private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
-        if (res.statusCode == BAD_REQUEST && res.headers[DPOP_NONCE] != null) {
+        if (BAD_REQUEST == res.statusCode  && res.headers[DPOP_NONCE] != null) {
             runCatching {
                 medNonce(request, req, nonce(res))
             }.getOrElse {
@@ -103,14 +105,14 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun medNonce(request: RequestEntity<*>, req: HttpRequest, nonce: Nonce?) =
         with(request) {
-            body?.let {
+            body?.let {b ->
                 restClient.method(POST)
                     .uri(url)
                     .headers {
                         it.addAll(headers)
                         it.add(DPOP.value, generator.bevisFor(POST, req.uri, nonce = nonce))
                     }
-                    .body(it)
+                    .body(b)
                     .exchange(exchangeEtterNonce())
             }
         } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No body in request", request.url.toString()))

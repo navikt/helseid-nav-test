@@ -7,6 +7,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
+import no.nav.helseidnavtest.edi20.EDI20Utils.other
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
@@ -71,7 +72,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .uri(cf::sendURI)
             .headers { herIdHeader(it, herId) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(format(XML, herId, other(herId)).encode()))
+            .body(BusinessDocument(format(XML, herId, herId.other()).encode()))
             .retrieve()
             .toBodilessEntity()
 
@@ -83,13 +84,6 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
             .accept(APPLICATION_JSON)
             .retrieve()
             .toBodilessEntity()
-
-    private fun other(herId: String) =
-        when(herId) {
-            EDI1_ID ->  EDI2_ID
-            EDI2_ID ->  EDI1_ID
-            else -> throw IllegalArgumentException("Ikke støttet herId $herId")
-        }
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
     private fun marshal() : String {
