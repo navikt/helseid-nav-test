@@ -24,7 +24,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { cf.uploadURI(it,herId) }
             .headers {
                 it.contentDisposition = ContentDisposition
-                    .attachment()
+                    .inline()
                     .filename("Filename")
                     .build()
                 it.herIdHeader(herId)
