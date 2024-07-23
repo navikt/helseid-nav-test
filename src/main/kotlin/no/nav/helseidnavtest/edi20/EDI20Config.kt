@@ -11,7 +11,6 @@ import java.util.*
 @ConfigurationProperties(EDI20)
 class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
 
-
     fun sendURI(b: UriBuilder) =
         b.path(MESSAGES_PATH).build()
 

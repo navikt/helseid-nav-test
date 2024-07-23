@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.security
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -81,11 +80,11 @@ class DPoPClientCredentialsTokenResponseClient(
                         }
                     }
                     .body(b)
-                    .exchange(førNonce(this))
+                    .exchange(utenNonce(this))
             } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No body in request", request.url.toString()))
         }
 
-    private fun førNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
+    private fun utenNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         if (BAD_REQUEST == res.statusCode  && res.headers[DPOP_NONCE] != null) {
             runCatching {
                 medNonce(request, req, nonce(res))
@@ -145,7 +144,6 @@ class DPoPClientCredentialsTokenResponseClient(
                 call(DPOP.value)
             }
 
-        private val MAPPER = jacksonObjectMapper()
         const val DPOP_NONCE = "dpop-nonce"
         private const val INVALID_RESPONSE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)

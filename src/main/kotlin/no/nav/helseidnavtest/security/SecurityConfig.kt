@@ -160,7 +160,4 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             throw IllegalArgumentException("Ukjent autentiseringsmetode: ${it.clientAuthenticationMethod}")
         }
     }
-
-    companion object    {
-    }
 }
