@@ -4,16 +4,12 @@ import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Utils.other
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
