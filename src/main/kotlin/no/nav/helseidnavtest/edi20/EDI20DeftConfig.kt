@@ -16,9 +16,9 @@ import org.springframework.web.util.UriBuilder
 
 
 @ConfigurationProperties(EDI20DEFT)
-class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
-    protected val log = getLogger(EDI20DeftConfig::class.java)
+class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, EDI20DEFT, enabled) {
 
+    private val log = getLogger(EDI20DeftConfig::class.java)
 
     fun uploadURI(b: UriBuilder, herId: String) =
         b.path(OBJECT_PATH)

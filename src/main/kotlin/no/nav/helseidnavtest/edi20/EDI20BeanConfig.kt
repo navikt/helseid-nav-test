@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DPoPBevisGenerator
 import org.springframework.beans.factory.annotation.Qualifier
@@ -27,6 +28,14 @@ class EDI20BeanConfig {
         .requestInterceptors {
            it.add(clientCredentialsRequestInterceptor)
        }.build()
+
+    @Bean
+    @Qualifier(EDI20DEFT)
+    fun edideft20RestClient(b: Builder, cfg: EDI20DeftConfig, @Qualifier(EDI20) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
+        b.baseUrl("${cfg.baseUri}")
+            .requestInterceptors {
+                it.add(clientCredentialsRequestInterceptor)
+            }.build()
 }
 
 @Component

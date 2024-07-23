@@ -127,11 +127,11 @@ pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
 edi20:
   base-uri: https://api.tjener.test.melding.nhn.no
-
+edi20deft:
+  base-uri: https://api.deft.test.melding.nhn.no
 springdoc:
   swagger-ui:
     csrf:
       enabled: true
-edi20deft:
-  base-uri: https://api.deft.test.melding.nhn.no
+
 

@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ContentDisposition
@@ -11,7 +12,7 @@ import java.net.URI
 
 
 @Component
-class EDI20DeftRestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20DeftConfig) : AbstractRestClientAdapter(restClient,cf) {
+class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, private val cf: EDI20DeftConfig) : AbstractRestClientAdapter(restClient,cf) {
 
     fun upload(bytes: ByteArray, herId: String): URI? {
 
