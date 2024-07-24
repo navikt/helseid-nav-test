@@ -6,6 +6,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import org.springframework.http.HttpHeaders
+import java.net.URI
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
 fun String.other() =
@@ -20,3 +21,5 @@ fun String.other() =
 annotation class Herid
 
 fun HttpHeaders.herId(herId: String) = add(HERID, herId)
+
+fun URI.key() = path.substringAfterLast('/')

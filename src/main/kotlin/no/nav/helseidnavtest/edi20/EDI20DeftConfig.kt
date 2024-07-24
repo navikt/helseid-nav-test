@@ -17,6 +17,8 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
             .build()
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+    fun deleteURI(b: UriBuilder, key: String) =
+        b.path(DELETE_PATH).build(key)
 
     companion object {
         private const val DEFAULT_PING_PATH = ""
@@ -24,5 +26,6 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
         private const val RECEIVER_HER_IDS = "ReceiverHerIds"
         const val EDI20DEFT = "edi20deft"
         const val OBJECT_PATH = "objects"
+        const val DELETE_PATH = "$OBJECT_PATH/{key}"
     }
 }
