@@ -74,3 +74,6 @@ data class Status(
     val appRecReceived: Boolean,
     val appRecResult: ApprecResult,
     val appRecErrorList: List<ErrorDetail> = emptyList())
+
+data class DeftStatus(val receiverDownloadStatus: Map<String, Boolean>)
+

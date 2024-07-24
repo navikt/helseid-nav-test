@@ -29,7 +29,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { cf.statusURI(it, key) }
             .headers { it.herId(herid) }
             .retrieve()
-            .body<Map<String, String>>()
+            .body<DeftStatus>()
 
     fun slett(key: String, herid: String) =
         restClient
