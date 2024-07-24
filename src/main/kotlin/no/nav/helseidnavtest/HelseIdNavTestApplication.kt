@@ -1,6 +1,6 @@
 package no.nav.helseidnavtest
+
 import no.nav.boot.conditionals.Cluster.Companion.profiler
-import org.springframework.boot.WebApplicationType.*
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
@@ -15,9 +15,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableWebMvc
 @EnableMethodSecurity
 @ConfigurationPropertiesScan
-@EnableRetry(proxyTargetClass=true)
+@EnableRetry(proxyTargetClass = true)
 @EnableJms
 class HelseIdNavTestApplication
+
 fun main(args: Array<String>) {
     runApplication<HelseIdNavTestApplication>(*args) {
         setAdditionalProfiles(*profiler())

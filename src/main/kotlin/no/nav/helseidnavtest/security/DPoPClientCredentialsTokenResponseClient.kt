@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
@@ -64,12 +63,18 @@ class DPoPClientCredentialsTokenResponseClient(
             log.info("Requesting vanilla token from ${request.url}")
             restOperations.exchange(request, OAuth2AccessTokenResponse::class.java).body!!
         }.getOrElse {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}", null), it)
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_RESPONSE,
+                    "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}",
+                    null
+                ), it
+            )
         }
 
     private fun dPoPTokenResponse(request: RequestEntity<*>) =
         with(request) {
-            body?.let {b ->
+            body?.let { b ->
                 log.info("Requesting DPoP token from ${request.url}")
                 restClient.method(POST)
                     .uri(url)
@@ -81,30 +86,54 @@ class DPoPClientCredentialsTokenResponseClient(
                     }
                     .body(b)
                     .exchange(utenNonce(this))
-            } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No body in request", request.url.toString()))
+            } ?: throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_RESPONSE,
+                    "No body in request",
+                    request.url.toString()
+                )
+            )
         }
 
     private fun utenNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
-        if (BAD_REQUEST == res.statusCode  && res.headers[DPOP_NONCE] != null) {
+        if (BAD_REQUEST == res.statusCode && res.headers[DPOP_NONCE] != null) {
             runCatching {
                 medNonce(request, req, nonce(res))
             }.getOrElse {
                 if (it is OAuth2AuthorizationException) throw it
-                throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Error response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()), it)
+                throw OAuth2AuthorizationException(
+                    OAuth2Error(
+                        INVALID_RESPONSE,
+                        "Error response from token endpoint: ${res.statusCode} ${res.body}",
+                        req.uri.toString()
+                    ), it
+                )
             }
         } else {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Error response from first shot token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_RESPONSE,
+                    "Error response from first shot token endpoint: ${res.statusCode} ${res.body}",
+                    req.uri.toString()
+                )
+            )
         }
     }
 
     private fun nonce(res: ClientHttpResponse) =
         res.headers[DPOP_NONCE]?.let {
             Nonce(it.single())
-        } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No nonce in response from token endpoint", null))
+        } ?: throw OAuth2AuthorizationException(
+            OAuth2Error(
+                INVALID_RESPONSE,
+                "No nonce in response from token endpoint",
+                null
+            )
+        )
 
     private fun medNonce(request: RequestEntity<*>, req: HttpRequest, nonce: Nonce?) =
         with(request) {
-            body?.let {b ->
+            body?.let { b ->
                 restClient.method(POST)
                     .uri(url)
                     .headers {
@@ -114,16 +143,34 @@ class DPoPClientCredentialsTokenResponseClient(
                     .body(b)
                     .exchange(exchangeEtterNonce())
             }
-        } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "No body in request", request.url.toString()))
+        } ?: throw OAuth2AuthorizationException(
+            OAuth2Error(
+                INVALID_RESPONSE,
+                "No body in request",
+                request.url.toString()
+            )
+        )
 
     private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
         if (!res.statusCode.is2xxSuccessful) {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Unexpected response from token endpoint: ${res.statusCode} ${res.body}", req.uri.toString()))
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_RESPONSE,
+                    "Unexpected response from token endpoint: ${res.statusCode} ${res.body}",
+                    req.uri.toString()
+                )
+            )
         }
         runCatching {
             deserialize(res)
         }.getOrElse {
-            throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE, "Error response from token endpoint: ${res.statusCode}", req.uri.toString()), it)
+            throw OAuth2AuthorizationException(
+                OAuth2Error(
+                    INVALID_RESPONSE,
+                    "Error response from token endpoint: ${res.statusCode}",
+                    req.uri.toString()
+                ), it
+            )
         }
     }
 

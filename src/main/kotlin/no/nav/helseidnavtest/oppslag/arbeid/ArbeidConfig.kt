@@ -4,7 +4,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.arbeid.ArbeidConfig.Companion.ARBEID
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.PeriodFormat
-import org.springframework.boot.convert.PeriodStyle.*
+import org.springframework.boot.convert.PeriodStyle.SIMPLE
 import org.springframework.web.util.UriBuilder
 import java.net.URI
 import java.time.LocalDate.now
@@ -13,11 +13,13 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 
 
 @ConfigurationProperties(ARBEID)
-class ArbeidConfig(baseUri: URI, private val path: String = PATH,
-                   enabled: Boolean = true,
-                   pingPath: String = PINGPATH,
-                   @PeriodFormat(SIMPLE) private val tidTilbake: Period = Period.ofYears(5),
-                   val sporingsinformasjon: Boolean = false) : AbstractRestConfig(baseUri, pingPath, ARBEID, enabled) {
+class ArbeidConfig(
+    baseUri: URI, private val path: String = PATH,
+    enabled: Boolean = true,
+    pingPath: String = PINGPATH,
+    @PeriodFormat(SIMPLE) private val tidTilbake: Period = Period.ofYears(5),
+    val sporingsinformasjon: Boolean = false
+) : AbstractRestConfig(baseUri, pingPath, ARBEID, enabled) {
 
     fun arbeidsforholdURI(b: UriBuilder) =
         b.path(path)
@@ -31,7 +33,7 @@ class ArbeidConfig(baseUri: URI, private val path: String = PATH,
 
     companion object {
         const val ARBEID = "arbeidsforhold"
-        private  const val PINGPATH = "internal/isAlive"
+        private const val PINGPATH = "internal/isAlive"
         private const val PATH = "api/v1/arbeidstaker/arbeidsforhold"
         private const val FOM = "ansettelsesperiodeFom"
         private const val SPORINGSINFORMASJON = "sporingsinformasjon"

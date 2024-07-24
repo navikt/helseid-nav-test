@@ -4,7 +4,6 @@ import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Utils.other
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
@@ -19,15 +18,18 @@ import java.io.StringWriter
 import java.lang.String.format
 import java.util.*
 import java.util.Base64.getEncoder
-import kotlin.text.*
 
 @Component
-class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private val cf: EDI20Config, private val generator: DialogmeldingGenerator) : AbstractRestClientAdapter(restClient,cf) {
+class EDI20RestClientAdapter(
+    @Qualifier(EDI20) restClient: RestClient,
+    private val cf: EDI20Config,
+    private val generator: DialogmeldingGenerator
+) : AbstractRestClientAdapter(restClient, cf) {
 
     fun apprec(herId: String, id: UUID) =
         restClient
             .post()
-            .uri { cf.apprecURI(it,id, herId) }
+            .uri { cf.apprecURI(it, id, herId) }
             .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .body(Apprec.OK)
@@ -37,7 +39,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun status(herId: String, id: UUID) =
         restClient
             .get()
-            .uri { cf.statusURI(it,id) }
+            .uri { cf.statusURI(it, id) }
             .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
@@ -46,7 +48,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun les(herId: String, id: UUID) =
         restClient
             .get()
-            .uri { cf.lesURI(it,id) }
+            .uri { cf.lesURI(it, id) }
             .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
@@ -55,7 +57,7 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun poll(herId: String, appRec: Boolean) =
         restClient
             .get()
-            .uri { cf.pollURI(it,herId, appRec) }
+            .uri { cf.pollURI(it, herId, appRec) }
             .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
@@ -75,26 +77,26 @@ class EDI20RestClientAdapter(@Qualifier(EDI20) restClient: RestClient, private v
     fun lest(herId: String, id: UUID) =
         restClient
             .put()
-            .uri { cf.lestURI(it,id,herId) }
+            .uri { cf.lestURI(it, id, herId) }
             .headers { it.herIdHeader(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .toBodilessEntity()
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
-    private fun marshal() : String {
+    private fun marshal(): String {
         val xml = StringWriter()
         Jaxb2Marshaller().apply {
             setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))
             setClassesToBeBound(
                 XMLBase64Container::class.java,
                 XMLDialogmelding::class.java,
-                XMLMsgHead::class.java)
+                XMLMsgHead::class.java
+            )
         }.createMarshaller().marshal(generator.hodemeldng(Fødselsnummer("12345678901"), UUID.randomUUID()), xml)
         log.info("XML {}", xml.toString())
         return xml.toString()
     }
-
 
 
     override fun toString() =

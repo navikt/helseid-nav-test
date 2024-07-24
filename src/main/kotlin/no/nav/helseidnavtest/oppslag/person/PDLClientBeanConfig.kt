@@ -18,7 +18,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestClient.*
+import org.springframework.web.client.RestClient.Builder
 
 
 @Configuration(proxyBeanMethods = false)
@@ -28,15 +28,19 @@ class PDLClientBeanConfig {
     @Qualifier(PDL)
     fun pdlRestClient(b: Builder, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
         b.requestInterceptors {
-           it.addAll(listOf(clientCredentialsRequestInterceptor,
-               temaRequestInterceptor(HELSE),
-               consumerRequestInterceptor(),
-               behandlingRequestInterceptor()))
-       }.build()
+            it.addAll(
+                listOf(
+                    clientCredentialsRequestInterceptor,
+                    temaRequestInterceptor(HELSE),
+                    consumerRequestInterceptor(),
+                    behandlingRequestInterceptor()
+                )
+            )
+        }.build()
 
     @Bean
     @Qualifier(PDL)
-    fun syncPdlGraphQLClient(@Qualifier(PDL) client: RestClient,cfg: PDLConfig) =
+    fun syncPdlGraphQLClient(@Qualifier(PDL) client: RestClient, cfg: PDLConfig) =
         HttpSyncGraphQlClient.builder(client)
             .url(cfg.baseUri)
             .interceptor(LoggingGraphQLInterceptor())
@@ -44,10 +48,11 @@ class PDLClientBeanConfig {
 
     @Bean
     @Qualifier(PDL)
-    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-        clientManager,
-        defaultShortName = PDL
-    )
+    fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) =
+        TokenExchangingRequestInterceptor(
+            clientManager,
+            defaultShortName = PDL
+        )
 
     @Bean
     fun pdlHealthIndicator(a: PDLRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}

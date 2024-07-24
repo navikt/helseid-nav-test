@@ -19,11 +19,11 @@ val MARSHALLER = JAXBContext.newInstance(
     setProperty(JAXB_ENCODING, "UTF-8")
 }
 
-object ObjectFactories{
+object ObjectFactories {
     val DMOF = no.nav.helseopplysninger.dialogmelding.ObjectFactory()
     val FFOF = no.nav.helseopplysninger.fellesformat2.ObjectFactory()
     val VOF = no.nav.helseopplysninger.basecontainer.ObjectFactory()
-    val HMOF =  no.nav.helseopplysninger.hodemelding.ObjectFactory()
+    val HMOF = no.nav.helseopplysninger.hodemelding.ObjectFactory()
 }
 
 

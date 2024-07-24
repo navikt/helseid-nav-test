@@ -1,8 +1,6 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import jakarta.jms.ConnectionFactory
-import jakarta.xml.bind.Marshaller.JAXB_ENCODING
-import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGMELDING
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseopplysninger.apprec.XMLAppRec
@@ -27,15 +25,11 @@ class DialogmeldingClientBeanConfig {
 
     @Bean
     @Qualifier(DIALOGMELDING)
-    fun restClientDialogmelding(builder: Builder, cfg: DialogmeldingConfig) =
-        builder
-            .baseUrl("${cfg.baseUri}")
-            .build()
+    fun restClientDialogmelding(builder: Builder, cfg: DialogmeldingConfig) = builder.baseUrl("${cfg.baseUri}").build()
 
     @Bean
     @ConditionalOnProperty("$DIALOGMELDING.enabled", havingValue = "true", matchIfMissing = true)
     fun dialogmeldingdHealthIndicator(a: DialogmeldingRestAdapter) = object : AbstractPingableHealthIndicator(a) {}
-
 
     @Bean
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
@@ -45,14 +39,10 @@ class DialogmeldingClientBeanConfig {
             XMLDialogmelding::class.java,
             XMLBase64Container::class.java,
             XMLAppRec::class.java)
-
-
-        //setJaxbContextProperties(mapOf(JAXB_FORMATTED_OUTPUT to true, JAXB_ENCODING to "UTF-8"))
     }
 
     @Bean
     fun xmlMessageConverter(marshaller: Jaxb2Marshaller) = MarshallingMessageConverter(marshaller, marshaller)
-
 
     @Bean
     fun jmsListenerContainerFactory(connectionFactory: ConnectionFactory, xmlMessageConverter: MessageConverter) =
@@ -66,6 +56,4 @@ class DialogmeldingClientBeanConfig {
         JmsTemplate(connectionFactory).apply {
             messageConverter = xmlMessageConverter
         }
-
-
 }

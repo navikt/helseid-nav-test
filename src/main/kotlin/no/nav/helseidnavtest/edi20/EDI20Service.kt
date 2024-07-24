@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.HerId
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class EDI20Service(val adapter: EDI20RestClientAdapter) {

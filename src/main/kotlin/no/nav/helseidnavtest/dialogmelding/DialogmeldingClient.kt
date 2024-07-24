@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component
 @Component
 @Retryable(include = [RecoverableException::class])
 class DialogmeldingClient(private val adapter: DialogmeldingRestAdapter) {
-    fun partnerId(herId: HerId, behandlerKontor: BehandlerKontor) = PartnerId(adapter.partnerId(herId.verdi,behandlerKontor))
+    fun partnerId(herId: HerId, behandlerKontor: BehandlerKontor) =
+        PartnerId(adapter.partnerId(herId.verdi, behandlerKontor))
 }

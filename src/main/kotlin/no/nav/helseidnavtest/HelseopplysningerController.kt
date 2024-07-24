@@ -6,7 +6,6 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.servlet.ModelAndView
 
 @RestController
 class HelseopplysningerController {
@@ -18,17 +17,17 @@ class HelseopplysningerController {
     @GetMapping("/hello")
     fun hello(authentication: Authentication) = dump(authentication)
 
-    private fun dump(authentication : Authentication) : String {
-    val oidcUser = authentication.oidcUser()
-    val extractor = ClaimsExtractor(oidcUser.claims)
-    val scopes = oidcUser.authorities.joinToString("") {
-        "<li>${it.authority.replace("SCOPE_", "")}</li>"
-    }
-    val claims = oidcUser.claims.map {
-        "<li>${it.key}: ${it.value}</li>"
-    }.joinToString("")
+    private fun dump(authentication: Authentication): String {
+        val oidcUser = authentication.oidcUser()
+        val extractor = ClaimsExtractor(oidcUser.claims)
+        val scopes = oidcUser.authorities.joinToString("") {
+            "<li>${it.authority.replace("SCOPE_", "")}</li>"
+        }
+        val claims = oidcUser.claims.map {
+            "<li>${it.key}: ${it.value}</li>"
+        }.joinToString("")
 
-    return """
+        return """
             <h1>/hello1</h1>
             <p>Hello from <b>${extractor.claim("name")}</b></p>
             <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>

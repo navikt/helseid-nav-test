@@ -1,30 +1,20 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
-import no.nav.helseidnavtest.edi20.EDI20Utils.other
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
-import java.net.URI
-import org.springframework.boot.context.properties.ConfigurationProperties
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import org.slf4j.LoggerFactory.getLogger
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
-
-
+import java.net.URI
 
 @ConfigurationProperties(EDI20DEFT)
-class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) : AbstractRestConfig(baseUri, pingPath, EDI20DEFT, enabled) {
-
-    private val log = getLogger(EDI20DeftConfig::class.java)
+class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
+    AbstractRestConfig(baseUri, pingPath, EDI20DEFT, enabled) {
 
     fun uploadURI(b: UriBuilder, herId: String) =
         b.path(OBJECT_PATH)
             .queryParam(SENDER_HER_ID, herId)
             .queryParam(RECEIVER_HER_IDS, herId.other())
-            .build().also { log.info("URI er $it") }
+            .build()
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

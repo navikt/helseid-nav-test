@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.dialogmelding
 
-
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.HENVENDELSE
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.DIALOG_NOTAT
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
@@ -33,21 +32,21 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
         }
 
-
     private fun hodemelding(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
         HMOF.createXMLMsgHead().apply {
             msgInfo = msgInfo(melding, arbeidstaker)
             document.addAll(listOf(dialogmeldingDocument(melding), vedleggDocument(melding)))
         }
+
     private fun mottakenhetBlokk(melding: Dialogmelding) =
         with(melding) {
-            if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk)  {
+            if (DIALOG_NOTAT to HENVENDELSE != type to kodeverk) {
                 throw IllegalArgumentException("Ugyldig melding/type kombinasjon $type/$kodeverk")
             }
             FFOF.createXMLMottakenhetBlokk().apply {
                 ebRole = EBROLE
                 //partnerReferanse = melding.behandler.kontor.partnerId!!.value
-                ebService =  EBSERVICE
+                ebService = EBSERVICE
                 ebAction = EBACTION
             }
         }
@@ -97,7 +96,6 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
         }
 
-
     private fun dialogmeldingDocument(melding: Dialogmelding) =
         HMOF.createXMLDocument().apply {
             documentConnection = HMOF.createXMLCS().apply {
@@ -118,6 +116,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                 }
             }
         }
+
     private fun xmlFra(melding: Dialogmelding) =
         with(melding) {
             require(type == DIALOG_NOTAT) { "Kan ikke lage dialogmelding, ukjent type '$type'" }
@@ -132,6 +131,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                 })
             }
         }
+
     private fun ident(fnr: Fødselsnummer) =
         HMOF.createXMLIdent().apply {
             id = fnr.verdi
@@ -147,7 +147,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                     id = NAV_ORGNR.verdi
                     typeId = type(NAV_OID, ENH, ENHET_DESC)
                 })
-                ident.add(idFra(adresse.herIdForOrgnummer(NAV_ORGNR).verdi,type(NAV_OID, HER, HER_DESC)))
+                ident.add(idFra(adresse.herIdForOrgnummer(NAV_ORGNR).verdi, type(NAV_OID, HER, HER_DESC)))
             }
         }
 
@@ -163,7 +163,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
 
     private fun mottaker(bestiling: Dialogmelding) =
         HMOF.createXMLReceiver().apply {
-            with(bestiling.behandler)  {
+            with(bestiling.behandler) {
                 organisation = HMOF.createXMLOrganisation().apply {
                     organisationName = kontor.navn
                     ident.add(HMOF.createXMLIdent().apply {
@@ -172,7 +172,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
                     })
 
                     ident.add(HMOF.createXMLIdent().apply {
-                        id =  kontor.orgnummer.verdi
+                        id = kontor.orgnummer.verdi
                         typeId = type(NAV_OID, ENH, ENHET_DESC)
                     })
 
@@ -217,16 +217,19 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
         const val EBACTION = "Henvendelse"
         private const val ENHET_DESC = "Organisasjonsnummeret i Enhetsregister"
         private const val HER_DESC = "HER-id"
-        private val NAV_ORGNR  = Orgnummer(889640782)
+        private val NAV_ORGNR = Orgnummer(889640782)
         private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
-        private const val HER_OID ="2.16.578.1.12.4.1.1.8116"
+        private const val HER_OID = "2.16.578.1.12.4.1.1.8116"
         private const val ENH = "ENH"
         private const val HER = "HER"
         private const val HPR = "HPR"
     }
-    private  data class Fellesformat(private val fellesformat: XMLEIFellesformat, private val marshaller: Function<XMLEIFellesformat, String>)  {
+
+    private data class Fellesformat(private val fellesformat: XMLEIFellesformat,
+                                    private val marshaller: Function<XMLEIFellesformat, String>) {
         val xml = marshaller.apply(fellesformat)
     }
+
     fun idFra(id: String, typeId: XMLCV) = HMOF.createXMLIdent().apply {
         this.id = id
         this.typeId = typeId

@@ -16,7 +16,8 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig, @Qualifier(ARBEID) filter: ClientHttpRequestInterceptor) =
+    fun restClientArbeidsforhold(builder: Builder, cfg: ArbeidConfig,
+                                 @Qualifier(ARBEID) filter: ClientHttpRequestInterceptor) =
         builder
             .baseUrl("${cfg.baseUri}")
             .requestInterceptor(filter)
@@ -28,8 +29,6 @@ class ArbeidClientBeanConfig {
 
     @Bean
     @Qualifier(ARBEID)
-    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) = TokenExchangingRequestInterceptor(
-        clientManager,
-        defaultShortName = ARBEID
-    )
+    fun arbeidClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) =
+        TokenExchangingRequestInterceptor(clientManager, defaultShortName = ARBEID)
 }

@@ -1,8 +1,8 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
@@ -29,20 +29,23 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
-import java.time.Instant.*
+import java.time.Instant.now
 
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
-class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@Value("\${helse-id.test1.jwk}") private val jwk1: String,@Value("\${helse-id.test2.jwk}") private val jwk2: String) {
+class SecurityConfig(
+    @Value("\${helse-id.jwk}") private val assertion: String,
+    @Value("\${helse-id.test1.jwk}") private val jwk1: String,
+    @Value("\${helse-id.test2.jwk}") private val jwk2: String
+) {
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val jwk = JWK.parse(assertion)
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
-
 
 
     private val log = getLogger(SecurityConfig::class.java)
@@ -63,6 +66,7 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
             }
         }
     }
+
     @Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
@@ -80,12 +84,16 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
 
     private fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
         DefaultAuthorizationCodeTokenResponseClient().apply {
-           setRequestEntityConverter(converter)
+            setRequestEntityConverter(converter)
         }
 
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, repo: ClientRegistrationRepository, successHandler: LogoutSuccessHandler): SecurityFilterChain {
+    fun securityFilterChain(
+        http: HttpSecurity,
+        repo: ClientRegistrationRepository,
+        successHandler: LogoutSuccessHandler
+    ): SecurityFilterChain {
         http {
             csrf { disable() }
             oauth2Login {
@@ -122,23 +130,31 @@ class SecurityConfig(@Value("\${helse-id.jwk}") private val assertion: String,@V
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
         }
+
     @Bean
     fun traceRepo() = InMemoryHttpExchangeRepository()
 
     @Bean
     fun clientCredentialsRequestEntityConverter() = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
-        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver()).apply {
-            setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
-        })
+        addParametersConverter(
+            NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(
+                jwkResolver()
+            ).apply {
+                setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
+            })
         addParametersConverter {
-            LinkedMultiValueMap<String,String>().apply {
+            LinkedMultiValueMap<String, String>().apply {
                 this[CLIENT_ID] = it.clientRegistration.clientId
             }
         }
     }
 
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(dPopClient: DPoPClientCredentialsTokenResponseClient, repo: ClientRegistrationRepository, service: OAuth2AuthorizedClientService) =
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(
+        dPopClient: DPoPClientCredentialsTokenResponseClient,
+        repo: ClientRegistrationRepository,
+        service: OAuth2AuthorizedClientService
+    ) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()

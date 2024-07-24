@@ -9,14 +9,12 @@ import org.springframework.http.HttpHeaders
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
-object EDI20Utils {
-     fun String.other() =
-        when(this) {
-            EDI1_ID ->  EDI2_ID
-            EDI2_ID ->  EDI1_ID
-            else -> throw IllegalArgumentException("Ikke støttet herId $this")
-        }
-}
+fun String.other() =
+    when(this) {
+        EDI1_ID ->  EDI2_ID
+        EDI2_ID ->  EDI1_ID
+        else -> throw IllegalArgumentException("Ikke støttet herId $this")
+    }
 @Target(VALUE_PARAMETER)
 @Retention(RUNTIME)
 @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID]))

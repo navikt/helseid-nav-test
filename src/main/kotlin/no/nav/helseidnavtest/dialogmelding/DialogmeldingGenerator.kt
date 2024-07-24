@@ -3,20 +3,24 @@ package no.nav.helseidnavtest.dialogmelding
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
-import no.nav.helseidnavtest.oppslag.person.Person.*
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder.*
+import org.springframework.security.core.context.SecurityContextHolder.getContext
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
-import java.util.UUID
-import java.util.UUID.*
+import java.util.*
+import java.util.UUID.randomUUID
 
 @Component
-class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val pdl: PDLClient, private val fastlege: FastlegeClient) {
+class DialogmeldingGenerator(
+    private val mapper: DialogmeldingMapper,
+    private val pdl: PDLClient,
+    private val fastlege: FastlegeClient
+) {
 
     @PreAuthorize("hasAuthority('LE_4')")
     fun hodemeldng(pasient: Fødselsnummer, uuid: UUID) {
@@ -28,24 +32,35 @@ class DialogmeldingGenerator(private val mapper: DialogmeldingMapper,private val
             is OAuth2AuthenticationToken -> {
                 mapper.fellesFormat(dialogmelding(
                     with(ClaimsExtractor(auth.principal.attributes)) {
-                    behandler(navn, fastlege.herIdForLegeViaPasient(pasient), hprNumber, fnr, fastlege.kontorForPasient(pasient))
-            },uuid), arbeidstaker(pasient))
-        }
+                        behandler(
+                            navn,
+                            fastlege.herIdForLegeViaPasient(pasient),
+                            hprNumber,
+                            fnr,
+                            fastlege.kontorForPasient(pasient)
+                        )
+                    }, uuid
+                ), arbeidstaker(pasient)
+                )
+            }
+
             else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
         }
 
     private fun arbeidstaker(pasient: Fødselsnummer) = Arbeidstaker(pasient, pdl.navn(pasient))
 
-
     private fun dialogmelding(behandler: Behandler, uuid: UUID) =
-        Dialogmelding(uuid, behandler, Fødselsnummer("26900799232"),
+        Dialogmelding(
+            uuid, behandler, Fødselsnummer("26900799232"),
             uuid, "dette er litt tekst", ClassPathResource("test.pdf").inputStream.readBytes(),
         )
 
-    private fun behandler(navn: Navn, herId: HerId,hprId: HprId, fnr: Fødselsnummer, kontor: BehandlerKontor) =
+    private fun behandler(navn: Navn, herId: HerId, hprId: HprId, fnr: Fødselsnummer, kontor: BehandlerKontor) =
         with(navn) {
-            Behandler(randomUUID(), fnr,
+            Behandler(
+                randomUUID(), fnr,
                 Navn(fornavn, mellomnavn, etternavn),
-                herId, hprId, "12345678", kontor) // TODO
+                herId, hprId, "12345678", kontor
+            ) // TODO
         }
 }

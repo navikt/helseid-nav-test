@@ -11,7 +11,8 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 
 @Component
-class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, private val cf : ArbeidConfig) : AbstractRestClientAdapter(restClient, cf) {
+class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient: RestClient, private val cf: ArbeidConfig) :
+    AbstractRestClientAdapter(restClient, cf) {
 
     fun arbeidInfo(fnr: Fødselsnummer) =
         if (cf.isEnabled) {
@@ -22,19 +23,18 @@ class ArbeidRestClientAdapter(@Qualifier(ARBEID) restClient : RestClient, privat
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .onStatus({ it.isError }) { req, res ->
-                   handleErrors(req, res, fnr.verdi)
+                    handleErrors(req, res, fnr.verdi)
                 }
                 .body<List<ArbeidsforholdDTO>>().also {
                     log.trace("Arbeidsforhold response {}", it)
                 } ?: listOf()
-        }
-        else {
+        } else {
             listOf()
         }
+
     override fun toString() = "${javaClass.simpleName} [webClient=$restClient, cfg=$cf]"
 
     companion object {
         private const val NAV_PERSONIDENT_HEADER = "Nav-Personident"
     }
-
 }

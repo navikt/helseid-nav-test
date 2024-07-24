@@ -1,21 +1,21 @@
 package no.nav.helseidnavtest.health
+
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 
-abstract class AbstractPingableHealthIndicator(private val pingable : Pingable) : HealthIndicator {
+abstract class AbstractPingableHealthIndicator(private val pingable: Pingable) : HealthIndicator {
 
     override fun health() =
         runCatching {
             up(pingable.ping())
         }.getOrElse(::down)
 
-    private fun up(status : Map<String, String>) = with(pingable) {
+    private fun up(status: Map<String, String>) = with(pingable) {
         if (isEnabled()) {
             Health.up()
                 .withDetail("endpoint", pingEndpoint()).withDetails(status)
                 .build()
-        }
-        else {
+        } else {
             Health.up()
                 .withDetail("endpoint", pingEndpoint())
                 .withDetail("status", "disabled")
@@ -23,12 +23,13 @@ abstract class AbstractPingableHealthIndicator(private val pingable : Pingable) 
         }
     }
 
-    private fun down(e : Throwable) = with(pingable) {
+    private fun down(e: Throwable) = with(pingable) {
         Health.down()
             .withDetail("endpoint", pingEndpoint())
             .withException(e)
             .build()
     }
+
 
     override fun toString() = "${javaClass.simpleName} [pingable=$pingable]"
 }

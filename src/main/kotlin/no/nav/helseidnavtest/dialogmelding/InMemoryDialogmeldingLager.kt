@@ -17,5 +17,5 @@ class InMemoryDialogmeldingLager : Dialogmeldinglager {
 
 interface Dialogmeldinglager {
 
-   fun lagre(uuid: UUID, dialogmelding: XMLEIFellesformat)
+    fun lagre(uuid: UUID, dialogmelding: XMLEIFellesformat)
 }

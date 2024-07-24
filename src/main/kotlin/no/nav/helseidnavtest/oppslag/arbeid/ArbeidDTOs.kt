@@ -7,8 +7,7 @@ import java.time.LocalDate
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ArbeidsforholdDTO(val ansettelsesperiode: AnsettelsesperiodeDTO,
                              val arbeidsavtaler: List<ArbeidsavtaleDTO>,
-                             val arbeidsgiver: ArbeidsgiverDTO
-) {
+                             val arbeidsgiver: ArbeidsgiverDTO) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class AnsettelsesperiodeDTO(val periode: Periode)
@@ -36,4 +35,4 @@ data class Arbeidsforhold(val navn: String, val avtaler: List<Arbeidsavtale>) {
     data class Arbeidsavtale(val stillingsprosent: Double, val antallTimerPrUke: Double, val periode: Periode)
 }
 
-data class Periode(val fom : LocalDate, val tom : LocalDate?)
+data class Periode(val fom: LocalDate, val tom: LocalDate?)

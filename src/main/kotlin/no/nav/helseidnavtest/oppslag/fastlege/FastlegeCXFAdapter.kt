@@ -3,15 +3,15 @@ package no.nav.helseidnavtest.oppslag.fastlege
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.error.NotFoundException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
-import no.nav.helseidnavtest.oppslag.person.Person.*
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nhn.schemas.reg.flr.IFlrReadOperations
-import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
 import no.nhn.schemas.reg.flr.ObjectFactory
 import no.nhn.schemas.reg.flr.WSGPOffice
 import org.springframework.stereotype.Component
+import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultFaultFaultMessage as ReadFault
 
 @Component
-class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
+class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
 
     private val client = client<IFlrReadOperations>()
 
@@ -23,7 +23,13 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlegeliste for avtale $avtale",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException(
+                "Fant ikke fastlegeliste for avtale $avtale",
+                it.message,
+                cfg.url,
+                it
+            )
+
             else -> throw it
         }
     }
@@ -35,18 +41,23 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
             page = 1
             pageSize = 10
         }
-        client.searchForGP(search).results.value.gpDetails.map {d ->
+        client.searchForGP(search).results.value.gpDetails.map { d ->
 
             val lege = with(d.gp.value) {
-                Person(Fødselsnummer(nin.value),
-                    Navn(firstName.value, middleName.value, lastName.value))
+                Person(
+                    Fødselsnummer(nin.value),
+                    Navn(firstName.value, middleName.value, lastName.value)
+                )
             }
-            if (d.contracts.isNil) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri=cfg.url)
-            if (d.contracts.value.gpOnContractAssociation.isNullOrEmpty()) throw NotFoundException("Fant ikke kontraktassosiasjoner for fastlege $navn", uri=cfg.url)
+            if (d.contracts.isNil) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri = cfg.url)
+            if (d.contracts.value.gpOnContractAssociation.isNullOrEmpty()) throw NotFoundException(
+                "Fant ikke kontraktassosiasjoner for fastlege $navn",
+                uri = cfg.url
+            )
             log.info("Vi har kontraktassosiasjoner for fastlege $navn ${d.contracts.value.gpOnContractAssociation.size}")
-            val x = d.contracts?.value?.gpOnContractAssociation?.map {a ->
+            val x = d.contracts?.value?.gpOnContractAssociation?.map { a ->
                 log.info("KontraktId: ${a.gpContractId}")
-                 a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map {l ->
+                a.gpContract.value.patientList.value?.patientToGPContractAssociation?.map { l ->
                     with(l.patient.value) {
                         Person(Fødselsnummer(nin.value), Navn(firstName.value, middleName.value, lastName.value))
                     }
@@ -56,7 +67,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn", it.message, cfg.url, it)
             else -> throw it
         }
     }
@@ -65,7 +76,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", it.message, cfg.url, it)
             else -> throw it
         }
     }
@@ -75,13 +86,17 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
             d.doctorCycles?.value?.let { a ->
                 a.gpOnContractAssociation?.firstNotNullOfOrNull { c ->
                     c.gp.value?.let {
-                        Lege(d.gpContractId,
-                            Person(Fødselsnummer(it.nin.value), Navn(it.firstName.value, it.middleName.value, it.lastName.value))
+                        Lege(
+                            d.gpContractId,
+                            Person(
+                                Fødselsnummer(it.nin.value),
+                                Navn(it.firstName.value, it.middleName.value, it.lastName.value)
+                            )
                         )
                     }
-                } ?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri=cfg.url)
-            } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", uri=cfg.url)
-        } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri=cfg.url)
+                } ?: throw NotFoundException("Fant ikke GP for pasient $pasient", uri = cfg.url)
+            } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", uri = cfg.url)
+        } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri = cfg.url)
     }.getOrElse {
         when (it) {
             is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", it.message, cfg.url, it)
@@ -102,7 +117,13 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
             }
         }.getOrElse {
             when (it) {
-                is ReadFault -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", it.message ,cfg.url,it)
+                is ReadFault -> throw NotFoundException(
+                    "Fant ikke detaljer for pasient $pasient",
+                    it.message,
+                    cfg.url,
+                    it
+                )
+
                 else -> throw it
             }
         }
@@ -110,11 +131,14 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) :  AbstractCXFAdapter(cfg) {
     private fun fastlegeKontor(kontor: WSGPOffice, orgnr: Int) =
         with(kontor) {
             with(physicalAddresses.value.physicalAddress.first()) {
-                BehandlerKontor(name.value, streetAddress.value,
-                   Postnummer(postalCode), city.value, Orgnummer(orgnr))
+                BehandlerKontor(
+                    name.value, streetAddress.value,
+                    Postnummer(postalCode), city.value, Orgnummer(orgnr)
+                )
             }
         }
-    override fun ping() = emptyMap<String,String>()
+
+    override fun ping() = emptyMap<String, String>()
 
     companion object {
         private val OF = ObjectFactory()

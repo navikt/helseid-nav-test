@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.Apprec.*
+import no.nav.helseidnavtest.edi20.Apprec.ApprecResult
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import java.util.*
 
@@ -36,21 +36,29 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
 
 data class Meldinger(val herId: HerId, val messageIds: List<UUID>)
 
-data class Apprec(val result: ApprecResult, val errorList: List<ApprecErrorDetail> = emptyList(), val properties: ApprecProperties = ApprecProperties()) {
+data class Apprec(
+    val result: ApprecResult,
+    val errorList: List<ApprecErrorDetail> = emptyList(),
+    val properties: ApprecProperties = ApprecProperties()) {
     data class ApprecProperties(val system: ApprecSystem = ApprecSystem()) {
-        data class ApprecSystem(val applicationName: String = APP_NAVN, val applicationVersion: String = VERSJON, val middlewareName: String? = APP_NAVN,
-                                val middlewareVersion: String? = VERSJON)
+        data class ApprecSystem(
+            val applicationName: String = APP_NAVN,
+            val applicationVersion: String = VERSJON,
+            val middlewareName: String? = APP_NAVN,
+            val middlewareVersion: String? = VERSJON)
     }
-    data class ApprecErrorDetail(val errorCode: String? = null,  val details: String? = null)
-   enum class ApprecResult(@JsonValue val result: Int) {
+
+    data class ApprecErrorDetail(val errorCode: String? = null, val details: String? = null)
+    enum class ApprecResult(@JsonValue val result: Int) {
         OK(1),
         ERROR(2),
-       DELFEIL(3)
+        DELFEIL(3)
     }
-    companion object  {
+
+    companion object {
         val OK = Apprec(ApprecResult.OK)
         val ERROR = Apprec(ApprecResult.ERROR)
-        val DELFEIL = Apprec(ApprecResult.DELFEIL, listOf(ApprecErrorDetail("42","Shit happens")))
+        val DELFEIL = Apprec(ApprecResult.DELFEIL, listOf(ApprecErrorDetail("42", "Shit happens")))
     }
 }
 

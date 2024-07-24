@@ -10,9 +10,8 @@ import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.*
+import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.TYPE
 import com.nimbusds.openid.connect.sdk.Nonce
-import com.nimbusds.openid.connect.sdk.claims.HashClaim.*
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.NONCE_CLAIM_NAME
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
@@ -22,7 +21,7 @@ import java.net.URI
 import java.security.MessageDigest
 import java.time.Instant.now
 import java.util.*
-import java.util.Base64.*
+import java.util.Base64.getUrlEncoder
 import java.util.Date.from
 
 @Component
@@ -32,16 +31,18 @@ class DPoPBevisGenerator(private val keyPair: ECKey = keyPair()) {
             sign(ECDSASigner(keyPair.toECPrivateKey()))
         }.serialize()
 
-    private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: Nonce? = null) = claimsBuilder(method, uri).apply {
-        nonce?.let {
-           claim(NONCE_CLAIM_NAME, it.value)
-        }
-        token?.let {
-            claim("ath", it.hash())
-        }
-    }.build()
+    private fun claims(method: String, uri: URI, token: OAuth2AccessToken?, nonce: Nonce? = null) =
+        claimsBuilder(method, uri).apply {
+            nonce?.let {
+                claim(NONCE_CLAIM_NAME, it.value)
+            }
+            token?.let {
+                claim("ath", it.hash())
+            }
+        }.build()
 
-    private fun OAuth2AccessToken.hash() =  getUrlEncoder().withoutPadding().encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
+    private fun OAuth2AccessToken.hash() = getUrlEncoder().withoutPadding()
+        .encodeToString(MessageDigest.getInstance("SHA-256").digest(tokenValue.toByteArray()))
 
     private fun claimsBuilder(method: String, uri: URI) = JWTClaimsSet.Builder()
         .jwtID("${UUID.randomUUID()}")
@@ -58,7 +59,7 @@ class DPoPBevisGenerator(private val keyPair: ECKey = keyPair()) {
 
     companion object {
         private val log = LoggerFactory.getLogger(DPoPBevisGenerator::class.java)
-        fun keyPair()=
+        fun keyPair() =
             ECKeyGenerator(P_256)
                 .algorithm(Algorithm("EC"))
                 .keyUse(SIGNATURE)
