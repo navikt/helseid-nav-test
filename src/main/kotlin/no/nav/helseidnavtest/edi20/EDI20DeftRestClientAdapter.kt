@@ -23,6 +23,14 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .retrieve()
             .body<String>()
 
+    fun kvitter(key: String, herid: String) =
+        restClient
+            .put()
+            .uri { cf.kvitteringURI(it, key, herid) }
+            .headers { it.herId(herid) }
+            .retrieve()
+            .toBodilessEntity()
+
     fun status(key: String, herid: String) =
         restClient
             .get()
@@ -39,16 +47,16 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .retrieve()
             .toBodilessEntity()
 
-    fun upload(file: MultipartFile, herId: String) =
+    fun upload(file: MultipartFile, herid: String) =
         restClient
             .post()
-            .uri { cf.uploadURI(it, herId) }
+            .uri { cf.uploadURI(it, herid) }
             .headers {
                 it.contentDisposition = ContentDisposition
                     .inline()
                     .filename(file.originalFilename)
                     .build()
-                it.herId(herId)
+                it.herId(herid)
             }
             .body(LinkedMultiValueMap<String, Any>().apply {
                 add("file", file.resource)

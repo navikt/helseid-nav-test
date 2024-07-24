@@ -31,4 +31,8 @@ class EDI20DeftController(private val deft: EDI20DeftService) {
     @DeleteMapping("$OBJECT_PATH/{key}")
     fun slett(@PathVariable key: String, @Herid @RequestParam herId: String) =
         deft.slett(key, of(herId))
+
+    @PutMapping("$OBJECT_PATH/{key}")
+    fun kvitter(@PathVariable key: String, @Herid @RequestParam herId: String) =
+        deft.kvitter(key, of(herId))
 }

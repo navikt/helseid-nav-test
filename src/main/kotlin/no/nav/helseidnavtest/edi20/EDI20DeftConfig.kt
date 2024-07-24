@@ -22,6 +22,9 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
     fun statusURI(b: UriBuilder, key: String) =
         b.path(STATUS_PATH).build(key)
 
+    fun kvitteringURI(b: UriBuilder, key: String, herId: String) =
+        b.path(KVITTERING_PATH).build(key, herId)
+
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
@@ -32,6 +35,7 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
         const val OBJECT_PATH = "objects"
         const val KEY_PATH = "$OBJECT_PATH/{key}"
         const val STATUS_PATH = "$KEY_PATH/DownloadStatus"
+        const val KVITTERING_PATH = "$KEY_PATH/DownloadReceipt/{herId}"
 
     }
 }
