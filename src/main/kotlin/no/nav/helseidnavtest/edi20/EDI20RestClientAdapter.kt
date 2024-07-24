@@ -30,7 +30,7 @@ class EDI20RestClientAdapter(
         restClient
             .post()
             .uri { cf.apprecURI(it, id, herId) }
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .body(Apprec.OK)
             .retrieve()
@@ -40,7 +40,7 @@ class EDI20RestClientAdapter(
         restClient
             .get()
             .uri { cf.statusURI(it, id) }
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Status>>()
@@ -49,7 +49,7 @@ class EDI20RestClientAdapter(
         restClient
             .get()
             .uri { cf.lesURI(it, id) }
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<String>()
@@ -58,17 +58,16 @@ class EDI20RestClientAdapter(
         restClient
             .get()
             .uri { cf.pollURI(it, herId, appRec) }
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .body<List<Meldinger>>()
-
 
     fun send(herId: String) =
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .body(BusinessDocument(format(XML, herId, herId.other()).encode()))
             .retrieve()
@@ -78,7 +77,7 @@ class EDI20RestClientAdapter(
         restClient
             .put()
             .uri { cf.lestURI(it, id, herId) }
-            .headers { it.herIdHeader(herId) }
+            .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .toBodilessEntity()
@@ -98,10 +97,8 @@ class EDI20RestClientAdapter(
         return xml.toString()
     }
 
-
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
-
 
     companion object {
         val XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

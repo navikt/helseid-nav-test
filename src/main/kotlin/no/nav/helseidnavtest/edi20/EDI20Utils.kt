@@ -6,18 +6,17 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
 import org.springframework.http.HttpHeaders
-import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
 fun String.other() =
-    when(this) {
-        EDI1_ID ->  EDI2_ID
-        EDI2_ID ->  EDI1_ID
+    when (this) {
+        EDI1_ID -> EDI2_ID
+        EDI2_ID -> EDI1_ID
         else -> throw IllegalArgumentException("Ikke støttet herId $this")
     }
+
 @Target(VALUE_PARAMETER)
-@Retention(RUNTIME)
 @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID]))
 annotation class Herid
 
-fun HttpHeaders.herIdHeader(herId: String) = add(HERID, herId)
+fun HttpHeaders.herId(herId: String) = add(HERID, herId)

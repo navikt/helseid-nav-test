@@ -7,11 +7,21 @@ import org.springframework.http.ContentDisposition
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import org.springframework.web.multipart.MultipartFile
+import java.net.URI
 
 @Component
 class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, private val cf: EDI20DeftConfig) :
     AbstractRestClientAdapter(restClient, cf) {
+
+    fun les(uri: URI, herid: String) =
+        restClient
+            .get()
+            .uri { uri }
+            .headers { it.herId(herid) }
+            .retrieve()
+            .body<String>()
 
     fun upload(file: MultipartFile, herId: String) =
         restClient
@@ -22,7 +32,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
                     .inline()
                     .filename(file.originalFilename)
                     .build()
-                it.herIdHeader(herId)
+                it.herId(herId)
             }
             .body(LinkedMultiValueMap<String, Any>().apply {
                 add("file", file.resource)
@@ -30,7 +40,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .retrieve()
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
-    
+
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
 
