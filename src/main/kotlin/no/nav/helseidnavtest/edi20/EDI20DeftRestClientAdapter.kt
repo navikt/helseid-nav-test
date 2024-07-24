@@ -23,6 +23,14 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .retrieve()
             .body<String>()
 
+    fun status(key: String, herid: String) =
+        restClient
+            .get()
+            .uri { cf.statusURI(it, key) }
+            .headers { it.herId(herid) }
+            .retrieve()
+            .body<Map<String, String>>()
+
     fun slett(key: String, herid: String) =
         restClient
             .delete()
@@ -30,7 +38,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .headers { it.herId(herid) }
             .retrieve()
             .toBodilessEntity()
-    
+
     fun upload(file: MultipartFile, herId: String) =
         restClient
             .post()

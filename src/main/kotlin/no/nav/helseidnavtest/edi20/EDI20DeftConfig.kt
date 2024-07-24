@@ -16,9 +16,13 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
             .queryParam(RECEIVER_HER_IDS, herId.other())
             .build()
 
-    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
     fun deleteURI(b: UriBuilder, key: String) =
-        b.path(DELETE_PATH).build(key)
+        b.path(KEY_PATH).build(key)
+
+    fun statusURI(b: UriBuilder, key: String) =
+        b.path(STATUS_PATH).build(key)
+
+    override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
         private const val DEFAULT_PING_PATH = ""
@@ -26,6 +30,8 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
         private const val RECEIVER_HER_IDS = "ReceiverHerIds"
         const val EDI20DEFT = "edi20deft"
         const val OBJECT_PATH = "objects"
-        const val DELETE_PATH = "$OBJECT_PATH/{key}"
+        const val KEY_PATH = "$OBJECT_PATH/{key}"
+        const val STATUS_PATH = "$KEY_PATH/DownloadStatus"
+
     }
 }

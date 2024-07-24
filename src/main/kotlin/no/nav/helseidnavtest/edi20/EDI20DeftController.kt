@@ -16,6 +16,10 @@ class EDI20DeftController(private val deft: EDI20DeftService) {
     fun upload(@RequestPart("file") file: MultipartFile, @Herid @RequestParam herId: String) =
         deft.upload(file, of(herId))
 
+    @GetMapping("$OBJECT_PATH/{key}/status")
+    fun status(key: String, @Herid @RequestParam herId: String) =
+        deft.status(key, of(herId))
+
     @GetMapping(OBJECT_PATH)
     fun les(uri: URI, @Herid @RequestParam herId: String) =
         deft.les(uri, of(herId))
