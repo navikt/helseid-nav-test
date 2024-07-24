@@ -19,4 +19,8 @@ class EDI20DeftController(private val deft: EDI20DeftService) {
     @GetMapping(OBJECT_PATH)
     fun les(uri: URI, @Herid @RequestParam herId: String) =
         deft.les(uri, of(herId))
+
+    @DeleteMapping(OBJECT_PATH)
+    fun slett(uri: URI, @Herid @RequestParam herId: String) =
+        deft.slett(uri, of(herId))
 }
