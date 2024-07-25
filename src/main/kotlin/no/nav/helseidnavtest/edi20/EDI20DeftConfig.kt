@@ -14,16 +14,16 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
         b.path(OBJECT_PATH)
             .queryParam(SENDER_HER_ID, herId)
             .queryParam(RECEIVER_HER_IDS, herId.other())
-            .build()
+            .build().also { log.info("uploadURI: $it") }
 
     fun deleteURI(b: UriBuilder, key: String) =
-        b.path(KEY_PATH).build(key)
+        b.path(KEY_PATH).build(key).also { log.info("deleteURI: $it") }
 
     fun statusURI(b: UriBuilder, key: String) =
-        b.path(STATUS_PATH).build(key)
+        b.path(STATUS_PATH).build(key).also { log.info("statusURI: $it") }
 
     fun kvitteringURI(b: UriBuilder, key: String, herId: String) =
-        b.path(KVITTERING_PATH).build(key, herId)
+        b.path(KVITTERING_PATH).build(key, herId).also { log.info("kvitteringURI: $it") }
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

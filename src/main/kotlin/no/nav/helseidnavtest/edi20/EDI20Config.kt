@@ -13,24 +13,24 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
     AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
 
     fun sendURI(b: UriBuilder) =
-        b.path(MESSAGES_PATH).build()
+        b.path(MESSAGES_PATH).build().also { log.info("sendURI: $it") }
 
     fun pollURI(b: UriBuilder, herId: String, appRec: Boolean) =
         b.path(MESSAGES_PATH)
             .queryParam("IncludeAppRec", "$appRec")
             .queryParam("ToHerIds", herId)
-            .build()
+            .build().also { log.info("pollURI: $it") }
 
-    fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id")
+    fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id").also { log.info("lesURI: $it") }
 
     fun lestURI(b: UriBuilder, id: UUID, herId: String) =
-        b.path("$DOK_PATH/read/$herId").build("$id")
+        b.path("$DOK_PATH/read/$herId").build("$id").also { log.info("lestURI: $it") }
 
     fun statusURI(b: UriBuilder, id: UUID) =
-        b.path("$DOK_PATH/status").build("$id")
+        b.path("$DOK_PATH/status").build("$id").also { log.info("statusURI: $it") }
 
     fun apprecURI(b: UriBuilder, id: UUID, other: String) =
-        b.path("$DOK_PATH/Apprec/$other").build("$id")
+        b.path("$DOK_PATH/Apprec/$other").build("$id").also { log.info("apprecURI: $it") }
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
