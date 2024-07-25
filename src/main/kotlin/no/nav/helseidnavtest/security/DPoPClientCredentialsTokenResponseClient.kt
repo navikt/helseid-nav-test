@@ -5,74 +5,50 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.security.DPoPClientCredentialsTokenResponseClient.Companion.INVALID_RESPONSE
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
 import org.springframework.http.client.ClientHttpResponse
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
-import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
-import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import kotlin.reflect.jvm.isAccessible
 
-
 @Component
-class DPoPClientCredentialsTokenResponseClient(
-    private val generator: DPoPBevisGenerator,
-    private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
-    private val mapper: ObjectMapper
-) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+class Vanilla(@Qualifier(EDI20) private val restTemplate: RestTemplate) {
+    private val log = LoggerFactory.getLogger(Vanilla::class.java)
 
-    private val restOperations =
-        RestTemplate(listOf(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())).apply {
-            setRequestFactory(HttpComponentsClientHttpRequestFactory())
-            errorHandler = OAuth2ErrorResponseErrorHandler()
-        }
-
-    private val restClient = RestClient.builder(restOperations)
-        .build()
-
-    override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
-        requestEntityConverter.convert(request)?.let { r ->
-            if (request.isDPoP()) {
-                dPoPTokenResponse(r)
-            } else {
-                vanillaTokenResponse(r)
-            }.also {
-                log.info("Received token response for : ${request.clientRegistration.registrationId}")
-            }
-        } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
-
-
-    private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith(EDI20)
-
-    private fun vanillaTokenResponse(request: RequestEntity<*>) =
+    fun getTokenResponse(request: RequestEntity<*>) =
         runCatching {
             log.info("Requesting vanilla token from ${request.url}")
-            restOperations.exchange(request, OAuth2AccessTokenResponse::class.java).body!!
+            restTemplate.exchange(request, OAuth2AccessTokenResponse::class.java).body!!
         }.getOrElse {
-            throw OAuth2AuthorizationException(
-                OAuth2Error(
-                    INVALID_RESPONSE,
-                    "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}",
-                    null
-                ), it
-            )
+            throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE,
+                "An error occurred while attempting to retrieve the OAuth 2.0 Access Token Response: ${it.message}",
+                null), it)
         }
+}
 
-    private fun dPoPTokenResponse(request: RequestEntity<*>) =
+@Component
+class DPOP(
+    @Qualifier(EDI20) restTemplate: RestTemplate,
+    private val generator: DPoPBevisGenerator,
+    private val mapper: ObjectMapper) {
+
+    private val restClient = RestClient.builder(restTemplate).build()
+
+    fun getTokenResponse(request: RequestEntity<*>) =
         with(request) {
             body?.let { b ->
                 log.info("Requesting DPoP token from ${request.url}")
@@ -143,12 +119,9 @@ class DPoPClientCredentialsTokenResponseClient(
                     .body(b)
                     .exchange(exchangeEtterNonce())
             }
-        } ?: throw OAuth2AuthorizationException(
-            OAuth2Error(
-                INVALID_RESPONSE,
-                "No body in request",
-                request.url.toString()
-            )
+        } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE,
+            "No body in request",
+            request.url.toString())
         )
 
     private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
@@ -192,7 +165,33 @@ class DPoPClientCredentialsTokenResponseClient(
             }
 
         const val DPOP_NONCE = "dpop-nonce"
-        private const val INVALID_RESPONSE = "invalid_token_response"
+        const val INVALID_RESPONSE = "invalid_token_response"
+        private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
+    }
+}
+
+@Component
+class DPoPClientCredentialsTokenResponseClient(
+    private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
+    private val vanilla: Vanilla,
+    private val dpop: DPOP) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
+
+    override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
+        requestEntityConverter.convert(request)?.let { r ->
+            if (request.isDPoP()) {
+                dpop.getTokenResponse(r)
+            } else {
+                vanilla.getTokenResponse(r)
+            }.also {
+                log.info("Received token response for : ${request.clientRegistration.registrationId}")
+            }
+        } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
+
+    private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith(EDI20)
+
+    companion object {
+
+        const val INVALID_RESPONSE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
     }
 }
