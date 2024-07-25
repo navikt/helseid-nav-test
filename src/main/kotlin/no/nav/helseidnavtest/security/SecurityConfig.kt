@@ -31,7 +31,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.util.LinkedMultiValueMap
 import java.time.Instant.now
 
-
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
@@ -46,7 +45,6 @@ class SecurityConfig(
     private val jwk = JWK.parse(assertion)
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
-
 
     private val log = getLogger(SecurityConfig::class.java)
 
@@ -87,7 +85,6 @@ class SecurityConfig(
             setRequestEntityConverter(converter)
         }
 
-
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
@@ -125,7 +122,6 @@ class SecurityConfig(
         return http.build()
     }
 
-
     private fun pkceAddingResolver(repo: ClientRegistrationRepository) =
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
@@ -153,8 +149,7 @@ class SecurityConfig(
     fun authorizedClientServiceOAuth2AuthorizedClientManager(
         dPopClient: DPoPClientCredentialsTokenResponseClient,
         repo: ClientRegistrationRepository,
-        service: OAuth2AuthorizedClientService
-    ) =
+        service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()

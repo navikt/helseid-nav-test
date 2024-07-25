@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2A
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClient.Builder
 
-
 @Configuration(proxyBeanMethods = false)
 class PDLClientBeanConfig {
 
@@ -29,13 +28,10 @@ class PDLClientBeanConfig {
     fun pdlRestClient(b: Builder, @Qualifier(PDL) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
         b.requestInterceptors {
             it.addAll(
-                listOf(
-                    clientCredentialsRequestInterceptor,
+                listOf(clientCredentialsRequestInterceptor,
                     temaRequestInterceptor(HELSE),
                     consumerRequestInterceptor(),
-                    behandlingRequestInterceptor()
-                )
-            )
+                    behandlingRequestInterceptor()))
         }.build()
 
     @Bean
@@ -49,10 +45,7 @@ class PDLClientBeanConfig {
     @Bean
     @Qualifier(PDL)
     fun pdlClientCredentialsRequestInterceptor(clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager) =
-        TokenExchangingRequestInterceptor(
-            clientManager,
-            defaultShortName = PDL
-        )
+        TokenExchangingRequestInterceptor(clientManager, defaultShortName = PDL)
 
     @Bean
     fun pdlHealthIndicator(a: PDLRestClientAdapter) = object : AbstractPingableHealthIndicator(a) {}

@@ -25,7 +25,6 @@ abstract class AbstractRestClientAdapter(
     private val pingClient: RestClient = restClient
 ) : Pingable {
 
-
     override fun ping(): Map<String, String> {
         if (isEnabled()) {
             pingClient
@@ -59,7 +58,6 @@ abstract class AbstractRestClientAdapter(
         fun consumerRequestInterceptor() = generellRequestInterceptor(NAV_CONSUMER_ID) { HELSE }
         fun behandlingRequestInterceptor() = generellRequestInterceptor(BEHANDLINGSNUMMER) { BID }
         fun temaRequestInterceptor(tema: String) = generellRequestInterceptor(TEMA) { tema }
-
 
         private object CallIdGenerator {
 
@@ -109,11 +107,10 @@ abstract class AbstractRestClientAdapter(
     }
 }
 
-open class TokenExchangingRequestInterceptor(
-    private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
-    private val tokenType: AccessTokenType = BEARER,
-    defaultShortName: String? = null
-) : ClientHttpRequestInterceptor {
+open class TokenExchangingRequestInterceptor(private val clientManager: AuthorizedClientServiceOAuth2AuthorizedClientManager,
+                                             private val tokenType: AccessTokenType = BEARER,
+                                             defaultShortName: String? = null) : ClientHttpRequestInterceptor {
+
     private val resolver = HerIdToShortNameMapper(defaultShortName)
     protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
@@ -141,11 +138,10 @@ open class TokenExchangingRequestInterceptor(
         fun map(req: HttpRequest) = defaultShortName ?: shortNameFromHeader(req)
 
         private fun shortNameFromHeader(req: HttpRequest) =
-            when (val herId = req.headers[HERID]?.single()) {
+            when (req.headers[HERID]?.single()) {
                 EDI_1.first.verdi -> EDI_1.second
                 EDI_2.first.verdi -> EDI_2.second
-                null -> throw IllegalArgumentException("No herId in request header")
-                else -> throw IllegalArgumentException("Unknown herId  $herId in request header")
+                else -> throw IllegalArgumentException("No/unknown herId in request header")
             }.also {
                 log.info("Mapped to shortName $it from header")
             }
