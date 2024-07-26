@@ -48,5 +48,5 @@ private fun problemDetail(status: HttpStatus, title: String?, detail: String? = 
     }
 
 data class ErrorResponse(val error: String,
-                         val validationErrors: List<String> = emptyList(),
+                         val validationErrors: List<String>? = emptyList(),
                          val stackTrace: String? = null)
