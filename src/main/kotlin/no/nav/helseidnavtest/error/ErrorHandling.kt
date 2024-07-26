@@ -10,7 +10,7 @@ import java.net.URI
 
 fun handleErrors(req: HttpRequest, res: ClientHttpResponse, detail: String): Nothing =
     throw when (res.statusCode) {
-        NOT_FOUND -> NotFoundException(detail = detail, uri = req.uri)
+        NOT_FOUND -> NotFoundException(detail = res.body.readAllBytes().decodeToString(), uri = req.uri)
         else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
     }
 
