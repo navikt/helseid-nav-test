@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
+import no.nav.helseidnavtest.error.handleErrors
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ContentDisposition
@@ -21,6 +22,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { uri }
             .headers { it.herId(herid) }
             .retrieve()
+            .onStatus({ it.isError }) { req, res ->
+                handleErrors(req, res, herid)
+            }
             .body<String>()
 
     fun kvitter(key: String, herid: String) =
@@ -29,6 +33,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { cf.kvitteringURI(it, key, herid) }
             .headers { it.herId(herid) }
             .retrieve()
+            .onStatus({ it.isError }) { req, res ->
+                handleErrors(req, res, herid)
+            }
             .toBodilessEntity()
 
     fun status(key: String, herid: String) =
@@ -37,6 +44,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { cf.statusURI(it, key) }
             .headers { it.herId(herid) }
             .retrieve()
+            .onStatus({ it.isError }) { req, res ->
+                handleErrors(req, res, herid)
+            }
             .body<DeftStatus>()
 
     fun slett(key: String, herid: String) =
@@ -45,6 +55,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .uri { cf.deleteURI(it, key) }
             .headers { it.herId(herid) }
             .retrieve()
+            .onStatus({ it.isError }) { req, res ->
+                handleErrors(req, res, herid)
+            }
             .toBodilessEntity()
 
     fun upload(file: MultipartFile, herid: String) =
@@ -62,6 +75,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
                 add("file", file.resource)
             })
             .retrieve()
+            .onStatus({ it.isError }) { req, res ->
+                handleErrors(req, res, herid)
+            }
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
 

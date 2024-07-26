@@ -20,7 +20,6 @@ import java.util.function.Function
 
 @Component
 class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
-
     fun fellesFormat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = createFellesformat(melding, arbeidstaker)
 
     private fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
