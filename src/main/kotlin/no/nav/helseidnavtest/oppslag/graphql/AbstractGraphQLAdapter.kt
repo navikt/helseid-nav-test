@@ -38,7 +38,6 @@ abstract class AbstractGraphQLAdapter(
         }
 }
 
-
 interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
@@ -50,7 +49,7 @@ interface GraphQLErrorHandler {
                 e
             )
 
-            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, e)
+            else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, "Ikke håndtert", e.message, uri, null, e)
         }
 
     companion object {

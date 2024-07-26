@@ -42,22 +42,22 @@ class NotFoundException(title: String = "Ikke funnet",
 open class IrrecoverableException(status: HttpStatus,
                                   title: String,
                                   detail: String? = null,
-                                  uri: URI? = null,
+                                  uri: URI,
                                   stackTrace: String? = null,
                                   cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, title, detail, uri, stackTrace), cause)
 
-open class RecoverableException(status: HttpStatus, detail: String, uri: URI? = null, cause: Throwable? = null) :
+open class RecoverableException(status: HttpStatus, detail: String, uri: URI, cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, "title", detail, uri), cause)
 
 private fun problemDetail(status: HttpStatus,
                           title: String?,
                           detail: String? = "",
-                          uri: URI?,
+                          uri: URI,
                           stackTrace: String? = null) =
     forStatusAndDetail(status, detail).apply {
         this.title = title
-        setProperty("uri", uri)
+        type = uri
         stackTrace?.let { setProperty("stackTrace", it) }
     }
 

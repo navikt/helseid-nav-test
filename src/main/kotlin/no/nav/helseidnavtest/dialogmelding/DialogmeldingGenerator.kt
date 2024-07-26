@@ -1,13 +1,11 @@
 package no.nav.helseidnavtest.dialogmelding
 
-import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder.getContext
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
@@ -44,7 +42,7 @@ class DialogmeldingGenerator(
                 )
             }
 
-            else -> throw IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
+            else -> throw IllegalStateException() //  IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
         }
 
     private fun arbeidstaker(pasient: Fødselsnummer) = Arbeidstaker(pasient, pdl.navn(pasient))

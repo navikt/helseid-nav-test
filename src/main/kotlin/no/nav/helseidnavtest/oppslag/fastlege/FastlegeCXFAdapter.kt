@@ -26,14 +26,13 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
             is ReadFault -> throw NotFoundException(
                 "Fant ikke fastlegeliste for avtale $avtale",
                 it.message,
-                cfg.url,
+                cfg.url, null,
                 it
             )
 
             else -> throw it
         }
     }
-
 
     fun pasienterForFastlege(navn: String) = runCatching {
         val search = OF.createWSGPSearchParameters().apply {
@@ -67,7 +66,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn", it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn", it.message, cfg.url, null, it)
             else -> throw it
         }
     }
@@ -76,7 +75,12 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",
+                it.message,
+                cfg.url,
+                null,
+                it)
+
             else -> throw it
         }
     }
@@ -99,7 +103,12 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", uri = cfg.url)
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", it.message, cfg.url, it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient",
+                it.message,
+                cfg.url,
+                null,
+                it)
+
             else -> throw it
         }
     }
@@ -120,7 +129,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
                 is ReadFault -> throw NotFoundException(
                     "Fant ikke detaljer for pasient $pasient",
                     it.message,
-                    cfg.url,
+                    cfg.url, null,
                     it
                 )
 

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Component
 import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
 
-
 @Component
 class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter(cfg) {
 
@@ -20,12 +19,12 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
         client.searchById(id).communicationParty.single().herId
     }.getOrElse {
         when (it) {
-            is CommPartyFault -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url, it)
+            is CommPartyFault -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url, null, it)
             is IllegalArgumentException -> throw IrrecoverableException(
                 BAD_REQUEST,
                 "Fant for mange kommunikasjonsparter for $id",
                 it.message ?: "",
-                cfg.url,
+                cfg.url, null,
                 it
             )
 
@@ -39,7 +38,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 INTERNAL_SERVER_ERROR,
                 "For mange kommunikasjonsparter for $id",
                 it.message,
-                cfg.url,
+                cfg.url, null,
                 it
             )
 
