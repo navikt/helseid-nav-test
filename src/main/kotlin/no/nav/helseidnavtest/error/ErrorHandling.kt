@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.client.ClientHttpResponse
@@ -17,7 +18,12 @@ class ErrorHandler(private val mapper: ObjectMapper) : RestClient.ResponseSpec.E
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
         val respons = mapper.readValue<ErrorResponse>(res.body)
         throw when (res.statusCode) {
-            NOT_FOUND -> NotFoundException(detail = respons.error,
+            NOT_FOUND -> IrrecoverableException(NOT_FOUND, detail = respons.error,
+                stackTrace = respons.stackTrace,
+                uri = req.uri)
+
+            BAD_REQUEST -> IrrecoverableException(BAD_REQUEST,
+                detail = respons.error,
                 stackTrace = respons.stackTrace,
                 uri = req.uri)
 
@@ -37,15 +43,16 @@ class NotFoundException(title: String = "Ikke funnet",
                         uri: URI,
                         stackTrace: String? = null,
                         cause: Throwable? = null) :
-    IrrecoverableException(NOT_FOUND, title, detail, uri, stackTrace, cause)
+    IrrecoverableException(NOT_FOUND, title, detail, uri, stackTrace, emptyList(), cause)
 
 open class IrrecoverableException(status: HttpStatus,
-                                  title: String,
+                                  title: String = status.reasonPhrase,
                                   detail: String? = null,
                                   uri: URI,
                                   stackTrace: String? = null,
+                                  validationErrors: List<String> = emptyList(),
                                   cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, title, detail, uri, stackTrace), cause)
+    ErrorResponseException(status, problemDetail(status, title, detail, uri, stackTrace, validationErrors), cause)
 
 open class RecoverableException(status: HttpStatus, detail: String, uri: URI, cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, "title", detail, uri), cause)
@@ -54,10 +61,12 @@ private fun problemDetail(status: HttpStatus,
                           title: String?,
                           detail: String? = "",
                           uri: URI,
-                          stackTrace: String? = null) =
+                          stackTrace: String? = null,
+                          validationErrors: List<String> = emptyList()) =
     forStatusAndDetail(status, detail).apply {
         this.title = title
         type = uri
+        validationErrors.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
     }
 
