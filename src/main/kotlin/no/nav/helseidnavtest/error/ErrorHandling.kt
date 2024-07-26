@@ -15,8 +15,12 @@ import java.net.URI
 @Component
 class ErrorHandler(private val mapper: ObjectMapper) : RestClient.ResponseSpec.ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
+        val respons = mapper.readValue<ErrorResponse>(res.body)
         throw when (res.statusCode) {
-            NOT_FOUND -> NotFoundException(detail = mapper.readValue<ErrorResponse>(res.body).error, uri = req.uri)
+            NOT_FOUND -> NotFoundException(detail = respons.error,
+                stackTrace = respons.stackTrace,
+                uri = req.uri)
+
             else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
         }
     }
@@ -28,23 +32,33 @@ fun handleErrors(req: HttpRequest, res: ClientHttpResponse, detail: String): Not
         else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
     }
 
-class NotFoundException(title: String = "Ikke funnet", detail: String? = null, uri: URI, cause: Throwable? = null) :
-    IrrecoverableException(NOT_FOUND, title, detail, uri, cause)
+class NotFoundException(title: String = "Ikke funnet",
+                        detail: String? = null,
+                        uri: URI,
+                        stackTrace: String? = null,
+                        cause: Throwable? = null) :
+    IrrecoverableException(NOT_FOUND, title, detail, uri, stackTrace, cause)
 
 open class IrrecoverableException(status: HttpStatus,
                                   title: String,
                                   detail: String? = null,
                                   uri: URI? = null,
+                                  stackTrace: String? = null,
                                   cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, title, detail, uri), cause)
+    ErrorResponseException(status, problemDetail(status, title, detail, uri, stackTrace), cause)
 
 open class RecoverableException(status: HttpStatus, detail: String, uri: URI? = null, cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, "title", detail, uri), cause)
 
-private fun problemDetail(status: HttpStatus, title: String?, detail: String? = "", uri: URI?) =
+private fun problemDetail(status: HttpStatus,
+                          title: String?,
+                          detail: String? = "",
+                          uri: URI?,
+                          stackTrace: String? = null) =
     forStatusAndDetail(status, detail).apply {
         this.title = title
-        properties = mapOf("uri" to "$uri")
+        setProperty("uri", uri)
+        stackTrace?.let { setProperty("stackTrace", it) }
     }
 
 data class ErrorResponse(val error: String,
