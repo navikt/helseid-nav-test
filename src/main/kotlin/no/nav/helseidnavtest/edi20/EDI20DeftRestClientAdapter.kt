@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
-import no.nav.helseidnavtest.error.handleErrors
+import no.nav.helseidnavtest.error.ErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ContentDisposition
@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 
 @Component
-class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, private val cf: EDI20DeftConfig) :
+class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
+                                 private val cf: EDI20DeftConfig,
+                                 private val handler: ErrorHandler) :
     AbstractRestClientAdapter(restClient, cf) {
 
     fun les(uri: URI, herid: String) =
@@ -23,7 +25,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res ->
-                handleErrors(req, res, herid)
+                handler.handle(req, res)
             }
             .body<String>()
 
@@ -34,7 +36,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res ->
-                handleErrors(req, res, herid)
+                handler.handle(req, res)
             }
             .toBodilessEntity()
 
@@ -45,7 +47,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res ->
-                handleErrors(req, res, herid)
+                handler.handle(req, res)
             }
             .body<DeftStatus>()
 
@@ -56,7 +58,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res ->
-                handleErrors(req, res, herid)
+                handler.handle(req, res)
             }
             .toBodilessEntity()
 
@@ -76,7 +78,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, p
             })
             .retrieve()
             .onStatus({ it.isError }) { req, res ->
-                handleErrors(req, res, herid)
+                handler.handle(req, res)
             }
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
