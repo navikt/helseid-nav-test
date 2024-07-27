@@ -18,15 +18,7 @@ class ErrorHandler(private val mapper: ObjectMapper) : RestClient.ResponseSpec.E
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
         val respons = mapper.readValue<ErrorResponse>(res.body)
         throw when (res.statusCode) {
-            NOT_FOUND -> IrrecoverableException(NOT_FOUND, detail = respons.error,
-                stackTrace = respons.stackTrace,
-                uri = req.uri)
-
-            BAD_REQUEST -> IrrecoverableException(BAD_REQUEST,
-                detail = respons.error,
-                stackTrace = respons.stackTrace,
-                uri = req.uri)
-
+            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(res.statusCode as HttpStatus, req.uri, respons)
             else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
         }
     }
@@ -38,38 +30,43 @@ fun handleErrors(req: HttpRequest, res: ClientHttpResponse, detail: String): Not
         else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
     }
 
-class NotFoundException(title: String = "Ikke funnet",
-                        detail: String? = null,
+class NotFoundException(detail: String? = null,
                         uri: URI,
                         stackTrace: String? = null,
                         cause: Throwable? = null) :
-    IrrecoverableException(NOT_FOUND, title, detail, uri, stackTrace, emptyList(), cause)
+    IrrecoverableException(NOT_FOUND, uri, detail, stackTrace, emptyList(), cause)
 
 open class IrrecoverableException(status: HttpStatus,
-                                  title: String = status.reasonPhrase,
-                                  detail: String? = null,
                                   uri: URI,
+                                  detail: String? = null,
                                   stackTrace: String? = null,
                                   validationErrors: List<String> = emptyList(),
                                   cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, title, detail, uri, stackTrace, validationErrors), cause)
+    ErrorResponseException(status, problemDetail(status, detail, uri, stackTrace, validationErrors), cause) {
+    constructor(status: HttpStatus, uri: URI, errorResponse: ErrorResponse, cause: Throwable? = null) :
+            this(status,
+                uri,
+                errorResponse.error,
+                errorResponse.stackTrace,
+                errorResponse.validationErrors,
+                cause)
+}
 
 open class RecoverableException(status: HttpStatus, detail: String, uri: URI, cause: Throwable? = null) :
-    ErrorResponseException(status, problemDetail(status, "title", detail, uri), cause)
+    ErrorResponseException(status, problemDetail(status, detail, uri), cause)
 
 private fun problemDetail(status: HttpStatus,
-                          title: String?,
-                          detail: String? = "",
+                          detail: String?,
                           uri: URI,
                           stackTrace: String? = null,
                           validationErrors: List<String> = emptyList()) =
     forStatusAndDetail(status, detail).apply {
-        this.title = title
+        this.title = status.reasonPhrase
         type = uri
         validationErrors.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
     }
 
 data class ErrorResponse(val error: String,
-                         val validationErrors: List<String>? = emptyList(),
+                         val validationErrors: List<String> = emptyList(),
                          val stackTrace: String? = null)

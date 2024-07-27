@@ -19,14 +19,8 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
         client.searchById(id).communicationParty.single().herId
     }.getOrElse {
         when (it) {
-            is CommPartyFault -> throw NotFoundException("Feil ved oppslag av $id", it.message, cfg.url, null, it)
-            is IllegalArgumentException -> throw IrrecoverableException(
-                BAD_REQUEST,
-                "Fant for mange kommunikasjonsparter for $id",
-                it.message ?: "",
-                cfg.url, null,
-                it
-            )
+            is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
+            is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST, cfg.url, it.message, cause = it)
 
             is NoSuchElementException -> throw NotFoundException(
                 detail = "Fant ikke kommunikasjonspart for $id",
@@ -34,13 +28,10 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 cause = it
             )
 
-            is IllegalStateException -> throw IrrecoverableException(
-                INTERNAL_SERVER_ERROR,
-                "For mange kommunikasjonsparter for $id",
+            is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
+                cfg.url,
                 it.message,
-                cfg.url, null,
-                it
-            )
+                cause = it)
 
             else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
         }
