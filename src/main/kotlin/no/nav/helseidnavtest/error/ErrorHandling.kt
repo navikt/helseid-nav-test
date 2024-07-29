@@ -44,7 +44,7 @@ open class IrrecoverableException(status: HttpStatus,
                                   detail: String? = null,
                                   cause: Throwable? = null,
                                   stackTrace: String? = null,
-                                  validationErrors: List<String> = emptyList()) :
+                                  validationErrors: List<String>? = emptyList()) :
     ErrorResponseException(status, problemDetail(status, detail, uri, stackTrace, validationErrors), cause) {
     constructor(status: HttpStatus, uri: URI, errorResponse: ErrorResponse, cause: Throwable? = null) :
             this(status,
@@ -71,11 +71,11 @@ private fun problemDetail(status: HttpStatus,
                           detail: String?,
                           uri: URI,
                           stackTrace: String? = null,
-                          validationErrors: List<String> = emptyList()) =
+                          validationErrors: List<String>? = emptyList()) =
     forStatusAndDetail(status, detail).apply {
         this.title = status.reasonPhrase
         type = uri
-        validationErrors.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
+        validationErrors?.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
     }
 
