@@ -11,10 +11,12 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 
 @Component
 class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlClient,
                            @Qualifier(PDL) restClient: RestClient,
+                           private val handler: ErrorHandler,
                            cfg: PDLConfig) : AbstractGraphQLAdapter(restClient, cfg) {
 
     override fun ping(): Map<String, String> {
@@ -23,6 +25,7 @@ class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlCli
             .uri(baseUri)
             .accept(APPLICATION_JSON, TEXT_PLAIN)
             .retrieve()
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
         return emptyMap()
     }
@@ -31,7 +34,7 @@ class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlCli
         with(fnr) {
             query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to verdi))?.active?.let {
                 pdlPersonTilPerson(it, this)
-            } ?: throw NotFoundException(detail = "Fant ikke $fnr", uri = baseUri)
+            } ?: throw NotFoundException("Fant ikke $fnr", baseUri)
         }
 
     override fun toString() =

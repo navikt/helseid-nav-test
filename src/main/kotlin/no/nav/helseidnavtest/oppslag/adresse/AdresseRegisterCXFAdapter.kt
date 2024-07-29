@@ -21,19 +21,16 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
         when (it) {
             is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
             is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST, cfg.url, it.message, cause = it)
-
-            is NoSuchElementException -> throw NotFoundException(
-                detail = "Fant ikke kommunikasjonspart for $id",
-                uri = cfg.url,
-                cause = it
-            )
+            is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
+                cfg.url,
+                cause = it)
 
             is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
                 cfg.url,
                 it.message,
                 cause = it)
 
-            else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message ?: "", it)
+            else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it)
         }
     }
 

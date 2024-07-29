@@ -111,7 +111,7 @@ open class TokenExchangingRequestInterceptor(private val clientManager: Authoriz
                                              private val tokenType: AccessTokenType = BEARER,
                                              defaultShortName: String? = null) : ClientHttpRequestInterceptor {
 
-    private val resolver = HerIdToShortNameMapper(defaultShortName)
+    private val mapper = HerIdToShortNameMapper(defaultShortName)
     protected val log = getLogger(TokenExchangingRequestInterceptor::class.java)
 
     override fun intercept(req: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution) =
@@ -122,13 +122,16 @@ open class TokenExchangingRequestInterceptor(private val clientManager: Authoriz
 
     protected fun authorize(req: HttpRequest) =
         clientManager.authorize(
-            withClientRegistrationId(resolver.map(req))
+            withClientRegistrationId(mapper.map(req))
                 .principal("whatever")
                 .build()
         )?.apply { ->
             req.headers.set(AUTHORIZATION, "${tokenType.value} ${accessToken.tokenValue}")
                 .also {
-                    log.info("Token {} exchanged for {}", accessToken.tokenValue, clientRegistration.registrationId)
+                    log.info("Token {} exchanged for type {} og id {}",
+                        accessToken.tokenValue,
+                        tokenType.value,
+                        clientRegistration.registrationId)
                 }
         }
 

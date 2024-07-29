@@ -46,13 +46,13 @@ open class IrrecoverableException(status: HttpStatus,
                                   stackTrace: String? = null,
                                   validationErrors: List<String>? = emptyList()) :
     ErrorResponseException(status, problemDetail(status, detail, uri, stackTrace, validationErrors), cause) {
-    constructor(status: HttpStatus, uri: URI, errorResponse: ErrorResponse, cause: Throwable? = null) :
+    constructor(status: HttpStatus, uri: URI, errors: ErrorResponse, cause: Throwable? = null) :
             this(status,
                 uri,
-                errorResponse.error,
+                errors.error,
                 cause,
-                errorResponse.stackTrace,
-                errorResponse.validationErrors)
+                errors.stackTrace,
+                errors.validationErrors)
 
     class NotFoundException(detail: String? = NOT_FOUND.reasonPhrase,
                             uri: URI,
@@ -63,7 +63,7 @@ open class IrrecoverableException(status: HttpStatus,
 
 open class RecoverableException(status: HttpStatus,
                                 uri: URI,
-                                detail: String = "Fikk respons $status",
+                                detail: String? = "Fikk respons $status",
                                 cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, uri), cause)
 
@@ -73,7 +73,7 @@ private fun problemDetail(status: HttpStatus,
                           stackTrace: String? = null,
                           validationErrors: List<String>? = emptyList()) =
     forStatusAndDetail(status, detail).apply {
-        this.title = status.reasonPhrase
+        title = status.reasonPhrase
         type = uri
         validationErrors?.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
