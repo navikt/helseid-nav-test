@@ -4,7 +4,7 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGM
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBACTION
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBROLE
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBSERVICE
-import no.nav.helseidnavtest.error.NotFoundException
+import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON

@@ -18,12 +18,12 @@ import java.net.URI
 
 @Component
 @Qualifier(EDI20)
-class BodyConsumingErrorHandler(private val mapper: ObjectMapper) : ErrorHandler {
+class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        val respons = mapper.readValue<ErrorResponse>(res.body)
-        throw when (res.statusCode) {
-            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(res.statusCode as HttpStatus, req.uri, respons)
-            else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
+        throw when (val code = res.statusCode as HttpStatus) {
+            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri, m.readValue<ErrorResponse>(res.body))
+
+            else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
         }
     }
 }
@@ -32,15 +32,12 @@ class BodyConsumingErrorHandler(private val mapper: ObjectMapper) : ErrorHandler
 @Primary
 class DefaultErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        throw when (res.statusCode) {
-            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(res.statusCode as HttpStatus, req.uri)
-            else -> RecoverableException(res.statusCode as HttpStatus, "Fikk response ${res.statusCode}", req.uri)
+        throw when (val code = res.statusCode as HttpStatus) {
+            BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri)
+            else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
         }
     }
 }
-
-class NotFoundException(detail: String? = null, uri: URI, stackTrace: String? = null, cause: Throwable? = null) :
-    IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace, emptyList())
 
 open class IrrecoverableException(status: HttpStatus,
                                   uri: URI,
@@ -56,9 +53,18 @@ open class IrrecoverableException(status: HttpStatus,
                 cause,
                 errorResponse.stackTrace,
                 errorResponse.validationErrors)
+
+    class NotFoundException(detail: String? = NOT_FOUND.reasonPhrase,
+                            uri: URI,
+                            stackTrace: String? = null,
+                            cause: Throwable? = null) :
+        IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace, emptyList())
 }
 
-open class RecoverableException(status: HttpStatus, detail: String, uri: URI, cause: Throwable? = null) :
+open class RecoverableException(status: HttpStatus,
+                                uri: URI,
+                                detail: String = "Fikk respons $status",
+                                cause: Throwable? = null) :
     ErrorResponseException(status, problemDetail(status, detail, uri), cause)
 
 private fun problemDetail(status: HttpStatus,
@@ -74,5 +80,5 @@ private fun problemDetail(status: HttpStatus,
     }
 
 data class ErrorResponse(val error: String,
-                         val validationErrors: List<String> = emptyList(),
+                         val validationErrors: List<String>? = emptyList(),
                          val stackTrace: String? = null)

@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.oppslag.fastlege
 
 import no.nav.helseidnavtest.dialogmelding.*
-import no.nav.helseidnavtest.error.NotFoundException
+import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nhn.schemas.reg.flr.IFlrReadOperations
@@ -23,7 +23,10 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlegeliste for avtale $avtale", cfg.url, cause = it)
+            is ReadFault -> throw NotFoundException("Fant ikke fastlegeliste for avtale $avtale",
+                cfg.url,
+                cause = it)
+
             else -> throw it
         }
     }

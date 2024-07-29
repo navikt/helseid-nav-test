@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.error.IrrecoverableException
-import no.nav.helseidnavtest.error.NotFoundException
+import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
 import no.nhn.register.communicationparty.ICommunicationPartyService
@@ -33,7 +33,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 it.message,
                 cause = it)
 
-            else -> throw RecoverableException(BAD_REQUEST, it.message ?: "", cfg.url, it)
+            else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message ?: "", it)
         }
     }
 

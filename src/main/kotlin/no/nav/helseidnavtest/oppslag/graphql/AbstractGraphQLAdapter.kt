@@ -44,8 +44,8 @@ interface GraphQLErrorHandler {
             is FieldAccessException -> throw e.oversett(uri)
             is GraphQlTransportException -> throw RecoverableException(
                 INTERNAL_SERVER_ERROR,
-                e.message ?: "Transport feil",
                 uri,
+                e.message ?: "Transport feil",
                 e
             )
 
