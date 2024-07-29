@@ -35,11 +35,8 @@ class DialogmeldingGenerator(
                             fastlege.herIdForLegeViaPasient(pasient),
                             hprNumber,
                             fnr,
-                            fastlege.kontorForPasient(pasient)
-                        )
-                    }, uuid
-                ), arbeidstaker(pasient)
-                )
+                            fastlege.kontorForPasient(pasient))
+                    }, uuid), arbeidstaker(pasient))
             }
 
             else -> throw IllegalStateException() //  IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")

@@ -1,13 +1,14 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
-import no.nav.helseidnavtest.error.ErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.ContentDisposition
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.body
 import org.springframework.web.multipart.MultipartFile
 import java.net.URI
@@ -15,7 +16,7 @@ import java.net.URI
 @Component
 class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
                                  private val cf: EDI20DeftConfig,
-                                 private val handler: ErrorHandler) :
+                                 @Qualifier(EDI20) private val handler: ErrorHandler) :
     AbstractRestClientAdapter(restClient, cf) {
 
     fun les(uri: URI, herid: String) =
@@ -24,9 +25,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .uri { uri }
             .headers { it.herId(herid) }
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
     fun kvitter(key: String, herid: String) =
@@ -35,9 +34,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .uri { cf.kvitteringURI(it, key, herid) }
             .headers { it.herId(herid) }
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
     fun status(key: String, herid: String) =
@@ -46,9 +43,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .uri { cf.statusURI(it, key) }
             .headers { it.herId(herid) }
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<DeftStatus>()
 
     fun slett(key: String, herid: String) =
@@ -57,9 +52,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .uri { cf.deleteURI(it, key) }
             .headers { it.herId(herid) }
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
     fun upload(file: MultipartFile, herid: String) =
@@ -77,9 +70,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
                 add("file", file.resource)
             })
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
 

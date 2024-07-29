@@ -5,16 +5,18 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBACTIO
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBROLE
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingMapper.Companion.EBSERVICE
 import no.nav.helseidnavtest.error.NotFoundException
-import no.nav.helseidnavtest.error.handleErrors
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler
 import org.springframework.web.client.body
 
 @Component
-class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(DIALOGMELDING) client: RestClient) :
+class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig,
+                               @Qualifier(DIALOGMELDING) client: RestClient,
+                               private val handler: ErrorHandler) :
     AbstractRestClientAdapter(client, cf) {
 
     fun partnerId(herId: String, behandlerKontor: BehandlerKontor) =
@@ -32,9 +34,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig, @Qualifier(D
                 }
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .onStatus({ it.isError }) { req, res ->
-                    handleErrors(req, res, "Fant ikke partnerId for $herId (${behandlerKontor.navn})")
-                }
+                .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
                 .body<String>().also {
                     log.trace("Dialogmelding partner response {}", it)
                 }

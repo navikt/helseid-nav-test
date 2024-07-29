@@ -4,7 +4,7 @@ import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.error.ErrorHandler
+import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
 import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
@@ -25,7 +25,7 @@ class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
     private val generator: DialogmeldingGenerator,
-    private val handler: ErrorHandler
+    @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
     fun apprec(herId: String, id: UUID) =
@@ -36,9 +36,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_JSON)
             .body(Apprec.OK)
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
     fun status(herId: String, id: UUID) =
@@ -48,9 +46,7 @@ class EDI20RestClientAdapter(
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Status>>()
 
     fun les(herId: String, id: UUID) =
@@ -60,9 +56,7 @@ class EDI20RestClientAdapter(
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
     fun poll(herId: String, appRec: Boolean) =
@@ -72,9 +66,7 @@ class EDI20RestClientAdapter(
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
     fun send(herId: String) =
@@ -85,9 +77,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_JSON)
             .body(BusinessDocument(format(XML, herId, herId.other()).encode()))
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
     fun lest(herId: String, id: UUID) =
@@ -97,9 +87,7 @@ class EDI20RestClientAdapter(
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus({ it.isError }) { req, res ->
-                handler.handle(req, res)
-            }
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
