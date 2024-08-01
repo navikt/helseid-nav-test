@@ -63,14 +63,13 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, vedlegg: MultipartFile?) =
+    fun send(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         restClient
             .post()
             .uri(cf::sendURI)
             .headers { it.herId(herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(xml(herId, herId.other(), Fødselsnummer("26900799232")).encode()))
-            // .body(BusinessDocument(String.format(XML, herId, herId.other()).also { log.info("XML er $it") }.encode()))
+            .body(BusinessDocument(xml(herId, herId.other(), pasient).encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
