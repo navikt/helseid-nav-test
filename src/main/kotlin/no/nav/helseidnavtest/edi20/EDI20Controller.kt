@@ -21,7 +21,8 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.poll(herId, apprec)
 
     @PostMapping(MESSAGES_PATH, consumes = [APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE])
-    fun send(@RequestPart("file") vedlegg: MultipartFile?, @Herid @RequestParam herId: HerId) = edi.send(herId, vedlegg)
+    fun send(@RequestPart("file", required = false) vedlegg: MultipartFile?, @Herid @RequestParam herId: HerId) =
+        edi.send(herId, vedlegg)
 
     @PutMapping("${DOK_PATH}/read/{herId}")
     fun lest(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.lest(herId, id)
