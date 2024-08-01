@@ -6,6 +6,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @RestController(EDI20)
@@ -20,7 +21,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.poll(herId, apprec)
 
     @PostMapping(MESSAGES_PATH)
-    fun send(@Herid @RequestParam herId: HerId) = edi.send(herId)
+    fun send(@RequestPart("file") vedlegg: MultipartFile?, @Herid @RequestParam herId: HerId) = edi.send(herId, vedlegg)
 
     @PutMapping("${DOK_PATH}/read/{herId}")
     fun lest(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.lest(herId, id)

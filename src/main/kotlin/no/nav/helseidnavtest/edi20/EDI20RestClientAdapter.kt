@@ -15,6 +15,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import org.springframework.web.multipart.MultipartFile
 import java.io.StringWriter
 import java.lang.String.format
 import java.util.*
@@ -69,7 +70,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: String) =
+    fun send(herId: String, vedlegg: MultipartFile?) =
         restClient
             .post()
             .uri(cf::sendURI)
