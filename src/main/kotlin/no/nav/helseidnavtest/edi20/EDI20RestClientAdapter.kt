@@ -121,7 +121,7 @@ class EDI20RestClientAdapter(
 		<ns4:Type V="DIALOG_NOTAT" DN="Notat"/>
 		<ns4:MIGversion>v1.2 2006-05-24</ns4:MIGversion>
 		<ns4:GenDate>2024-07-04T16:55:43.904207659</ns4:GenDate>
-		<ns4:MsgId>ce3de801-9cae-4cb6-aa4e-b682cb6de3c9</ns4:MsgId>
+		<ns4:MsgId>ce3de801-9cae-4cb6-aa4e-b682cb6de3c3</ns4:MsgId>
 		<ns4:Sender>
 			<ns4:Organisation>
 				<ns4:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns4:OrganisationName>
