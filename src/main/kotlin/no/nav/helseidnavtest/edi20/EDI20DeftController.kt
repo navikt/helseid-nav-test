@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.HerId.Companion.of
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.OBJECT_PATH
@@ -13,8 +14,8 @@ import java.net.URI
 class EDI20DeftController(private val deft: EDI20DeftService) {
 
     @PostMapping(OBJECT_PATH, consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun upload(@RequestPart("file") file: MultipartFile, @Herid @RequestParam herId: String) =
-        deft.upload(file, of(herId))
+    fun upload(@RequestPart("file") file: MultipartFile, @Herid @RequestParam herId: HerId) =
+        deft.upload(file, herId)
 
     @GetMapping("$OBJECT_PATH/{key}/status")
     fun status(key: String, @Herid @RequestParam herId: String) =
