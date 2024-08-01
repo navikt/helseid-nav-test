@@ -163,21 +163,6 @@ class EDI20RestClientAdapter(
 			</ns4:Ident>
 		</ns4:Patient>
 	</ns4:MsgInfo>
-	<ns4:Document>
-		<ns4:DocumentConnection V="H" DN="Hoveddokument"/>
-		<ns4:RefDoc>
-			<ns4:MsgType V="XML" DN="XML-instans"/>
-			<ns4:MimeType>text/xml</ns4:MimeType>
-			<ns4:Content>
-				<ns2:Dialogmelding>
-					<ns2:Notat>
-						<ns2:TemaKodet V="8" S="2.16.578.1.12.4.1.1.8127" DN="Melding fra NAV"/>
-						<ns2:TekstNotatInnhold>dette er litt tekst</ns2:TekstNotatInnhold>
-					</ns2:Notat>
-				</ns2:Dialogmelding>
-			</ns4:Content>
-		</ns4:RefDoc>
-	</ns4:Document>
 </ns4:MsgHead>
     """.trimIndent()
     }
