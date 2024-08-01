@@ -76,7 +76,7 @@ class EDI20RestClientAdapter(
             .uri(cf::sendURI)
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(format(XML, herId, herId.other()).encode()))
+            .body(BusinessDocument(format(XML, herId, herId.other()).also { log.info("XML er $it") }.encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
