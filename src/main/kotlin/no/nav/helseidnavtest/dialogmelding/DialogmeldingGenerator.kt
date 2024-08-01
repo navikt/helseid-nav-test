@@ -42,7 +42,7 @@ class DialogmeldingGenerator(
             else -> throw IllegalStateException() //  IrrecoverableException(FORBIDDEN, "Ikke autentisert", "${auth::class.java}")
         }
 
-    private fun arbeidstaker(pasient: Fødselsnummer) = Arbeidstaker(pasient, pdl.navn(pasient))
+    private fun arbeidstaker(pasient: Fødselsnummer) = Pasient(pasient, pdl.navn(pasient))
 
     private fun dialogmelding(behandler: Behandler, uuid: UUID) =
         Dialogmelding(

@@ -20,9 +20,9 @@ import java.util.function.Function
 
 @Component
 class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
-    fun fellesFormat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) = createFellesformat(melding, arbeidstaker)
+    fun fellesFormat(melding: Dialogmelding, arbeidstaker: Pasient) = createFellesformat(melding, arbeidstaker)
 
-    private fun createFellesformat(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
+    private fun createFellesformat(melding: Dialogmelding, arbeidstaker: Pasient) =
         FFOF.createXMLEIFellesformat().apply {
             with(any) {
                 add(hodemelding(melding, arbeidstaker))
@@ -31,7 +31,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
         }
 
-    private fun hodemelding(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
+    private fun hodemelding(melding: Dialogmelding, arbeidstaker: Pasient) =
         HMOF.createXMLMsgHead().apply {
             msgInfo = msgInfo(melding, arbeidstaker)
             document.addAll(listOf(dialogmeldingDocument(melding), vedleggDocument(melding)))
@@ -58,7 +58,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             tidsstempel = now()
         })
 
-    private fun msgInfo(melding: Dialogmelding, arbeidstaker: Arbeidstaker) =
+    private fun msgInfo(melding: Dialogmelding, arbeidstaker: Pasient) =
         HMOF.createXMLMsgInfo().apply {
             type = HMOF.createXMLCS().apply {
                 dn = "Notat"
@@ -150,7 +150,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
         }
 
-    private fun pasient(arbeidstaker: Arbeidstaker) =
+    private fun pasient(arbeidstaker: Pasient) =
         HMOF.createXMLPatient().apply {
             with(arbeidstaker) {
                 familyName = navn.etternavn

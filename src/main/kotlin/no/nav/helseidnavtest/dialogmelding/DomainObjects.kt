@@ -18,7 +18,7 @@ import java.time.LocalDateTime.now
 import java.time.OffsetDateTime
 import java.util.*
 
-data class Arbeidstaker(
+data class Pasient(
     val id: Fødselsnummer,
     val navn: Navn,
     val mottatt: OffsetDateTime = OffsetDateTime.now())

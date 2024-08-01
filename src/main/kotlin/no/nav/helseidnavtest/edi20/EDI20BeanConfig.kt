@@ -7,6 +7,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.HELSE
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.correlatingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DPoPBevisGenerator
+import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -16,6 +17,7 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
+import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
