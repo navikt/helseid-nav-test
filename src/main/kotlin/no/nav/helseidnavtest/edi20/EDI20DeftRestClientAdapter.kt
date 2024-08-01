@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
@@ -19,7 +20,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
                                  @Qualifier(EDI20) private val handler: ErrorHandler) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    fun les(uri: URI, herid: String) =
+    fun les(uri: URI, herid: HerId) =
         restClient
             .get()
             .uri { uri }
@@ -28,16 +29,16 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
-    fun kvitter(key: String, herid: String) =
+    fun kvitter(key: String, herid: HerId) =
         restClient
             .put()
-            .uri { cf.kvitteringURI(it, key, herid) }
+            .uri { cf.kvitteringURI(it, key, herid.verdi) }
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun status(key: String, herid: String) =
+    fun status(key: String, herid: HerId) =
         restClient
             .get()
             .uri { cf.statusURI(it, key) }
@@ -46,7 +47,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<DeftStatus>()
 
-    fun slett(key: String, herid: String) =
+    fun slett(key: String, herid: HerId) =
         restClient
             .delete()
             .uri { cf.deleteURI(it, key) }
@@ -55,10 +56,10 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun upload(file: MultipartFile, herid: String) =
+    fun upload(file: MultipartFile, herid: HerId) =
         restClient
             .post()
-            .uri { cf.uploadURI(it, herid) }
+            .uri { cf.uploadURI(it, herid.verdi) }
             .headers {
                 it.contentDisposition = ContentDisposition
                     .inline()

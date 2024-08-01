@@ -1,23 +1,16 @@
 package no.nav.helseidnavtest.edi20
 
-import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
-import no.nav.helseidnavtest.dialogmelding.DialogmeldingGenerator
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
-import no.nav.helseopplysninger.basecontainer.XMLBase64Container
-import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
-import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import org.springframework.web.multipart.MultipartFile
-import java.io.StringWriter
-import java.lang.String.format
 import java.util.*
 import java.util.Base64.getEncoder
 
@@ -25,14 +18,14 @@ import java.util.Base64.getEncoder
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
-    private val generator: DialogmeldingGenerator,
+    private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
-    fun apprec(herId: String, id: UUID) =
+    fun apprec(herId: HerId, id: UUID) =
         restClient
             .post()
-            .uri { cf.apprecURI(it, id, herId) }
+            .uri { cf.apprecURI(it, id, herId.verdi) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .body(Apprec.OK)
@@ -40,7 +33,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
-    fun status(herId: String, id: UUID) =
+    fun status(herId: HerId, id: UUID) =
         restClient
             .get()
             .uri { cf.statusURI(it, id) }
@@ -50,7 +43,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Status>>()
 
-    fun les(herId: String, id: UUID) =
+    fun les(herId: HerId, id: UUID) =
         restClient
             .get()
             .uri { cf.lesURI(it, id) }
@@ -60,51 +53,42 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
-    fun poll(herId: String, appRec: Boolean) =
+    fun poll(herId: HerId, appRec: Boolean) =
         restClient
             .get()
-            .uri { cf.pollURI(it, herId, appRec) }
+            .uri { cf.pollURI(it, herId.verdi, appRec) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: String, vedlegg: MultipartFile?) =
+    fun send(herId: HerId, vedlegg: MultipartFile?) =
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { it.herId(herId) }
+            .headers { it.herId(herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(format(XML, herId, herId.other()).also { log.info("XML er $it") }.encode()))
+            .body(BusinessDocument(xml(herId, herId.other(), Fødselsnummer("26900799232")).encode()))
+            // .body(BusinessDocument(String.format(XML, herId, herId.other()).also { log.info("XML er $it") }.encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun lest(herId: String, id: UUID) =
+    fun lest(herId: HerId, id: UUID) =
         restClient
             .put()
-            .uri { cf.lestURI(it, id, herId) }
+            .uri { cf.lestURI(it, id, herId.verdi) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
+    private fun xml(from: HerId, to: HerId, pasient: Fødselsnummer) =
+        generator.hodemelding(from, to, pasient).also { log.info("XML er $it") }
+
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
-    private fun marshal(): String {
-        val xml = StringWriter()
-        Jaxb2Marshaller().apply {
-            setMarshallerProperties(mapOf(JAXB_FORMATTED_OUTPUT to true))
-            setClassesToBeBound(
-                XMLBase64Container::class.java,
-                XMLDialogmelding::class.java,
-                XMLMsgHead::class.java
-            )
-        }.createMarshaller().marshal(generator.hodemeldng(Fødselsnummer("12345678901"), UUID.randomUUID()), xml)
-        log.info("XML {}", xml.toString())
-        return xml.toString()
-    }
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"

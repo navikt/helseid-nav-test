@@ -8,11 +8,11 @@ import java.util.*
 @Service
 class EDI20Service(val adapter: EDI20RestClientAdapter) {
 
-    fun status(herId: HerId, id: UUID) = adapter.status(herId.verdi, id)
-    fun les(herId: HerId, id: UUID) = adapter.les(herId.verdi, id)
-    fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId.verdi, appRec)
-    fun send(herId: HerId, vedlegg: MultipartFile?) = adapter.send(herId.verdi, vedlegg)
-    fun lest(herId: HerId, id: UUID) = adapter.lest(herId.verdi, id)
-    fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId.verdi, id)
+    fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
+    fun les(herId: HerId, id: UUID) = adapter.les(herId, id)
+    fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
+    fun send(herId: HerId, vedlegg: MultipartFile?) = adapter.send(herId, vedlegg)
+    fun lest(herId: HerId, id: UUID) = adapter.lest(herId, id)
+    fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
 }
