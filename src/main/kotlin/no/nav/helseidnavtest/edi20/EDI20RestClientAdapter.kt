@@ -6,6 +6,7 @@ import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -46,7 +47,7 @@ class EDI20RestClientAdapter(
             .get()
             .uri { cf.lesURI(it, id) }
             .headers { it.herId(herId) }
-            .accept(APPLICATION_JSON)
+            .accept(APPLICATION_XML)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
