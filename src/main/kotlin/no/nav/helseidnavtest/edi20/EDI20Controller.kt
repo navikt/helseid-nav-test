@@ -17,16 +17,17 @@ import java.util.*
 @RequestMapping("/$EDI20/")
 class EDI20Controller(private val edi: EDI20Service) {
 
-    @Operation(description = "Sender apprec for en gitt melding for en gitt herId")
+    @Operation(description = "Sender apprec for melding for gitt avsender")
     @PostMapping("${DOK_PATH}/apprec")
     fun apprec(@Herid @RequestParam herId: HerId, @PathVariable id: UUID) = edi.apprec(herId, id)
 
-    @Operation(description = "Henter uleste meldinger for eh gitt herId")
+    @Operation(description = "Henter uleste meldinger for gitt herId")
     @GetMapping(MESSAGES_PATH)
     fun poll(@Herid @RequestParam herId: HerId,
              @Parameter(description = "Inkluderer apprec hvis satt") @RequestParam(defaultValue = "false") apprec: Boolean) =
         edi.poll(herId, apprec)
 
+    @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendRef(@RequestPart("file", required = false) vedlegg: MultipartFile?,
                 @RequestParam(defaultValue = "26900799232") pasient: String,
@@ -35,29 +36,35 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
+    @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
     fun showRef(@RequestPart("file", required = false) vedlegg: MultipartFile,
                 @RequestParam(defaultValue = "26900799232") pasient: String,
                 @Herid @RequestParam herId: HerId) =
         edi.showRef(herId, Fødselsnummer(pasient), vedlegg)
 
+    @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendInline(@RequestPart("file", required = false) vedlegg: MultipartFile?,
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Herid @RequestParam herId: HerId) =
         edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
 
+    @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun showInline(@RequestPart("file", required = false) vedlegg: MultipartFile,
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Herid @RequestParam herId: HerId) =
         edi.showInline(herId, Fødselsnummer(pasient), vedlegg)
 
+    @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")
-    fun lest(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.lest(herId, id)
+    fun konsumert(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.konsumert(herId, id)
 
+    @Operation(description = "Les et dokument som en gitt herId")
     @GetMapping(DOK_PATH, produces = [APPLICATION_XML_VALUE])
     fun les(@Herid herId: HerId, @PathVariable id: UUID) = edi.les(herId, id)
 
+    @Operation(description = "Les status for et dokument som en gitt herId")
     @GetMapping("${DOK_PATH}/status")
     fun status(@Herid herId: HerId, @PathVariable id: UUID) = edi.status(herId, id)
 }

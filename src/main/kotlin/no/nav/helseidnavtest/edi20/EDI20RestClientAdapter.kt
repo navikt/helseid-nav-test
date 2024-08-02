@@ -73,7 +73,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun lest(herId: HerId, id: UUID) =
+    fun konsumert(herId: HerId, id: UUID) =
         restClient
             .put()
             .uri { cf.lestURI(it, id, herId.verdi) }
