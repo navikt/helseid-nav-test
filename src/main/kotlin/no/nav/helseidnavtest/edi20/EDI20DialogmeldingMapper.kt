@@ -7,10 +7,10 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime.now
@@ -20,12 +20,17 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vararg refs: Pair<URI, MediaType>) =
+    fun hodemeldingVedleggReferanse(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
         HMOF.createXMLMsgHead().apply {
             msgInfo = msgInfo(fra, til, pasient)
-            refs.forEach { (uri, mediaType) ->
-                document.add(vedleggReferanse(uri, mediaType))
-            }
+            vedlegg?.let { document.add(vedleggReferanse(it.first, it.second)) }
+            // vedlegg?.let { document.add(inlineVedlegg(it.bytes)) }
+        }
+
+    fun hodemeldingVedleggInline(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
+        HMOF.createXMLMsgHead().apply {
+            msgInfo = msgInfo(fra, til, pasient)
+            vedlegg?.let { document.add(inlineVedlegg(it.bytes)) }
         }
 
     private fun msgInfo(fra: HerId, til: HerId, pasient: Pasient) =
@@ -78,7 +83,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun vedleggReferanse(url: URI, mediaType: MediaType) =
+    private fun vedleggReferanse(uri: URI, contentType: String) =
         HMOF.createXMLDocument().apply {
             refDoc = HMOF.createXMLRefDoc().apply {
                 issueDate = HMOF.createXMLTS().apply {
@@ -88,9 +93,9 @@ class EDI20DialogmeldingMapper {
                     dn = VEDLEGG
                     v = "A"
                 }
-                mimeType = mediaType.toString()
-                description = url.path
-                fileReference = url.toString()
+                mimeType = contentType
+                description = "Beskrivelse av vedlegg"
+                fileReference = "$uri"
             }
         }
 

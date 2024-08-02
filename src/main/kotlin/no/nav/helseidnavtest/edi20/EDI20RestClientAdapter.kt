@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
@@ -10,7 +9,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import org.springframework.web.multipart.MultipartFile
 import java.util.*
 import java.util.Base64.getEncoder
 
@@ -63,13 +61,13 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+    fun send(herId: HerId, hodemelding: String) =
         restClient
             .post()
             .uri(cf::sendURI)
             .headers { it.herId(herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(xml(herId, herId.other(), pasient).encode()))
+            .body(BusinessDocument(hodemelding.encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
@@ -83,9 +81,6 @@ class EDI20RestClientAdapter(
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
-
-    private fun xml(from: HerId, to: HerId, pasient: Fødselsnummer) =
-        generator.hodemelding(from, to, pasient).also { log.info("XML er $it") }
 
     private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
 

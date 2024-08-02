@@ -22,11 +22,17 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun poll(@Herid @RequestParam herId: HerId, @RequestParam(defaultValue = "false") apprec: Boolean) =
         edi.poll(herId, apprec)
 
-    @PostMapping(MESSAGES_PATH, consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun send(@RequestPart("file", required = false) vedlegg: MultipartFile?,
-             @RequestParam(defaultValue = "26900799232") pasient: String,
-             @Herid @RequestParam herId: HerId) =
-        edi.send(herId, Fødselsnummer(pasient), vedlegg)
+    @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun sendMedReferanse(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+                         @RequestParam(defaultValue = "26900799232") pasient: String,
+                         @Herid @RequestParam herId: HerId) =
+        edi.sendMedReferanse(herId, Fødselsnummer(pasient), vedlegg)
+
+    @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun sendInline(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+                   @RequestParam(defaultValue = "26900799232") pasient: String,
+                   @Herid @RequestParam herId: HerId) =
+        edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
 
     @PutMapping("${DOK_PATH}/read/{herId}")
     fun lest(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.lest(herId, id)
