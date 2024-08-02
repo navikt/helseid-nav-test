@@ -23,16 +23,28 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.poll(herId, apprec)
 
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendMedReferanse(@RequestPart("file", required = false) vedlegg: MultipartFile?,
-                         @RequestParam(defaultValue = "26900799232") pasient: String,
-                         @Herid @RequestParam herId: HerId) =
-        edi.sendMedReferanse(herId, Fødselsnummer(pasient), vedlegg)
+    fun sendRef(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+                @RequestParam(defaultValue = "26900799232") pasient: String,
+                @Herid @RequestParam herId: HerId) =
+        edi.sendRef(herId, Fødselsnummer(pasient), vedlegg)
+
+    @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun showRef(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+                @RequestParam(defaultValue = "26900799232") pasient: String,
+                @Herid @RequestParam herId: HerId) =
+        edi.showRef(herId, Fødselsnummer(pasient), vedlegg)
 
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendInline(@RequestPart("file", required = false) vedlegg: MultipartFile?,
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Herid @RequestParam herId: HerId) =
         edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
+
+    @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun showInline(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+                   @RequestParam(defaultValue = "26900799232") pasient: String,
+                   @Herid @RequestParam herId: HerId) =
+        edi.showInline(herId, Fødselsnummer(pasient), vedlegg)
 
     @PutMapping("${DOK_PATH}/read/{herId}")
     fun lest(@Herid @PathVariable herId: HerId, @PathVariable id: UUID) = edi.lest(herId, id)

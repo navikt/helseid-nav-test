@@ -14,17 +14,24 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
                    private val adapter: EDI20RestClientAdapter) {
 
     fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
+
     fun les(herId: HerId, id: UUID) = adapter.les(herId, id)
+
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
-    fun sendMedReferanse(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) {
+
+    fun sendRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         vedlegg?.let {
             adapter.send(herId, hodemelding(herId, pasient, Pair(deft.upload(it, herId), it.contentType!!)))
         } ?: adapter.send(herId, hodemelding(herId, pasient))
-    }
 
-    fun sendInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) {
+    fun sendInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         adapter.send(herId, hodemelding(herId, pasient, vedlegg))
-    }
+
+    fun showRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile) =
+        hodemelding(herId, pasient, Pair(deft.upload(vedlegg, herId), vedlegg.contentType!!))
+
+    fun showInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+        hodemelding(herId, pasient, vedlegg)
 
     fun lest(herId: HerId, id: UUID) = adapter.lest(herId, id)
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
