@@ -17,7 +17,8 @@ import java.util.*
 
 @RestController(EDI20)
 @RequestMapping("/$EDI20/")
-@Tag(name = "Controller for å teste EDI2.0-apiet, kaller videre til NHN-apiet med auth (Client Credential Flow) for valgt herId",
+@Tag(name = "EDI2.0",
+    description = "Controller for å teste EDI2.0-apiet, kaller videre til NHN-apiet med auth (Client Credential Flow) for valgt herId",
     externalDocs = ExternalDocumentation(description = "EDI 2.0",
         url = "https://utviklerportal.nhn.no/informasjonstjenester/meldingstjener/edi-20/edi-20-ekstern-docs/openapi/meldingstjener-api/"))
 class EDI20Controller(private val edi: EDI20Service) {
@@ -25,7 +26,6 @@ class EDI20Controller(private val edi: EDI20Service) {
     @Operation(description = "Sender apprec for melding for gitt mottaker")
     @PostMapping("${DOK_PATH}/apprec")
     fun apprec(@Herid
-               @Parameter(description = "HerId for avsender")
                @RequestParam herId: HerId,
                @Parameter(description = "Dokument-id")
                @PathVariable id: UUID) =
@@ -33,14 +33,16 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Henter uleste meldinger for en gitt herId")
     @GetMapping(MESSAGES_PATH)
-    fun poll(@Herid @RequestParam herId: HerId,
+    fun poll(@Herid
+             @RequestParam herId: HerId,
              @Parameter(description = "Spesifiserer om apprec-meldinger skal inkluderes eller ikke")
              @RequestParam(defaultValue = "false") apprec: Boolean) =
         edi.poll(herId, apprec)
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendRef(@Herid @RequestParam herId: HerId,
+    fun sendRef(@Herid
+                @RequestParam herId: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = "26900799232") pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
@@ -50,7 +52,8 @@ class EDI20Controller(private val edi: EDI20Service) {
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
-    fun showRef(@Herid @RequestParam herId: HerId,
+    fun showRef(@Herid
+                @RequestParam herId: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = "26900799232") pasient: String,
                 @Parameter(description = "Vedlegg")
@@ -59,7 +62,8 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(@Herid @RequestParam herId: HerId,
+    fun sendInline(@Herid
+                   @RequestParam herId: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
@@ -68,7 +72,8 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun showInline(@Herid @RequestParam herId: HerId,
+    fun showInline(@Herid
+                   @RequestParam herId: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Parameter(description = "Vedlegg")
@@ -77,7 +82,8 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")
-    fun konsumert(@Herid @PathVariable herId: HerId,
+    fun konsumert(@Herid
+                  @PathVariable herId: HerId,
                   @Parameter(description = "Dokument-id")
                   @PathVariable id: UUID) =
         edi.konsumert(herId, id)
