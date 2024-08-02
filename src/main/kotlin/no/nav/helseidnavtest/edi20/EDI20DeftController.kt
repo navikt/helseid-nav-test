@@ -15,7 +15,7 @@ import java.net.URI
 @RestController(EDI20DEFT)
 @RequestMapping("/$EDI20DEFT/")
 @Tag(name = "EDI2.0 Deft",
-    description = "Controller for å teste EDI2.0-Deft apiet, kaller videre til NHN-apiet med auth (Client Credential Flow) for valgt herId",
+    description = "Controller for å teste EDI2.0-Deft apiet, kaller videre til NHN-apiet med auth (Client Credential Flow) for valgt herId. Multipart-opplasting er ikke implementert",
     externalDocs = ExternalDocumentation(description = "EDI 2.0",
         url = "https://utviklerportal.nhn.no/informasjonstjenester/meldingstjener/edi-20/edi-20-ekstern-docs/openapi/deft-api-store-filer/"))
 class EDI20DeftController(private val deft: EDI20DeftService) {
