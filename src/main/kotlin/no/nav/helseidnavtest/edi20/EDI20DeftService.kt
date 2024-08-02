@@ -7,10 +7,10 @@ import java.net.URI
 
 @Service
 class EDI20DeftService(val adapter: EDI20DeftRestClientAdapter) {
-    fun upload(file: MultipartFile, id: HerId) = adapter.upload(file, id)
-    fun les(uri: URI, id: HerId) = adapter.les(uri, id)
-    fun kvitter(key: String, id: HerId) = adapter.kvitter(key, id)
-    fun status(key: String, id: HerId) = adapter.status(key, id)
-    fun slett(uri: URI, id: HerId) = slett(uri.key(), id)
-    fun slett(key: String, id: HerId) = adapter.slett(key, id)
+    fun upload(id: HerId, file: MultipartFile) = adapter.upload(id, file)
+    fun les(id: HerId, uri: URI) = adapter.les(id, uri)
+    fun kvitter(id: HerId, key: String) = adapter.kvitter(id, key)
+    fun status(id: HerId, key: String) = adapter.status(id, key)
+    fun slett(id: HerId, uri: URI) = slett(id, uri.key())
+    fun slett(id: HerId, key: String) = adapter.slett(id, key)
 }

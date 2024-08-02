@@ -20,7 +20,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
                                  @Qualifier(EDI20) private val handler: ErrorHandler) :
     AbstractRestClientAdapter(restClient, cf) {
 
-    fun les(uri: URI, herid: HerId) =
+    fun les(herid: HerId, uri: URI) =
         restClient
             .get()
             .uri { uri }
@@ -29,7 +29,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
-    fun kvitter(key: String, herid: HerId) =
+    fun kvitter(herid: HerId, key: String) =
         restClient
             .put()
             .uri { cf.kvitteringURI(it, key, herid.verdi) }
@@ -38,7 +38,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun status(key: String, herid: HerId) =
+    fun status(herid: HerId, key: String) =
         restClient
             .get()
             .uri { cf.statusURI(it, key) }
@@ -47,7 +47,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<DeftStatus>()
 
-    fun slett(key: String, herid: HerId) =
+    fun slett(herid: HerId, key: String) =
         restClient
             .delete()
             .uri { cf.deleteURI(it, key) }
@@ -56,7 +56,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    fun upload(file: MultipartFile, herid: HerId) =
+    fun upload(herid: HerId, file: MultipartFile) =
         restClient
             .post()
             .uri { cf.uploadURI(it, herid.verdi) }

@@ -21,14 +21,14 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
 
     fun sendRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         vedlegg?.let {
-            adapter.send(herId, hodemelding(herId, pasient, Pair(deft.upload(it, herId), it.contentType!!)))
+            adapter.send(herId, hodemelding(herId, pasient, Pair(deft.upload(herId, it), it.contentType!!)))
         } ?: adapter.send(herId, hodemelding(herId, pasient))
 
     fun sendInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         adapter.send(herId, hodemelding(herId, pasient, vedlegg))
 
     fun showRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile) =
-        hodemelding(herId, pasient, Pair(deft.upload(vedlegg, herId), vedlegg.contentType!!))
+        hodemelding(herId, pasient, Pair(deft.upload(herId, vedlegg), vedlegg.contentType!!))
 
     fun showInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         hodemelding(herId, pasient, vedlegg)
