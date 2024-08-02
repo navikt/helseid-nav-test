@@ -24,7 +24,9 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Sender apprec for melding for gitt mottaker")
     @PostMapping("${DOK_PATH}/apprec")
-    fun apprec(@Herid @RequestParam herId: HerId,
+    fun apprec(@Herid
+               @Parameter(description = "HerId for avsender")
+               @RequestParam herId: HerId,
                @Parameter(description = "Dokument-id")
                @PathVariable id: UUID) =
         edi.apprec(herId, id)
