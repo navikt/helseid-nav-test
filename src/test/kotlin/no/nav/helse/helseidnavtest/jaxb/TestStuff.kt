@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import java.net.URI
 import java.util.*
@@ -60,12 +61,21 @@ class TestStuff {
     private fun <T> any(type: Class<T>): T = Mockito.any(type)
 
     @Test
-    fun jalla() {
+    fun ref() {
         whenever(pdl.navn(any(Fødselsnummer::class.java))).thenReturn(Navn("Ola", "Mellomnavn", "Olsen"))
         EDI20DialogmeldingGenerator(jaxb2Marshaller(), EDI20DialogmeldingMapper(), pdl).hodemelding(EDI_1.first,
             EDI_2.first,
             Fødselsnummer("26900799232"),
-            Pair(URI.create("http://www.vg.no"), MediaType.APPLICATION_PDF)).also { println(it) }
+            Pair(URI.create("http://www.vg.no"), MediaType.APPLICATION_PDF_VALUE)).also { println(it) }
+    }
+
+    @Test
+    fun inline() {
+        whenever(pdl.navn(any(Fødselsnummer::class.java))).thenReturn(Navn("Ola", "Mellomnavn", "Olsen"))
+        EDI20DialogmeldingGenerator(jaxb2Marshaller(), EDI20DialogmeldingMapper(), pdl).hodemelding(EDI_1.first,
+            EDI_2.first,
+            Fødselsnummer("26900799232"),
+            MockMultipartFile("test", ClassPathResource("test.pdf").inputStream)).also { println(it) }
     }
 
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply {

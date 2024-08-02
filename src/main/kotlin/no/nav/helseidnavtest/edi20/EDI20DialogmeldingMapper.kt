@@ -20,18 +20,19 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemeldingVedleggReferanse(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
-        HMOF.createXMLMsgHead().apply {
-            msgInfo = msgInfo(fra, til, pasient)
-            vedlegg?.let { document.add(vedleggReferanse(it.first, it.second)) }
-            // vedlegg?.let { document.add(inlineVedlegg(it.bytes)) }
+    fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
+        msgInfo(msgInfo(fra, til, pasient)).apply {
+            vedlegg?.let { document.add(vedlegg(it.first, it.second)) }
         }
 
-    fun hodemeldingVedleggInline(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
-        HMOF.createXMLMsgHead().apply {
-            msgInfo = msgInfo(fra, til, pasient)
-            vedlegg?.let { document.add(inlineVedlegg(it.bytes)) }
+    fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
+        msgInfo(msgInfo(fra, til, pasient)).apply {
+            vedlegg?.let { document.add(vedlegg(it.bytes)) }
         }
+
+    private fun msgInfo(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
+        msgInfo = info
+    }
 
     private fun msgInfo(fra: HerId, til: HerId, pasient: Pasient) =
         HMOF.createXMLMsgInfo().apply {
@@ -83,7 +84,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun vedleggReferanse(uri: URI, contentType: String) =
+    private fun vedlegg(uri: URI, contentType: String) =
         HMOF.createXMLDocument().apply {
             refDoc = HMOF.createXMLRefDoc().apply {
                 issueDate = HMOF.createXMLTS().apply {
@@ -99,7 +100,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun inlineVedlegg(vedlegg: ByteArray) =
+    private fun vedlegg(vedlegg: ByteArray) =
         HMOF.createXMLDocument().apply {
             documentConnection = HMOF.createXMLCS().apply {
                 dn = VEDLEGG

@@ -21,7 +21,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
             marshaller.createMarshaller().apply {
                 setProperty(JAXB_FORMATTED_OUTPUT, true)
                 setProperty(JAXB_ENCODING, "UTF-8")
-            }.marshal(mapper.hodemeldingVedleggReferanse(from, to, pasient(pasient), vedlegg), it)
+            }.marshal(mapper.hodemelding(from, to, pasient(pasient), vedlegg), it)
             "$it"
         }
 
@@ -30,7 +30,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
             marshaller.createMarshaller().apply {
                 setProperty(JAXB_FORMATTED_OUTPUT, true)
                 setProperty(JAXB_ENCODING, "UTF-8")
-            }.marshal(mapper.hodemeldingVedleggInline(from, to, pasient(pasient), vedlegg), it)
+            }.marshal(mapper.hodemelding(from, to, pasient(pasient), vedlegg), it)
             "$it"
         }
 
