@@ -1,5 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
@@ -15,11 +17,14 @@ import java.util.*
 @RequestMapping("/$EDI20/")
 class EDI20Controller(private val edi: EDI20Service) {
 
+    @Operation(description = "Sender apprec for en gitt melding for en gitt herId")
     @PostMapping("${DOK_PATH}/apprec")
     fun apprec(@Herid @RequestParam herId: HerId, @PathVariable id: UUID) = edi.apprec(herId, id)
 
+    @Operation(description = "Henter uleste meldinger for eh gitt herId")
     @GetMapping(MESSAGES_PATH)
-    fun poll(@Herid @RequestParam herId: HerId, @RequestParam(defaultValue = "false") apprec: Boolean) =
+    fun poll(@Herid @RequestParam herId: HerId,
+             @Parameter(description = "Inkluderer apprec hvis satt") @RequestParam(defaultValue = "false") apprec: Boolean) =
         edi.poll(herId, apprec)
 
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -29,6 +34,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.sendRef(herId, Fødselsnummer(pasient), vedlegg)
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
+
     fun showRef(@RequestPart("file", required = false) vedlegg: MultipartFile,
                 @RequestParam(defaultValue = "26900799232") pasient: String,
                 @Herid @RequestParam herId: HerId) =

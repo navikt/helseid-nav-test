@@ -19,7 +19,7 @@ fun String.other() =
     }
 
 @Target(VALUE_PARAMETER)
-@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID]))
+@Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID], description = "ID for EDI1 eller EDI2"))
 annotation class Herid
 
 fun HttpHeaders.herId(herId: HerId) = herId(herId.verdi)
