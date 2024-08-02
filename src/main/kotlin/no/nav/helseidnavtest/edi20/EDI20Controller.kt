@@ -29,7 +29,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.sendRef(herId, Fødselsnummer(pasient), vedlegg)
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun showRef(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+    fun showRef(@RequestPart("file", required = false) vedlegg: MultipartFile,
                 @RequestParam(defaultValue = "26900799232") pasient: String,
                 @Herid @RequestParam herId: HerId) =
         edi.showRef(herId, Fødselsnummer(pasient), vedlegg)
@@ -41,7 +41,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
 
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun showInline(@RequestPart("file", required = false) vedlegg: MultipartFile?,
+    fun showInline(@RequestPart("file", required = false) vedlegg: MultipartFile,
                    @RequestParam(defaultValue = "26900799232") pasient: String,
                    @Herid @RequestParam herId: HerId) =
         edi.showInline(herId, Fødselsnummer(pasient), vedlegg)
