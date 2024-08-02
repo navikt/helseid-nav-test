@@ -1,7 +1,9 @@
 package no.nav.helseidnavtest.edi20
 
+import io.swagger.v3.oas.annotations.ExternalDocumentation
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
@@ -15,6 +17,9 @@ import java.util.*
 
 @RestController(EDI20)
 @RequestMapping("/$EDI20/")
+@Tag(name = "Controller for å teste EDI2.0-apiet, kaller videre til NHN-apiet med auth (Client Credential Flow) for valgt herId",
+    externalDocs = ExternalDocumentation(description = "EDI 2.0",
+        url = "https://utviklerportal.nhn.no/informasjonstjenester/meldingstjener/edi-20/edi-20-ekstern-docs/openapi/meldingstjener-api/"))
 class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Sender apprec for melding for gitt mottaker")
