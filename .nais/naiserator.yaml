@@ -1,102 +1,106 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-    annotations:
-        nais.io/read-only-file-system: "false"
-        nais.io/run-as-user: "1001"
-    name: helseid-nav-test
-    namespace: helseopplysninger
-    labels:
-        team: helseopplysninger
+  annotations:
+    nais.io/read-only-file-system: "false"
+    nais.io/run-as-user: "1001"
+  name: helseid-nav-test
+  namespace: helseopplysninger
+  labels:
+    team: helseopplysninger
 spec:
-    gcp:
-        sqlInstances:
-            - name: helseid-nav-test-dev
-              type: POSTGRES_14
-              tier: db-custom-1-3840
-              diskAutoresize: true
-              diskType: SSD
-              databases:
-                  - name: helseid-nav-test-dev
-                    envVarPrefix: DB
-    azure:
-        application:
-            enabled: true
-    accessPolicy:
-        outbound:
-            external:
-                -   host:  api.tjener.test.melding.nhn.no
-                -   host: {{dialogmelding.partnerhost}}
-                -   host: {{dialogmelding.host}}
-                    ports:
-                    -  port: {{dialogmelding.port}}
-                -   host: {{wshost}}
-                -   host: {{stshost}}
-                -   host: {{aareg}}
-                -   host: {{ereg}}
-    observability:
-        autoInstrumentation:
-            enabled: true
-            runtime: java
-        logging:
-            enabled: true
-    image: {{image}}
-    liveness:
-        path: /monitoring/health/liveness
-        initialDelay: 60
-    readiness:
-        path: /monitoring/health/readiness
-        initialDelay: 60
-    prometheus:
-        enabled: true
-        path: /monitoring/prometheus
-    replicas:
-        min: 1
-        max: 1
-        cpuThresholdPercentage: 50
-    ingresses:
-        - {{ingress}}
-    resources:
-        limits:
-            memory: 8192Mi
-        requests:
-            cpu: 250m
-            memory: 4096Mi
-    env:
-        -   name: stshost
-            value: {{stshost}}
-        -   name: dialogmelding_partnerhost
-            value: {{dialogmelding.partnerhost}}
-        -   name: dialogmelding_host
-            value: {{dialogmelding.host}}
-        -   name: dialogmelding_port
-            value: "{{dialogmelding.port}}"
-        -   name: dialogmelding_qm
-            value: {{dialogmelding.qm}}
-        -   name: dialogmelding_request
-            value: {{dialogmelding.request}}
-        -   name: dialogmelding_reply
-            value: {{dialogmelding.reply}}
-        -   name: dialogmelding_channel
-            value: {{dialogmelding.channel}}
-        -   name: dialogmelding_uri
-            value: {{dialogmelding.uri}}
-        -   name:   wshost
-            value: {{wshost}}
-        -   name: env
-            value: {{env}}
-        -   name: clientid
-            value: {{clientid}}
-        -   name: clientid-test1
-            value: {{clientid-test1}}
-        -   name: clientid-test2
-            value: {{clientid-test2}}
-        -   name: aareg
-            value: {{aareg}}
-        - name: ereg
-          value: {{ereg}}
-    envFrom:
-        -   secret: helseid
-        -   secret: helseid2
-        -   secret: fastlege
-        -   secret: dialogmelding
+  gcp:
+    sqlInstances:
+      - name: helseid-nav-test-dev
+        type: POSTGRES_14
+        tier: db-custom-1-3840
+        diskAutoresize: true
+        diskType: SSD
+        databases:
+          - name: helseid-nav-test-dev
+            envVarPrefix: DB
+  azure:
+    application:
+      enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{edihost}}
+        - host: {{dialogmelding.partnerhost}}
+        - host: {{dialogmelding.host}}
+          ports:
+            - port: {{dialogmelding.port}}
+        - host: {{wshost}}
+        - host: {{stshost}}
+        - host: {{aareg}}
+        - host: {{ereg}}
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+    logging:
+      enabled: true
+  image: {{image}}
+  liveness:
+    path: /monitoring/health/liveness
+    initialDelay: 60
+  readiness:
+    path: /monitoring/health/readiness
+    initialDelay: 60
+  prometheus:
+    enabled: true
+    path: /monitoring/prometheus
+  replicas:
+    min: 1
+    max: 1
+    cpuThresholdPercentage: 50
+  ingresses:
+    - {{ingress}}
+  resources:
+    limits:
+      memory: 8192Mi
+    requests:
+      cpu: 250m
+      memory: 4096Mi
+  env:
+    - name: stshost
+      value: {{stshost}}
+    - name: edihost
+      value: {{edihost}}
+    - name: edidefthost
+      value: {{edidefthost}}
+    - name: dialogmelding_partnerhost
+      value: {{dialogmelding.partnerhost}}
+    - name: dialogmelding_host
+      value: {{dialogmelding.host}}
+    - name: dialogmelding_port
+      value: "{{dialogmelding.port}}"
+    - name: dialogmelding_qm
+      value: {{dialogmelding.qm}}
+    - name: dialogmelding_request
+      value: {{dialogmelding.request}}
+    - name: dialogmelding_reply
+      value: {{dialogmelding.reply}}
+    - name: dialogmelding_channel
+      value: {{dialogmelding.channel}}
+    - name: dialogmelding_uri
+      value: {{dialogmelding.uri}}
+    - name: wshost
+      value: {{wshost}}
+    - name: env
+      value: {{env}}
+    - name: clientid
+      value: {{clientid}}
+    - name: clientid-test1
+      value: {{clientid-test1}}
+    - name: clientid-test2
+      value: {{clientid-test2}}
+    - name: aareg
+      value: {{aareg}}
+    - name: ereg
+      value: {{ereg}}
+  envFrom:
+    - secret: helseid
+    - secret: helseid2
+    - secret: fastlege
+    - secret: dialogmelding

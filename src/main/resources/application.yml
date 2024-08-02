@@ -1,24 +1,24 @@
 management:
-   httpexchanges:
-     recording:
-       enabled: true
-   health:
+  httpexchanges:
+    recording:
+      enabled: true
+  health:
     ping:
       enabled: false
     diskspace:
       enabled: false
-   endpoint:
-      health:
-        show-details: always
-        show-components: always
-      env:
-        show-values: always
-      configprops:
-        show-values: always
-   endpoints:
-     web:
-       base-path: /monitoring
-       exposure:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    env:
+      show-values: always
+    configprops:
+      show-values: always
+  endpoints:
+    web:
+      base-path: /monitoring
+      exposure:
         include: '*'
 spring:
   jackson:
@@ -74,7 +74,7 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
-            client-id:  ${clientid}
+            client-id: ${clientid}
             client-name: NAV Helseopplysninger
             scope:
               - profile
@@ -108,10 +108,10 @@ helse-id:
   issuer: https://${stshost}
 
 fastlege:
-    url: https://${wshost}/v2/flr/Basic
+  url: https://${wshost}/v2/flr/Basic
 
 authserver:
-    url: https://${stshost}
+  url: https://${stshost}
 
 dialogmelding:
   base-uri: https://${dialogmelding.partnerhost}
@@ -126,9 +126,9 @@ ibm:
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
 edi20:
-  base-uri: https://api.tjener.test.melding.nhn.no
+  base-uri: ${edihost}
 edi20deft:
-  base-uri: https://api.deft.test.melding.nhn.no
+  base-uri: ${edidefthost}
 springdoc:
   swagger-ui:
     csrf:
