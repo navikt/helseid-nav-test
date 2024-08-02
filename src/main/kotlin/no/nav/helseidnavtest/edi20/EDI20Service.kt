@@ -18,8 +18,7 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
     fun sendMedReferanse(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) {
         vedlegg?.let {
-            val uri = deft.upload(it, herId)
-            adapter.send(herId, hodemelding(herId, pasient, Pair(uri, it.contentType!!)))
+            adapter.send(herId, hodemelding(herId, pasient, Pair(deft.upload(it, herId), it.contentType!!)))
         } ?: adapter.send(herId, hodemelding(herId, pasient))
     }
 
