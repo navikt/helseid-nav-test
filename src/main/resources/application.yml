@@ -126,9 +126,9 @@ ibm:
 pdl:
   base-uri: https://pdl-api.${env}-fss-pub.nais.io/graphql
 edi20:
-  base-uri: ${edihost}
+  base-uri: https://${edihost}
 edi20deft:
-  base-uri: ${edidefthost}
+  base-uri: https://${edidefthost}
 springdoc:
   swagger-ui:
     csrf:
