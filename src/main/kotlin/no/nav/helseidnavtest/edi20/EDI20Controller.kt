@@ -17,14 +17,14 @@ import java.util.*
 @RequestMapping("/$EDI20/")
 class EDI20Controller(private val edi: EDI20Service) {
 
-    @Operation(description = "Sender apprec for melding for gitt avsender")
+    @Operation(description = "Sender apprec for melding for gitt mottaker")
     @PostMapping("${DOK_PATH}/apprec")
     fun apprec(@Herid @RequestParam herId: HerId,
                @Parameter(description = "Dokument-id")
                @PathVariable id: UUID) =
         edi.apprec(herId, id)
 
-    @Operation(description = "Henter uleste meldinger for gitt herId")
+    @Operation(description = "Henter uleste meldinger for en gitt herId")
     @GetMapping(MESSAGES_PATH)
     fun poll(@Herid @RequestParam herId: HerId,
              @Parameter(description = "Spesifiserer om apprec-meldinger skal inkluderes eller ikke")
@@ -75,14 +75,14 @@ class EDI20Controller(private val edi: EDI20Service) {
                   @PathVariable id: UUID) =
         edi.konsumert(herId, id)
 
-    @Operation(description = "Les et dokument som en gitt herId")
+    @Operation(description = "Les et dokument for en gitt herId")
     @GetMapping(DOK_PATH, produces = [APPLICATION_XML_VALUE])
     fun les(@Herid herId: HerId,
             @Parameter(description = "Dokument-id")
             @PathVariable id: UUID) =
         edi.les(herId, id)
 
-    @Operation(description = "Les status for et dokument som en gitt herId")
+    @Operation(description = "Les status for et dokument for en gitt herId")
     @GetMapping("${DOK_PATH}/status")
     fun status(@Herid herId: HerId,
                @Parameter(description = "Dokument-id")
