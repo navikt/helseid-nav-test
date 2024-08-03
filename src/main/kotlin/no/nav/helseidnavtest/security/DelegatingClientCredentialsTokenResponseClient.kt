@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.security.DPoPClientCredentialsTokenResponseClient.Companion.INVALID_RESPONSE
+import no.nav.helseidnavtest.security.DelegatingClientCredentialsTokenResponseClient.Companion.INVALID_RESPONSE
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.convert.converter.Converter
@@ -164,12 +164,12 @@ class DPOP(
 
         const val DPOP_NONCE = "dpop-nonce"
         const val INVALID_RESPONSE = "invalid_token_response"
-        private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
+        private val log = LoggerFactory.getLogger(DelegatingClientCredentialsTokenResponseClient::class.java)
     }
 }
 
 @Component
-class DPoPClientCredentialsTokenResponseClient(
+class DelegatingClientCredentialsTokenResponseClient(
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
     private val vanilla: Vanilla,
     private val dpop: DPOP) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
@@ -189,6 +189,6 @@ class DPoPClientCredentialsTokenResponseClient(
     companion object {
         private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith(EDI20)
         const val INVALID_RESPONSE = "invalid_token_response"
-        private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
+        private val log = LoggerFactory.getLogger(DelegatingClientCredentialsTokenResponseClient::class.java)
     }
 }

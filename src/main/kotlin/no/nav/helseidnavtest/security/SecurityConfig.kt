@@ -147,7 +147,7 @@ class SecurityConfig(
 
     @Bean
     fun authorizedClientServiceOAuth2AuthorizedClientManager(
-        dPopClient: DPoPClientCredentialsTokenResponseClient,
+        dPopClient: DelegatingClientCredentialsTokenResponseClient,
         repo: ClientRegistrationRepository,
         service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
