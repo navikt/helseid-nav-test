@@ -1,5 +1,6 @@
 package no.nav.helse.helseidnavtest.jaxb
 
+import jakarta.xml.bind.Marshaller
 import no.nav.helseidnavtest.dialogmelding.*
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
@@ -20,6 +21,8 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
@@ -28,9 +31,13 @@ import java.net.URI
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
+@SpringBootTest(classes = [Marshaller::class])
 class TestStuff {
     @Mock
     lateinit var adresse: AdresseRegisterClient
+
+    @Autowired
+    lateinit var marshaller: Marshaller
 
     @Mock
     lateinit var pdl: PDLClient
@@ -85,5 +92,8 @@ class TestStuff {
             XMLDialogmelding::class.java,
             XMLBase64Container::class.java,
             XMLAppRec::class.java)
+    }.createMarshaller().apply {
+        setProperty("jaxb.formatted.output", true)
+        setProperty("jaxb.encoding", "UTF-8")
     }
 }

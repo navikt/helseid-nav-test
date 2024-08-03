@@ -14,6 +14,7 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.RequestEntity
 import org.springframework.http.client.ClientHttpResponse
+import org.springframework.security.oauth2.client.endpoint.DefaultClientCredentialsTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient
 import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentialsGrantRequest
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
@@ -62,12 +63,9 @@ class DPOP(
                     }
                     .body(b)
                     .exchange(utenNonce(this))
-            } ?: throw OAuth2AuthorizationException(
-                OAuth2Error(
-                    INVALID_RESPONSE,
-                    "No body in request",
-                    request.url.toString()
-                )
+            } ?: throw OAuth2AuthorizationException(OAuth2Error(INVALID_RESPONSE,
+                "No body in request",
+                request.url.toString())
             )
         }
 
@@ -181,16 +179,15 @@ class DPoPClientCredentialsTokenResponseClient(
             if (request.isDPoP()) {
                 dpop.getTokenResponse(r)
             } else {
-                vanilla.getTokenResponse(r)
+                DefaultClientCredentialsTokenResponseClient().getTokenResponse(request)
+                //  vanilla.getTokenResponse(r)
             }.also {
                 log.info("Received token response for : ${request.clientRegistration.registrationId}")
             }
         } ?: throw OAuth2AuthorizationException(OAuth2Error("invalid_request", "Request could not be converted", null))
 
-    private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith(EDI20)
-
     companion object {
-
+        private fun OAuth2ClientCredentialsGrantRequest.isDPoP() = clientRegistration.registrationId.startsWith(EDI20)
         const val INVALID_RESPONSE = "invalid_token_response"
         private val log = LoggerFactory.getLogger(DPoPClientCredentialsTokenResponseClient::class.java)
     }

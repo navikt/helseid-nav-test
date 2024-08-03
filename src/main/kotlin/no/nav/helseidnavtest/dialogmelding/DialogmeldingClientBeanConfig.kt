@@ -1,6 +1,8 @@
 package no.nav.helseidnavtest.dialogmelding
 
 import jakarta.jms.ConnectionFactory
+import jakarta.xml.bind.Marshaller.JAXB_ENCODING
+import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGMELDING
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseopplysninger.apprec.XMLAppRec
@@ -39,6 +41,12 @@ class DialogmeldingClientBeanConfig {
             XMLDialogmelding::class.java,
             XMLBase64Container::class.java,
             XMLAppRec::class.java)
+    }
+
+    @Bean
+    fun marshaller(marshaller: Jaxb2Marshaller) = marshaller.createMarshaller().apply {
+        setProperty(JAXB_FORMATTED_OUTPUT, true)
+        setProperty(JAXB_ENCODING, "UTF-8")
     }
 
     @Bean
