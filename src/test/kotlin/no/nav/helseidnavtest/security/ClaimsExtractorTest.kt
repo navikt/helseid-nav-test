@@ -31,20 +31,20 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.reflect.jvm.isAccessible
 
-class ClaimsExtractorTest   {
+class ClaimsExtractorTest {
     @Test
     fun testExtractClaims() {
         val claims = mapOf(
             HPR_DETAILS to mapOf(
-                    APPROVALS to listOf(
-                        mapOf(
-                            PROFESSION to "LE",
-                            AUTHORIZATION to mapOf("value" to "1", DESCRIPTION to "Autorisasjon"),
-                            REQUISITION_RIGHTS to listOf(mapOf(VALUE to "1", DESCRIPTION to "Full rekvisisjonsrett")),
-                            SPECIALITIES to emptyList<Map<String, String>>()
-                        )
-                    ),
-                    "hpr_number" to "123456"
+                APPROVALS to listOf(
+                    mapOf(
+                        PROFESSION to "LE",
+                        AUTHORIZATION to mapOf("value" to "1", DESCRIPTION to "Autorisasjon"),
+                        REQUISITION_RIGHTS to listOf(mapOf(VALUE to "1", DESCRIPTION to "Full rekvisisjonsrett")),
+                        SPECIALITIES to emptyList<Map<String, String>>()
+                    )
+                ),
+                "hpr_number" to "123456"
             ),
             PID to "12345678901",
             HPR_NUMBER to "123456", SECURITY_LEVEL to "4",
@@ -53,19 +53,14 @@ class ClaimsExtractorTest   {
             "middle_name" to "mellom",
             "family_name" to "Nordmann"
         )
-       val e = ClaimsExtractor(claims)
+        val e = ClaimsExtractor(claims)
         assertThat(e.hprNumber).isEqualTo(HprId(123456))
         println(e.professions)
         println(e.securityLevel)
         println(e.navn)
         println(e.assuranceLevel)
         println(e.fnr)
-       // println(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(claims))
+        // println(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(claims))
     }
-
-   @Test
-    fun ser() {
-
-     println(Base64.getEncoder().withoutPadding().encodeToString(EDI20RestClientAdapter.XML.toByteArray()))
-    }
+    
 }
