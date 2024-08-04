@@ -17,7 +17,6 @@ import java.util.Base64.getEncoder
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
-    private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
