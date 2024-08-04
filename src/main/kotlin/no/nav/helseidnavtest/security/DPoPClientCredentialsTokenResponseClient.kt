@@ -61,7 +61,7 @@ class DPoPClientCredentialsTokenResponseClient(
     private fun utenNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         if (HttpStatus.BAD_REQUEST == res.statusCode && res.headers[DPOP_NONCE] != null) {
             runCatching {
-                log.trace("comparing ${request.url} with ${req.uri}")
+                log.info("comparing ${request.url} with ${req.uri}")
                 medNonce(request, req.uri, nonce(res))
             }.getOrElse {
                 if (it is OAuth2AuthorizationException) throw it

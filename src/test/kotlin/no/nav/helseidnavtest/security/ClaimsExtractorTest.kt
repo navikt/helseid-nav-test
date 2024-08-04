@@ -62,5 +62,5 @@ class ClaimsExtractorTest {
         println(e.fnr)
         // println(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(claims))
     }
-    
+
 }
