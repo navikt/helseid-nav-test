@@ -44,7 +44,7 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun sendRef(@Herid
                 @RequestParam herId: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
-                @RequestParam(defaultValue = "26900799232") pasient: String,
+                @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         edi.sendRef(herId, Fødselsnummer(pasient), vedlegg)
@@ -55,7 +55,7 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun showRef(@Herid
                 @RequestParam herId: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
-                @RequestParam(defaultValue = "26900799232") pasient: String,
+                @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
         edi.showRef(herId, Fødselsnummer(pasient), vedlegg)
@@ -65,7 +65,7 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun sendInline(@Herid
                    @RequestParam herId: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
-                   @RequestParam(defaultValue = "26900799232") pasient: String,
+                   @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
@@ -75,7 +75,7 @@ class EDI20Controller(private val edi: EDI20Service) {
     fun showInline(@Herid
                    @RequestParam herId: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
-                   @RequestParam(defaultValue = "26900799232") pasient: String,
+                   @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile) =
         edi.showInline(herId, Fødselsnummer(pasient), vedlegg)
@@ -101,4 +101,5 @@ class EDI20Controller(private val edi: EDI20Service) {
                @Parameter(description = "Dokument-id")
                @PathVariable id: UUID) =
         edi.status(herId, id)
+
 }
