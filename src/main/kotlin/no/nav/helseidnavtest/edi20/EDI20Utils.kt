@@ -22,6 +22,7 @@ fun String.other() =
 @Parameter(schema = Schema(allowableValues = [EDI1_ID, EDI2_ID], description = "ID for EDI1 eller EDI2"))
 annotation class Herid
 
+const val DEFAULT_PASIENT = "26900799232"
 fun HttpHeaders.herId(herId: HerId) = herId(herId.verdi)
 fun HttpHeaders.herId(herId: String) = add(HERID, herId)
 
