@@ -147,7 +147,7 @@ class SecurityConfig(
 
     @Bean
     fun authorizedClientServiceOAuth2AuthorizedClientManager(
-        delegatingResponseClient: DelegatingDPoPEnabledClientCredentialsTokenResponseClient,
+        delegatingResponseClient: DelegatingDPoPDetectingClientCredentialsTokenResponseClient,
         repo: ClientRegistrationRepository,
         service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
