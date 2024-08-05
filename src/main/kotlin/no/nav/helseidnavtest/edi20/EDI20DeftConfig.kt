@@ -26,14 +26,13 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        const val EDI20DEFT = "edi20deft"
+        const val OBJECT_PATH = "objects"
         private const val DEFAULT_PING_PATH = ""
         private const val SENDER_HER_ID = "SenderHerId"
         private const val RECEIVER_HER_IDS = "ReceiverHerIds"
-        const val EDI20DEFT = "edi20deft"
-        const val OBJECT_PATH = "objects"
-        const val KEY_PATH = "$OBJECT_PATH/{key}"
-        const val STATUS_PATH = "$KEY_PATH/DownloadStatus"
-        const val KVITTERING_PATH = "$KEY_PATH/DownloadReceipt/{herId}"
-
+        private const val KEY_PATH = "$OBJECT_PATH/{key}"
+        private const val STATUS_PATH = "$KEY_PATH/DownloadStatus"
+        private const val KVITTERING_PATH = "$KEY_PATH/DownloadReceipt/{herId}"
     }
 }

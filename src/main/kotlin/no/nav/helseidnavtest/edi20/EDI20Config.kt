@@ -31,16 +31,16 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
-        private const val INCLUDE_APPREC = "IncludeAppRec"
-        private const val TO_HER_IDS = "ToHerIds"
+        const val MESSAGES_PATH = "messages"
+        const val DOK_PATH = "$MESSAGES_PATH/{id}"
+        const val HERID = "herId"
         const val EDI20 = "edi20"
         const val EDI1_ID = "8142519"
         const val EDI2_ID = "8142520"
         val EDI_1 = HerId(EDI1_ID) to "$EDI20-1"
         val EDI_2 = HerId(EDI2_ID) to "$EDI20-2"
-        const val MESSAGES_PATH = "messages"
-        const val DOK_PATH = "$MESSAGES_PATH/{id}"
-        const val HERID = "herId"
+        private const val INCLUDE_APPREC = "IncludeAppRec"
+        private const val TO_HER_IDS = "ToHerIds"
         private const val DEFAULT_PING_PATH = ""
     }
 }
