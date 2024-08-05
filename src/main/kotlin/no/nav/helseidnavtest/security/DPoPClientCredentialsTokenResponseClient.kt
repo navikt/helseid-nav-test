@@ -29,7 +29,7 @@ import kotlin.reflect.jvm.isAccessible
 @Component
 class DPoPClientCredentialsTokenResponseClient(
     @Qualifier(EDI20) restTemplate: RestTemplate,
-    private val generator: DPoPBevisGenerator,
+    private val generator: DPoPProofGenerator,
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
     private val mapper: ObjectMapper) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
@@ -48,7 +48,7 @@ class DPoPClientCredentialsTokenResponseClient(
                     .headers {
                         it.apply {
                             addAll(headers)
-                            add(DPOP.value, generator.bevisFor(POST, url))
+                            add(DPOP.value, generator.proofFor(POST, url))
                         }
                     }
                     .body(it)
@@ -81,7 +81,7 @@ class DPoPClientCredentialsTokenResponseClient(
                     .uri(url)
                     .headers {
                         it.addAll(headers)
-                        it.add(DPOP.value, generator.bevisFor(POST, req.url, nonce = nonce))
+                        it.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
                     }
                     .body(b)
                     .exchange(exchangeEtterNonce())
@@ -128,6 +128,7 @@ class DPoPClientCredentialsTokenResponseClient(
         const val INVALID_RES = "invalid_token_response"
         const val INVALID_REQ = "invalid_token_request"
 
-        private val log = LoggerFactory.getLogger(DelegatingDPoPEnabledClientCredentialsTokenResponseClient::class.java)
+        private val log =
+            LoggerFactory.getLogger(DelegatingDPoPDetectingClientCredentialsTokenResponseClient::class.java)
     }
 }
