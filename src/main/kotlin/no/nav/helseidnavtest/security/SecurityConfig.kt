@@ -177,8 +177,8 @@ class SecurityConfig(
     private fun jwkResolver(): (ClientRegistration) -> JWK = {
         if (it.clientAuthenticationMethod == PRIVATE_KEY_JWT) {
             when (it.registrationId) {
-                EDI_1.second -> edi20_1_jwk.also { log.info("Klient: edi20-1") }
-                EDI_2.second -> edi20_2_jwk.also { log.info("Klient: edi20-2") }
+                EDI_1.second -> edi20_1_jwk
+                EDI_2.second -> edi20_2_jwk
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         } else {
