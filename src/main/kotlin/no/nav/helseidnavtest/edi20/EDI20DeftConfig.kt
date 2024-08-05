@@ -14,7 +14,7 @@ class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enable
     fun uploadURI(b: UriBuilder, herId: HerId) =
         b.path(OBJECT_PATH)
             .queryParam(SENDER_HER_ID, herId.verdi)
-            .queryParam(RECEIVER_HER_IDS, herId.other())
+            .queryParam(RECEIVER_HER_IDS, herId.other().verdi)
             .build()
 
     fun deleteURI(b: UriBuilder, key: String) = b.path(KEY_PATH).build(key)
