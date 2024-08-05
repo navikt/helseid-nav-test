@@ -1,9 +1,12 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
 import org.springframework.context.annotation.Bean
@@ -126,6 +129,16 @@ class SecurityConfig(
         DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
             setAuthorizationRequestCustomizer(withPkce())
         }
+
+    @Bean
+    @Qualifier(PLAIN)
+    fun plainClientCredentialsTokenResponseClient() = DefaultClientCredentialsTokenResponseClient()
+
+    @Bean
+    fun dPopDetector() = object : DPopDetector {
+        override fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest) =
+            req.clientRegistration.registrationId.startsWith(EDI20)
+    }
 
     @Bean
     fun traceRepo() = InMemoryHttpExchangeRepository()

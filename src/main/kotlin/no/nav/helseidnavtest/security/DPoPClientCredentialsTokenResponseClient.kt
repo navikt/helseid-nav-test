@@ -27,6 +27,7 @@ import java.net.URI
 import kotlin.reflect.jvm.isAccessible
 
 @Component
+@Qualifier(EDI20)
 class DPoPClientCredentialsTokenResponseClient(
     @Qualifier(EDI20) restTemplate: RestTemplate,
     private val generator: DPoPProofGenerator,
