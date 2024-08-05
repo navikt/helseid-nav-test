@@ -79,6 +79,7 @@ spring:
             scope:
               - profile
               - openid
+              - offline_access
               - helseid://scopes/identity/assurance_level
               - helseid://scopes/identity/pid
               - helseid://scopes/identity/security_level

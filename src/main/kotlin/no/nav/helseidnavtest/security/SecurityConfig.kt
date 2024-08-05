@@ -153,6 +153,7 @@ class SecurityConfig(
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
             setAuthorizedClientProvider(
                 OAuth2AuthorizedClientProviderBuilder.builder()
+                    .refreshToken()
                     .clientCredentials {
                         it.accessTokenResponseClient(delegatingResponseClient)
                     }
