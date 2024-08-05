@@ -12,29 +12,27 @@ import java.util.*
 class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
 
-    fun sendURI(b: UriBuilder) =
-        b.path(MESSAGES_PATH).build().also { log.info("sendURI: $it") }
+    fun sendURI(b: UriBuilder) = b.path(MESSAGES_PATH).build()
 
-    fun pollURI(b: UriBuilder, herId: String, appRec: Boolean) =
+    fun pollURI(b: UriBuilder, herId: HerId, appRec: Boolean) =
         b.path(MESSAGES_PATH)
-            .queryParam("IncludeAppRec", "$appRec")
-            .queryParam("ToHerIds", herId)
-            .build().also { log.info("pollURI: $it") }
+            .queryParam(INCLUDE_APPREC, "$appRec")
+            .queryParam(TO_HER_IDS, herId.verdi)
+            .build()
 
-    fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id").also { log.info("lesURI: $it") }
+    fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id")
 
-    fun lestURI(b: UriBuilder, id: UUID, herId: String) =
-        b.path("$DOK_PATH/read/$herId").build("$id").also { log.info("lestURI: $it") }
+    fun lestURI(b: UriBuilder, id: UUID, herId: HerId) = b.path("$DOK_PATH/read/${herId.verdi}").build("$id")
 
-    fun statusURI(b: UriBuilder, id: UUID) =
-        b.path("$DOK_PATH/status").build("$id").also { log.info("statusURI: $it") }
+    fun statusURI(b: UriBuilder, id: UUID) = b.path("$DOK_PATH/status").build("$id")
 
-    fun apprecURI(b: UriBuilder, id: UUID, other: String) =
-        b.path("$DOK_PATH/Apprec/$other").build("$id").also { log.info("apprecURI: $it") }
+    fun apprecURI(b: UriBuilder, id: UUID, other: HerId) = b.path("$DOK_PATH/Apprec/${other.verdi}").build("$id")
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        private const val INCLUDE_APPREC = "IncludeAppRec"
+        private const val TO_HER_IDS = "ToHerIds"
         const val EDI20 = "edi20"
         const val EDI1_ID = "8142519"
         const val EDI2_ID = "8142520"

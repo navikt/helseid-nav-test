@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -10,20 +11,17 @@ import java.net.URI
 class EDI20DeftConfig(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
     AbstractRestConfig(baseUri, pingPath, EDI20DEFT, enabled) {
 
-    fun uploadURI(b: UriBuilder, herId: String) =
+    fun uploadURI(b: UriBuilder, herId: HerId) =
         b.path(OBJECT_PATH)
-            .queryParam(SENDER_HER_ID, herId)
+            .queryParam(SENDER_HER_ID, herId.verdi)
             .queryParam(RECEIVER_HER_IDS, herId.other())
-            .build().also { log.info("uploadURI: $it") }
+            .build()
 
-    fun deleteURI(b: UriBuilder, key: String) =
-        b.path(KEY_PATH).build(key).also { log.info("deleteURI: $it") }
+    fun deleteURI(b: UriBuilder, key: String) = b.path(KEY_PATH).build(key)
 
-    fun statusURI(b: UriBuilder, key: String) =
-        b.path(STATUS_PATH).build(key).also { log.info("statusURI: $it") }
+    fun statusURI(b: UriBuilder, key: String) = b.path(STATUS_PATH).build(key)
 
-    fun kvitteringURI(b: UriBuilder, key: String, herId: String) =
-        b.path(KVITTERING_PATH).build(key, herId).also { log.info("kvitteringURI: $it") }
+    fun kvitteringURI(b: UriBuilder, key: String, herId: HerId) = b.path(KVITTERING_PATH).build(key, herId.verdi)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

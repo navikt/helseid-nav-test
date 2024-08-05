@@ -24,7 +24,7 @@ class EDI20RestClientAdapter(
     fun apprec(herId: HerId, id: UUID) =
         restClient
             .post()
-            .uri { cf.apprecURI(it, id, herId.verdi) }
+            .uri { cf.apprecURI(it, id, herId) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .body(OK)
@@ -55,7 +55,7 @@ class EDI20RestClientAdapter(
     fun poll(herId: HerId, appRec: Boolean) =
         restClient
             .get()
-            .uri { cf.pollURI(it, herId.verdi, appRec) }
+            .uri { cf.pollURI(it, herId, appRec) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
@@ -76,7 +76,7 @@ class EDI20RestClientAdapter(
     fun konsumert(herId: HerId, id: UUID) =
         restClient
             .put()
-            .uri { cf.lestURI(it, id, herId.verdi) }
+            .uri { cf.lestURI(it, id, herId) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()

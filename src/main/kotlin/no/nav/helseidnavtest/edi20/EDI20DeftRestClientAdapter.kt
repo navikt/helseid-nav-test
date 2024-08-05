@@ -32,7 +32,7 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
     fun kvitter(herid: HerId, key: String) =
         restClient
             .put()
-            .uri { cf.kvitteringURI(it, key, herid.verdi) }
+            .uri { cf.kvitteringURI(it, key, herid) }
             .headers { it.herId(herid) }
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
@@ -59,12 +59,9 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
     fun upload(herid: HerId, file: MultipartFile) =
         restClient
             .post()
-            .uri { cf.uploadURI(it, herid.verdi) }
+            .uri { cf.uploadURI(it, herid) }
             .headers {
-                it.contentDisposition = ContentDisposition
-                    .inline()
-                    .filename(file.originalFilename)
-                    .build()
+                it.contentDisposition = contentDisposition(file.originalFilename)
                 it.herId(herid)
             }
             .body(LinkedMultiValueMap<String, Any>().apply {
@@ -74,6 +71,11 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
+
+    private fun contentDisposition(originalFilename: String?) = ContentDisposition
+        .inline()
+        .filename(originalFilename)
+        .build()
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
