@@ -27,12 +27,12 @@ class EDI20DialogmeldingMapper {
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
-            vedlegg?.let { document.addAll(listOf(refDokument(it.first, it.second), dialogmelding("Dialogmelding"))) }
+            vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
         }
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
-            vedlegg?.let { document.addAll(listOf(inlineDokument(it.bytes), dialogmelding("Dialogmelding"))) }
+            vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
         }
 
     private fun msgInfo(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
@@ -105,7 +105,7 @@ class EDI20DialogmeldingMapper {
                             tekstNotatInnhold = tekst
                             temaKodet = DMOF.createCV().apply {
                                 s = HENVENDELSE.id
-                                v = KODE8.value.toString()
+                                v = "${KODE8.value}"
                                 dn = "Melding fra NAV"
                             }
                         })
