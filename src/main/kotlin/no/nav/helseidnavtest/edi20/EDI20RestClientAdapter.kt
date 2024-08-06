@@ -68,7 +68,7 @@ class EDI20RestClientAdapter(
             .uri(cf::sendURI)
             .headers { it.herId(herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(hodemelding.encode()))
+            .body(BusinessDocument(hodemelding.encode()).also { log.info("Business dokument $it") })
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
