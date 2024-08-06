@@ -1,6 +1,8 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.Dialogmelding
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingKode.KODE8
+import no.nav.helseidnavtest.dialogmelding.DialogmeldingKodeverk.HENVENDELSE
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.DIALOG_NOTAT
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
@@ -101,6 +103,11 @@ class EDI20DialogmeldingMapper {
                     any.add(DMOF.createXMLDialogmelding().apply {
                         notat.add(DMOF.createXMLNotat().apply {
                             tekstNotatInnhold = tekst
+                            temaKodet = DMOF.createCV().apply {
+                                s = HENVENDELSE.id
+                                v = KODE8.value.toString()
+                                dn = "Melding fra NAV"
+                            }
                         })
                     })
                 }

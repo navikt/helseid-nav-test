@@ -1,58 +1,72 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:MsgHead xmlns="http://www.nav.no/xml/eiff/2/" xmlns:ns5="http://www.kith.no/xmlstds/apprec/2004-11-21" xmlns:ns2="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns4="http://www.kith.no/xmlstds/base64container" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#">
-    <ns2:MsgInfo>
-        <ns2:Type V="DIALOG_NOTAT" DN="Notat"/>
-        <ns2:MIGversion>v1.2 2006-05-24</ns2:MIGversion>
-        <ns2:GenDate>2024-08-06T10:27:10.323642125</ns2:GenDate>
-        <ns2:MsgId>10c8e665-a0bc-4fa8-b36b-87ad67d81c40</ns2:MsgId>
-        <ns2:Sender>
-            <ns2:Organisation>
-                <ns2:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns2:OrganisationName>
-                <ns2:Ident>
-                    <ns2:Id>90128</ns2:Id>
-                    <ns2:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                </ns2:Ident>
-                <ns2:Organisation>
-                    <ns2:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns2:OrganisationName>
-                    <ns2:Ident>
-                        <ns2:Id>8142519</ns2:Id>
-                        <ns2:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                    </ns2:Ident>
-                </ns2:Organisation>
-            </ns2:Organisation>
-        </ns2:Sender>
-        <ns2:Receiver>
-            <ns2:Organisation>
-                <ns2:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns2:OrganisationName>
-                <ns2:Ident>
-                    <ns2:Id>90128</ns2:Id>
-                    <ns2:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                </ns2:Ident>
-                <ns2:Organisation>
-                    <ns2:OrganisationName>Samhandling Arbeids- og velferdsetaten</ns2:OrganisationName>
-                    <ns2:Ident>
-                        <ns2:Id>8142520</ns2:Id>
-                        <ns2:TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
-                    </ns2:Ident>
-                </ns2:Organisation>
-            </ns2:Organisation>
-        </ns2:Receiver>
-        <ns2:Patient>
-            <ns2:FamilyName>KONTROLL</ns2:FamilyName>
-            <ns2:GivenName>FIRKANTET</ns2:GivenName>
-            <ns2:Ident>
-                <ns2:Id>26900799232</ns2:Id>
-                <ns2:TypeId V="FNR" S="2.16.578.1.12.4.1.1.8116" DN="Fødselsnummer"/>
-            </ns2:Ident>
-        </ns2:Patient>
-    </ns2:MsgInfo>
-    <ns2:Document>
-        <ns2:RefDoc>
-            <ns2:IssueDate V="2024-08-06"/>
-            <ns2:MsgType V="A" DN="Vedlegg"/>
-            <ns2:MimeType>application/pdf</ns2:MimeType>
-            <ns2:Description>Beskrivelse av vedlegg</ns2:Description>
-            <ns2:FileReference>https://api.deft.test.melding.nhn.no/Objects/f30bafae-7d1e-4d96-837a-d2b6b90f2054_jlalla.pdf</ns2:FileReference>
-        </ns2:RefDoc>
-    </ns2:Document>
-</ns2:MsgHead>
+<MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns6="http://www.kith.no/xmlstds/apprec/2004-11-21" xmlns:ns5="http://www.kith.no/xmlstds/base64container" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" xmlns:ns4="http://www.kith.no/xmlstds/felleskomponent1" xmlns:ns3="http://www.kith.no/xmlstds/dialog/2006-10-11">
+    <MsgInfo>
+        <Type V="DIALOG_NOTAT" DN="Notat"/>
+        <MIGversion>v1.2 2006-05-24</MIGversion>
+        <GenDate>2024-08-06T11:48:14.889002924</GenDate>
+        <MsgId>5cb56412-b2a9-40ab-8bbf-64fabed5900c</MsgId>
+        <Sender>
+            <Organisation>
+                <OrganisationName>ARBEIDS- OG VELFERDSETATEN</OrganisationName>
+                <Ident>
+                    <Id>90128</Id>
+                    <TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+                </Ident>
+                <Organisation>
+                    <OrganisationName>Samhandling Arbeids- og velferdsetaten</OrganisationName>
+                    <Ident>
+                        <Id>8142519</Id>
+                        <TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+                    </Ident>
+                </Organisation>
+            </Organisation>
+        </Sender>
+        <Receiver>
+            <Organisation>
+                <OrganisationName>ARBEIDS- OG VELFERDSETATEN</OrganisationName>
+                <Ident>
+                    <Id>90128</Id>
+                    <TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+                </Ident>
+                <Organisation>
+                    <OrganisationName>Samhandling Arbeids- og velferdsetaten</OrganisationName>
+                    <Ident>
+                        <Id>8142520</Id>
+                        <TypeId V="HER" S="2.16.578.1.12.4.1.1.9051" DN="HER-id"/>
+                    </Ident>
+                </Organisation>
+            </Organisation>
+        </Receiver>
+        <Patient>
+            <FamilyName>KONTROLL</FamilyName>
+            <GivenName>FIRKANTET</GivenName>
+            <Ident>
+                <Id>26900799232</Id>
+                <TypeId V="FNR" S="2.16.578.1.12.4.1.1.8116" DN="F�dselsnummer"/>
+            </Ident>
+        </Patient>
+    </MsgInfo>
+    <Document>
+        <RefDoc>
+            <IssueDate V="2024-08-06"/>
+            <MsgType V="A" DN="Vedlegg"/>
+            <MimeType>application/pdf</MimeType>
+            <Content>
+                <ns5:Base64Container>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8bnMyOk1zZ0hlYWQgeG1sbnM9Imh0dHA6Ly93d3cubmF2Lm5vL3htbC9laWZmLzIvIiB4bWxuczpuczU9Imh0dHA6Ly93d3cua2l0aC5uby94bWxzdGRzL2FwcHJlYy8yMDA0LTExLTIxIiB4bWxuczpuczI9Imh0dHA6Ly93d3cua2l0aC5uby94bWxzdGRzL21zZ2hlYWQvMjAwNi0wNS0yNCIgeG1sbnM6bnM0PSJodHRwOi8vd3d3LmtpdGgubm8veG1sc3Rkcy9iYXNlNjRjb250YWluZXIiIHhtbG5zOm5zMz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyI+CiAgICA8bnMyOk1zZ0luZm8+CiAgICAgICAgPG5zMjpUeXBlIFY9IkRJQUxPR19OT1RBVCIgRE49Ik5vdGF0Ii8+CiAgICAgICAgPG5zMjpNSUd2ZXJzaW9uPnYxLjIgMjAwNi0wNS0yNDwvbnMyOk1JR3ZlcnNpb24+CiAgICAgICAgPG5zMjpHZW5EYXRlPjIwMjQtMDgtMDZUMTA6Mjc6MTAuMzIzNjQyMTI1PC9uczI6R2VuRGF0ZT4KICAgICAgICA8bnMyOk1zZ0lkPjEwYzhlNjY1LWEwYmMtNGZhOC1iMzZiLTg3YWQ2N2Q4MWM0MDwvbnMyOk1zZ0lkPgogICAgICAgIDxuczI6U2VuZGVyPgogICAgICAgICAgICA8bnMyOk9yZ2FuaXNhdGlvbj4KICAgICAgICAgICAgICAgIDxuczI6T3JnYW5pc2F0aW9uTmFtZT5BUkJFSURTLSBPRyBWRUxGRVJEU0VUQVRFTjwvbnMyOk9yZ2FuaXNhdGlvbk5hbWU+CiAgICAgICAgICAgICAgICA8bnMyOklkZW50PgogICAgICAgICAgICAgICAgICAgIDxuczI6SWQ+OTAxMjg8L25zMjpJZD4KICAgICAgICAgICAgICAgICAgICA8bnMyOlR5cGVJZCBWPSJIRVIiIFM9IjIuMTYuNTc4LjEuMTIuNC4xLjEuOTA1MSIgRE49IkhFUi1pZCIvPgogICAgICAgICAgICAgICAgPC9uczI6SWRlbnQ+CiAgICAgICAgICAgICAgICA8bnMyOk9yZ2FuaXNhdGlvbj4KICAgICAgICAgICAgICAgICAgICA8bnMyOk9yZ2FuaXNhdGlvbk5hbWU+U2FtaGFuZGxpbmcgQXJiZWlkcy0gb2cgdmVsZmVyZHNldGF0ZW48L25zMjpPcmdhbmlzYXRpb25OYW1lPgogICAgICAgICAgICAgICAgICAgIDxuczI6SWRlbnQ+CiAgICAgICAgICAgICAgICAgICAgICAgIDxuczI6SWQ+ODE0MjUxOTwvbnMyOklkPgogICAgICAgICAgICAgICAgICAgICAgICA8bnMyOlR5cGVJZCBWPSJIRVIiIFM9IjIuMTYuNTc4LjEuMTIuNC4xLjEuOTA1MSIgRE49IkhFUi1pZCIvPgogICAgICAgICAgICAgICAgICAgIDwvbnMyOklkZW50PgogICAgICAgICAgICAgICAgPC9uczI6T3JnYW5pc2F0aW9uPgogICAgICAgICAgICA8L25zMjpPcmdhbmlzYXRpb24+CiAgICAgICAgPC9uczI6U2VuZGVyPgogICAgICAgIDxuczI6UmVjZWl2ZXI+CiAgICAgICAgICAgIDxuczI6T3JnYW5pc2F0aW9uPgogICAgICAgICAgICAgICAgPG5zMjpPcmdhbmlzYXRpb25OYW1lPkFSQkVJRFMtIE9HIFZFTEZFUkRTRVRBVEVOPC9uczI6T3JnYW5pc2F0aW9uTmFtZT4KICAgICAgICAgICAgICAgIDxuczI6SWRlbnQ+CiAgICAgICAgICAgICAgICAgICAgPG5zMjpJZD45MDEyODwvbnMyOklkPgogICAgICAgICAgICAgICAgICAgIDxuczI6VHlwZUlkIFY9IkhFUiIgUz0iMi4xNi41NzguMS4xMi40LjEuMS45MDUxIiBETj0iSEVSLWlkIi8+CiAgICAgICAgICAgICAgICA8L25zMjpJZGVudD4KICAgICAgICAgICAgICAgIDxuczI6T3JnYW5pc2F0aW9uPgogICAgICAgICAgICAgICAgICAgIDxuczI6T3JnYW5pc2F0aW9uTmFtZT5TYW1oYW5kbGluZyBBcmJlaWRzLSBvZyB2ZWxmZXJkc2V0YXRlbjwvbnMyOk9yZ2FuaXNhdGlvbk5hbWU+CiAgICAgICAgICAgICAgICAgICAgPG5zMjpJZGVudD4KICAgICAgICAgICAgICAgICAgICAgICAgPG5zMjpJZD44MTQyNTIwPC9uczI6SWQ+CiAgICAgICAgICAgICAgICAgICAgICAgIDxuczI6VHlwZUlkIFY9IkhFUiIgUz0iMi4xNi41NzguMS4xMi40LjEuMS45MDUxIiBETj0iSEVSLWlkIi8+CiAgICAgICAgICAgICAgICAgICAgPC9uczI6SWRlbnQ+CiAgICAgICAgICAgICAgICA8L25zMjpPcmdhbmlzYXRpb24+CiAgICAgICAgICAgIDwvbnMyOk9yZ2FuaXNhdGlvbj4KICAgICAgICA8L25zMjpSZWNlaXZlcj4KICAgICAgICA8bnMyOlBhdGllbnQ+CiAgICAgICAgICAgIDxuczI6RmFtaWx5TmFtZT5LT05UUk9MTDwvbnMyOkZhbWlseU5hbWU+CiAgICAgICAgICAgIDxuczI6R2l2ZW5OYW1lPkZJUktBTlRFVDwvbnMyOkdpdmVuTmFtZT4KICAgICAgICAgICAgPG5zMjpJZGVudD4KICAgICAgICAgICAgICAgIDxuczI6SWQ+MjY5MDA3OTkyMzI8L25zMjpJZD4KICAgICAgICAgICAgICAgIDxuczI6VHlwZUlkIFY9IkZOUiIgUz0iMi4xNi41NzguMS4xMi40LjEuMS44MTE2IiBETj0iRsO4ZHNlbHNudW1tZXIiLz4KICAgICAgICAgICAgPC9uczI6SWRlbnQ+CiAgICAgICAgPC9uczI6UGF0aWVudD4KICAgIDwvbnMyOk1zZ0luZm8+CiAgICA8bnMyOkRvY3VtZW50PgogICAgICAgIDxuczI6UmVmRG9jPgogICAgICAgICAgICA8bnMyOklzc3VlRGF0ZSBWPSIyMDI0LTA4LTA2Ii8+CiAgICAgICAgICAgIDxuczI6TXNnVHlwZSBWPSJBIiBETj0iVmVkbGVnZyIvPgogICAgICAgICAgICA8bnMyOk1pbWVUeXBlPmFwcGxpY2F0aW9uL3BkZjwvbnMyOk1pbWVUeXBlPgogICAgICAgICAgICA8bnMyOkRlc2NyaXB0aW9uPkJlc2tyaXZlbHNlIGF2IHZlZGxlZ2c8L25zMjpEZXNjcmlwdGlvbj4KICAgICAgICAgICAgPG5zMjpGaWxlUmVmZXJlbmNlPmh0dHBzOi8vYXBpLmRlZnQudGVzdC5tZWxkaW5nLm5obi5uby9PYmplY3RzL2YzMGJhZmFlLTdkMWUtNGQ5Ni04MzdhLWQyYjZiOTBmMjA1NF9qbGFsbGEucGRmPC9uczI6RmlsZVJlZmVyZW5jZT4KICAgICAgICA8L25zMjpSZWZEb2M+CiAgICA8L25zMjpEb2N1bWVudD4KPC9uczI6TXNnSGVhZD4K</ns5:Base64Container>
+            </Content>
+        </RefDoc>
+    </Document>
+    <Document>
+        <RefDoc>
+            <IssueDate V="2024-08-06"/>
+            <MsgType V="XML" DN="XML-instans"/>
+            <Content>
+                <ns3:Dialogmelding>
+                    <ns3:Notat>
+                        <ns3:TekstNotatInnhold>Dialogmelding</ns3:TekstNotatInnhold>
+                    </ns3:Notat>
+                </ns3:Dialogmelding>
+            </Content>
+        </RefDoc>
+    </Document>
+</MsgHead>
