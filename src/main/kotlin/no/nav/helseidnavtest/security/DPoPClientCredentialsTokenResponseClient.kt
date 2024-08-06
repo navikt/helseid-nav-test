@@ -40,8 +40,8 @@ class DPoPClientCredentialsTokenResponseClient(
         requestEntityConverter.convert(request)?.let(::getResponse)
             ?: authErrorRequest("No request entity")
 
-    private fun getResponse(request: RequestEntity<*>) =
-        with(request) {
+    private fun getResponse(req: RequestEntity<*>) =
+        with(req) {
             body?.let {
                 log.info("Requesting DPoP token from $url")
                 restClient.method(POST)
@@ -53,20 +53,22 @@ class DPoPClientCredentialsTokenResponseClient(
                         }
                     }
                     .body(it)
-                    .exchange(utenNonce(this))
-            } ?: authErrorResponse("No body in response", null, request.url)
+                    .exchange(noNonce(this))
+            } ?: authErrorResponse("No body in response", null, req.url)
         }
 
-    private fun utenNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
-        if (BAD_REQUEST == res.statusCode && res.headers[DPOP_NONCE] != null) {
-            runCatching {
-                medNonce(request, nonce(res))
-            }.getOrElse {
-                if (it is OAuth2AuthorizationException) throw it
-                authErrorResponse("Unexpected response from token endpoint", res.statusCode, req.uri, it)
+    private fun noNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
+        with(res) {
+            if (BAD_REQUEST == statusCode && headers[DPOP_NONCE] != null) {
+                runCatching {
+                    retryWithNonce(request, nonce(this))
+                }.getOrElse {
+                    if (it is OAuth2AuthorizationException) throw it
+                    authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
+                }
+            } else {
+                authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
             }
-        } else {
-            authErrorResponse("Unexpected response from token endpoint", res.statusCode, req.uri)
         }
     }
 
@@ -75,7 +77,7 @@ class DPoPClientCredentialsTokenResponseClient(
             Nonce(it.single())
         } ?: authErrorResponse("No nonce in response from token endpoint", res.statusCode)
 
-    private fun medNonce(req: RequestEntity<*>, nonce: Nonce) =
+    private fun retryWithNonce(req: RequestEntity<*>, nonce: Nonce) =
         with(req) {
             body?.let { b ->
                 restClient.method(POST)
@@ -90,14 +92,17 @@ class DPoPClientCredentialsTokenResponseClient(
         }
 
     private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
-        if (!res.statusCode.is2xxSuccessful) {
-            authErrorResponse("Unexpected response from token endpoint", res.statusCode, req.uri)
+        with(res) {
+            if (!statusCode.is2xxSuccessful) {
+                authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
+            }
+            runCatching {
+                deserialize(this)
+            }.getOrElse {
+                authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
+            }
         }
-        runCatching {
-            deserialize(res)
-        }.getOrElse {
-            authErrorResponse("Unexpected response from token endpoint", res.statusCode, req.uri, it)
-        }
+
     }
 
     private fun deserialize(res: ClientHttpResponse) =

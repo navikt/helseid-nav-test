@@ -14,11 +14,11 @@ class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI
                                                                   private val detector: DPopDetector) :
     OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
-    override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
-        if (detector.isDPoP(request)) {
-            dpop.getTokenResponse(request)
+    override fun getTokenResponse(req: OAuth2ClientCredentialsGrantRequest) =
+        if (detector.isDPoP(req)) {
+            dpop.getTokenResponse(req)
         } else {
-            plain.getTokenResponse(request)
+            plain.getTokenResponse(req)
         }
 }
 
