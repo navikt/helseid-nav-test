@@ -25,12 +25,12 @@ class EDI20DialogmeldingMapper {
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
-            vedlegg?.let { document.add(vedlegg(it.first, it.second)) }
+            vedlegg?.let { document.addAll(listOf(refDokument(it.first, it.second), dialogmelding("Dialogmelding"))) }
         }
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
-            vedlegg?.let { document.add(vedlegg(it.bytes)) }
+            vedlegg?.let { document.addAll(listOf(inlineDokument(it.bytes), dialogmelding("Dialogmelding"))) }
         }
 
     private fun msgInfo(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
@@ -87,7 +87,27 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun vedlegg(uri: URI, contentType: String) =
+    private fun dialogmelding(tekst: String) =
+        HMOF.createXMLDocument().apply {
+            refDoc = HMOF.createXMLRefDoc().apply {
+                issueDate = HMOF.createXMLTS().apply {
+                    v = LocalDate.now().format(ISO_DATE)
+                }
+                msgType = HMOF.createXMLCS().apply {
+                    dn = "XML-instans"
+                    v = "XML"
+                }
+                content = HMOF.createXMLRefDocContent().apply {
+                    DMOF.createXMLDialogmelding().apply {
+                        notat.add(DMOF.createXMLNotat().apply {
+                            tekstNotatInnhold = tekst
+                        })
+                    }
+                }
+            }
+        }
+
+    private fun refDokument(uri: URI, contentType: String) =
         HMOF.createXMLDocument().apply {
             refDoc = HMOF.createXMLRefDoc().apply {
                 issueDate = HMOF.createXMLTS().apply {
@@ -103,7 +123,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun vedlegg(vedlegg: ByteArray) =
+    private fun inlineDokument(vedlegg: ByteArray) =
         HMOF.createXMLDocument().apply {
             documentConnection = HMOF.createXMLCS().apply {
                 dn = VEDLEGG
@@ -176,9 +196,7 @@ class EDI20DialogmeldingMapper {
         private val NAV_HERID = HerId(90128)
         private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
         private const val HER_OID = "2.16.578.1.12.4.1.1.8116"
-        private const val ENH = "ENH"
         private const val HER = "HER"
-        private const val HPR = "HPR"
     }
 
     fun idFra(id: String, typeId: XMLCV) = HMOF.createXMLIdent().apply {
