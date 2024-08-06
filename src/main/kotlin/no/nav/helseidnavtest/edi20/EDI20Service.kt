@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.net.URI
@@ -11,6 +12,8 @@ import java.util.*
 class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
                    private val deft: EDI20DeftService,
                    private val adapter: EDI20RestClientAdapter) {
+
+    val log = getLogger(EDI20Service::class.java)
 
     fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
 
@@ -37,9 +40,9 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
     private fun hodemelding(fra: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>? = null) =
-        generator.hodemelding(fra, fra.other(), pasient, vedlegg)
+        generator.hodemelding(fra, fra.other(), pasient, vedlegg).also { log.info("Hodemelding er $it") }
 
     private fun hodemelding(fra: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
-        generator.hodemelding(fra, fra.other(), pasient, vedlegg)
+        generator.hodemelding(fra, fra.other(), pasient, vedlegg).also { log.info("Hodemelding er $it") }
 
 }

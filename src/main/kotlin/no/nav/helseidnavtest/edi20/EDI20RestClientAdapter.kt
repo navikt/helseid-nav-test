@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -62,16 +63,18 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, hodemelding: String) =
-        restClient
+    fun send(herId: HerId, hodemelding: String): ResponseEntity<Void> {
+        log.info("XXXXXXX " + hodemelding.encode())
+        return restClient
             .post()
             .uri(cf::sendURI)
             .headers { it.herId(herId.verdi) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(hodemelding.encode()).also { log.info("Business dokument $it") })
+            .body(BusinessDocument(hodemelding.encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
+    }
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient
