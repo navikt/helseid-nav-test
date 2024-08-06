@@ -7,7 +7,6 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingConfig.Companion.DIALOGM
 import no.nav.helseidnavtest.health.AbstractPingableHealthIndicator
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
-import no.nav.helseopplysninger.dialogmelding.XMLDialogmelding
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -35,7 +34,7 @@ class DialogmeldingClientBeanConfig {
     fun jaxb2Marshaller() = Jaxb2Marshaller().apply {
         setClassesToBeBound(
             XMLMsgHead::class.java,
-            XMLDialogmelding::class.java,
+            //  XMLDialogmelding::class.java,
             XMLBase64Container::class.java,
             XMLAppRec::class.java)
     }
