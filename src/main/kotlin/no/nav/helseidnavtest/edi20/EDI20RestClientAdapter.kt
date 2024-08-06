@@ -86,7 +86,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray())
+    private fun String.encode() = getEncoder().withoutPadding().encodeToString(toByteArray(Charsets.UTF_8))
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
