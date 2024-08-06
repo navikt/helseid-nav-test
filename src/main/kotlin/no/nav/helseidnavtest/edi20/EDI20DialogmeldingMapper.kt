@@ -1,10 +1,13 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.dialogmelding.*
+import no.nav.helseidnavtest.dialogmelding.Dialogmelding
 import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.DIALOG_NOTAT
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
+import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
@@ -170,7 +173,6 @@ class EDI20DialogmeldingMapper {
         private const val VEDLEGG = "Vedlegg"
         private const val VERSION = "v1.2 2006-05-24"
         private const val HER_DESC = "HER-id"
-        private val NAV_ORGNR = Orgnummer(889640782)
         private val NAV_HERID = HerId(90128)
         private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
         private const val HER_OID = "2.16.578.1.12.4.1.1.8116"
