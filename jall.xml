@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:MsgHead xmlns="http://www.nav.no/xml/eiff/2/" xmlns:ns6="http://www.kith.no/xmlstds/base64container" xmlns:ns5="http://www.kith.no/xmlstds/felleskomponent1" xmlns:ns7="http://www.kith.no/xmlstds/apprec/2004-11-21" xmlns:ns2="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns4="http://www.kith.no/xmlstds/dialog/2006-10-11" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#">
+<ns2:MsgHead xmlns="http://www.nav.no/xml/eiff/2/" xmlns:ns5="http://www.kith.no/xmlstds/apprec/2004-11-21" xmlns:ns2="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns4="http://www.kith.no/xmlstds/base64container" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#">
     <ns2:MsgInfo>
         <ns2:Type V="DIALOG_NOTAT" DN="Notat"/>
         <ns2:MIGversion>v1.2 2006-05-24</ns2:MIGversion>
-        <ns2:GenDate>2024-08-06T10:07:03.964711907</ns2:GenDate>
-        <ns2:MsgId>e6324f16-0faa-4ac2-820e-21b8e9a54b1f</ns2:MsgId>
+        <ns2:GenDate>2024-08-06T10:27:10.323642125</ns2:GenDate>
+        <ns2:MsgId>10c8e665-a0bc-4fa8-b36b-87ad67d81c40</ns2:MsgId>
         <ns2:Sender>
             <ns2:Organisation>
                 <ns2:OrganisationName>ARBEIDS- OG VELFERDSETATEN</ns2:OrganisationName>
@@ -52,7 +52,7 @@
             <ns2:MsgType V="A" DN="Vedlegg"/>
             <ns2:MimeType>application/pdf</ns2:MimeType>
             <ns2:Description>Beskrivelse av vedlegg</ns2:Description>
-            <ns2:FileReference>https://api.deft.test.melding.nhn.no/Objects/81b384c4-2a5b-4657-884a-1e0b9e65c97c_jlalla.pdf</ns2:FileReference>
+            <ns2:FileReference>https://api.deft.test.melding.nhn.no/Objects/f30bafae-7d1e-4d96-837a-d2b6b90f2054_jlalla.pdf</ns2:FileReference>
         </ns2:RefDoc>
     </ns2:Document>
 </ns2:MsgHead>
