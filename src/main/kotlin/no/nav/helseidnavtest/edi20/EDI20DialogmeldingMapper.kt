@@ -98,11 +98,11 @@ class EDI20DialogmeldingMapper {
                     v = "XML"
                 }
                 content = HMOF.createXMLRefDocContent().apply {
-                    DMOF.createXMLDialogmelding().apply {
+                    any.add(DMOF.createXMLDialogmelding().apply {
                         notat.add(DMOF.createXMLNotat().apply {
                             tekstNotatInnhold = tekst
                         })
-                    }
+                    })
                 }
             }
         }
@@ -125,10 +125,6 @@ class EDI20DialogmeldingMapper {
 
     private fun inlineDokument(vedlegg: ByteArray) =
         HMOF.createXMLDocument().apply {
-            documentConnection = HMOF.createXMLCS().apply {
-                dn = VEDLEGG
-                v = "V"
-            }
             refDoc = HMOF.createXMLRefDoc().apply {
                 issueDate = HMOF.createXMLTS().apply {
                     v = LocalDate.now().format(ISO_DATE)
