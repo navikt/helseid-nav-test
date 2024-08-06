@@ -11,10 +11,10 @@
         <logger name="reactor.netty.http.client.HttpClient" level="info"/>
         <logger name="no.nav.helse" level="trace"/>
         <logger name="org.springframework.web.client" level="trace"/>
-        <logger name="org.apache.http" level="trace"/>
+        <logger name="org.apache.http" level="info"/>
         <logger name="org.springframework.graphql" level="trace"/>
-        <logger name="org.apache.hc.client5.http.wire" level="trace"/>
-        <logger name="org.apache.cxf.ws.security" level="trace"/>
+        <logger name="org.apache.hc.client5.http.wire" level="info"/>
+        <logger name="org.apache.cxf.ws.security" level="info"/>
     </springProfile>
     <springProfile name="local,test">
         <appender name="stdout"
