@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.convert.converter.Converter
@@ -28,7 +29,7 @@ import kotlin.reflect.jvm.isAccessible
 @Component
 @Qualifier(EDI20)
 class DPoPClientCredentialsTokenResponseClient(
-    @Qualifier(EDI20 + "plain") private val restClient: RestClient,
+    @Qualifier(PLAIN) private val restClient: RestClient,
     private val generator: DPoPProofGenerator,
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
     private val mapper: ObjectMapper) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {

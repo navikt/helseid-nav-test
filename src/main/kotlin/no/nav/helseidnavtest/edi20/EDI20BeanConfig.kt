@@ -6,9 +6,8 @@ import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.HELSE
-import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.correlatingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.slf4j.LoggerFactory.getLogger
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
@@ -32,17 +30,14 @@ class EDI20BeanConfig {
     private val log = getLogger(EDI20BeanConfig::class.java)
 
     @Bean
-    @Qualifier(EDI20 + "plain")
+    @Qualifier(PLAIN)
     fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) =
         b.baseUrl("${cfg.baseUri}")
-            .requestFactory(HttpComponentsClientHttpRequestFactory())
             .messageConverters {
                 it.addAll(listOf(FormHttpMessageConverter(),
                     OAuth2AccessTokenResponseHttpMessageConverter()))
             }
-            .requestInterceptors {
-                correlatingRequestInterceptor(HELSE)
-            }.build()
+            .build()
 
     @Bean
     @Qualifier(EDI20)
