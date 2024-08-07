@@ -99,6 +99,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
             }
             runCatching {
+                log.info("Exchange after nonce successful, deserialize response")
                 deserialize(this)
             }.getOrElse {
                 authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
