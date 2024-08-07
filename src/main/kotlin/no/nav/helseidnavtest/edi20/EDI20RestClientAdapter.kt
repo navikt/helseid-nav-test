@@ -8,12 +8,12 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.util.*
 import java.util.Base64.getEncoder
+import kotlin.text.Charsets.UTF_8
 
 @Component
 class EDI20RestClientAdapter(
@@ -63,18 +63,15 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, hodemelding: String): ResponseEntity<Void> {
-        log.info("XXXXXXX " + hodemelding.encode())
-        return restClient
-            .post()
-            .uri(cf::sendURI)
-            .headers { it.herId(herId.verdi) }
-            .accept(APPLICATION_JSON)
-            .body(BusinessDocument(hodemelding.encode()))
-            .retrieve()
-            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .toBodilessEntity()
-    }
+    fun send(herId: HerId, hodemelding: String) = restClient
+        .post()
+        .uri(cf::sendURI)
+        .headers { it.herId(herId.verdi) }
+        .accept(APPLICATION_JSON)
+        .body(BusinessDocument(hodemelding.encode()))
+        .retrieve()
+        .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
+        .toBodilessEntity()
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient
@@ -86,7 +83,7 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
 
-    private fun String.encode() = getEncoder().encodeToString(toByteArray(Charsets.UTF_8))
+    private fun String.encode() = getEncoder().encodeToString(toByteArray(UTF_8))
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
