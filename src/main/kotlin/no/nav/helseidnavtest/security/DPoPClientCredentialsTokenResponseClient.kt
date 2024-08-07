@@ -53,11 +53,11 @@ class DPoPClientCredentialsTokenResponseClient(
                         }
                     }
                     .body(it)
-                    .exchange(noNonce(this))
+                    .exchange(handleMissingNonce(this))
             } ?: authErrorResponse("No body in response", null, req.url)
         }
 
-    private fun noNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
+    private fun handleMissingNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         with(res) {
             if (BAD_REQUEST == statusCode && headers[DPOP_NONCE] != null) {
                 runCatching {
@@ -73,9 +73,11 @@ class DPoPClientCredentialsTokenResponseClient(
     }
 
     private fun nonce(res: ClientHttpResponse) =
-        res.headers[DPOP_NONCE]?.let {
-            Nonce(it.single())
-        } ?: authErrorResponse("No nonce in response from token endpoint", res.statusCode)
+        with(res) {
+            headers[DPOP_NONCE]?.let {
+                Nonce(it.single())
+            } ?: authErrorResponse("No nonce in response from token endpoint", statusCode)
+        }
 
     private fun retryWithNonce(req: RequestEntity<*>, nonce: Nonce) =
         with(req) {
@@ -83,7 +85,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 restClient.method(POST)
                     .uri(url)
                     .headers {
-                        it.addAll(headers).also { log.info("FLyttet headere $headers") }
+                        //  it.addAll(headers).also { log.info("Flyttet headere $headers") }
                         it.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
                     }
                     .body(b)
