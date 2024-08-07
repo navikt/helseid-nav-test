@@ -83,7 +83,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 restClient.method(POST)
                     .uri(url)
                     .headers {
-                        it.addAll(headers)
+                        it.addAll(headers).also { log.info("FLyttet headere $headers") }
                         it.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
                     }
                     .body(b)
