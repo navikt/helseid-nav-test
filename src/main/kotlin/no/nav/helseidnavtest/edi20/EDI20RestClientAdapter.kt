@@ -60,7 +60,7 @@ class EDI20RestClientAdapter(
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
-            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
+            //   .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
     fun send(herId: HerId, hodemelding: String) = restClient
