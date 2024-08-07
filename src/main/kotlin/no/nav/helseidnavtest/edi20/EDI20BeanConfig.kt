@@ -11,29 +11,33 @@ import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.HELSE
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter.Companion.correlatingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DPoPProofGenerator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
-import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
+import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
 @Configuration(proxyBeanMethods = true)
 class EDI20BeanConfig {
-    
+
+    private val log = getLogger(EDI20BeanConfig::class.java)
+
     @Bean
     @Qualifier(EDI20 + "plain")
     fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) =
         b.baseUrl("${cfg.baseUri}")
+            .defaultStatusHandler(statusHandler())
             .requestFactory(HttpComponentsClientHttpRequestFactory())
             .messageConverters {
                 it.addAll(listOf(FormHttpMessageConverter(),
@@ -42,6 +46,14 @@ class EDI20BeanConfig {
             .requestInterceptors {
                 correlatingRequestInterceptor(HELSE)
             }.build()
+
+    private fun statusHandler() = object : ResponseErrorHandler {
+        override fun hasError(response: ClientHttpResponse) = false.also { log.info("No error") }
+
+        override fun handleError(response: ClientHttpResponse) {
+            log.info("Status code: ${response.statusCode}")
+        }
+    }
 
     @Bean
     @Qualifier(EDI20)
