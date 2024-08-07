@@ -29,33 +29,35 @@ import java.util.*
 
 @Configuration(proxyBeanMethods = true)
 class EDI20BeanConfig {
+    
+    @Bean
+    @Qualifier(EDI20 + "plain")
+    fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) =
+        b.baseUrl("${cfg.baseUri}")
+            .requestFactory(HttpComponentsClientHttpRequestFactory())
+            .messageConverters {
+                it.addAll(listOf(FormHttpMessageConverter(),
+                    OAuth2AccessTokenResponseHttpMessageConverter()))
+            }
+            .requestInterceptors {
+                correlatingRequestInterceptor(HELSE)
+            }.build()
 
     @Bean
     @Qualifier(EDI20)
-    fun edi20RestTemplate(b: RestTemplateBuilder) =
-        b.interceptors(correlatingRequestInterceptor(HELSE))
-            .requestFactory(HttpComponentsClientHttpRequestFactory::class.java)
-            .messageConverters(FormHttpMessageConverter(), OAuth2AccessTokenResponseHttpMessageConverter())
-            .errorHandler(OAuth2ErrorResponseErrorHandler())
-            .build()
-
-    @Bean
-    @Qualifier(EDI20)
-    fun edi20RestClient(b: Builder, cfg: EDI20Config,
-                        @Qualifier(EDI20) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
+    fun edi20RestClient(b: Builder, cfg: EDI20Config, @Qualifier(EDI20) interceptor: ClientHttpRequestInterceptor) =
         b.baseUrl("${cfg.baseUri}")
             .requestInterceptors {
-                it.add(clientCredentialsRequestInterceptor)
+                it.add(interceptor)
             }.build()
 
     @Bean
     @Qualifier(EDI20DEFT)
-    fun edideft20RestClient(b: Builder,
-                            cfg: EDI20DeftConfig,
-                            @Qualifier(EDI20) clientCredentialsRequestInterceptor: ClientHttpRequestInterceptor) =
+    fun ediDeft20RestClient(b: Builder, cfg: EDI20DeftConfig,
+                            @Qualifier(EDI20) interceptor: ClientHttpRequestInterceptor) =
         b.baseUrl("${cfg.baseUri}")
             .requestInterceptors {
-                it.add(clientCredentialsRequestInterceptor)
+                it.add(interceptor)
             }.build()
 
     @Bean

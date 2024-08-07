@@ -22,19 +22,16 @@ import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestTemplate
 import java.net.URI
 import kotlin.reflect.jvm.isAccessible
 
 @Component
 @Qualifier(EDI20)
 class DPoPClientCredentialsTokenResponseClient(
-    @Qualifier(EDI20) restTemplate: RestTemplate,
+    @Qualifier(EDI20 + "plain") private val restClient: RestClient,
     private val generator: DPoPProofGenerator,
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
     private val mapper: ObjectMapper) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
-
-    private val restClient = RestClient.builder(restTemplate).build()
 
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let(::getResponse)
@@ -81,14 +78,13 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun retryWithNonce(req: RequestEntity<*>, nonce: Nonce) =
         with(req) {
-            body?.let { b ->
+            body?.let {
                 restClient.method(POST)
                     .uri(url)
-                    .headers {
-                        //  it.addAll(headers).also { log.info("Flyttet headere $headers") }
-                        it.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
+                    .headers { headers ->
+                        headers.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
                     }
-                    .body(b)
+                    .body(it)
                     .exchange(exchangeEtterNonce())
             } ?: authErrorResponse("No body in request", null, req.url)
         }
