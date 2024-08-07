@@ -66,7 +66,6 @@ abstract class AbstractRestClientAdapter(
 
         fun correlatingRequestInterceptor(defaultConsumerId: String) =
             ClientHttpRequestInterceptor { req, b, next ->
-
                 with(req.headers) {
                     mapOf(
                         NAV_CONSUMER_ID to consumerId(defaultConsumerId),

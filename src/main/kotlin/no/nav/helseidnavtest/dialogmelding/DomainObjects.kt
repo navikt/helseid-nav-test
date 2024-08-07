@@ -10,8 +10,6 @@ import no.nav.helseidnavtest.dialogmelding.DialogmeldingType.DIALOG_NOTAT
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer.Type.DNR
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer.Type.FNR
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory.getLogger
 import java.lang.String.format
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
@@ -72,21 +70,17 @@ enum class BehandlerKategori(val kode: String) {
     LEGE("LE")
 }
 
-data class Fødselsnummer(@get:JsonValue val verdi: String) {
-    private val log: Logger = getLogger(javaClass)
+@JvmInline
+value class Fødselsnummer(@get:JsonValue val verdi: String) {
+    val type get() = if (verdi[0].digitToInt() > 3) DNR else FNR
 
     init {
         require(verdi.length == 11) { "Fødselsnummer $verdi er ikke 11 siffer" }
         if (currentCluster() == PROD_GCP) {
-            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), verdi)
             require(mod11(W1, verdi) == verdi[9] - '0') { "Første kontrollsiffer $verdi[9] ikke validert" }
             require(mod11(W2, verdi) == verdi[10] - '0') { "Andre kontrollsiffer $verdi[10] ikke validert" }
-        } else {
-            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), verdi)
         }
     }
-
-    val type = if (verdi[0].digitToInt() > 3) DNR else FNR
 
     enum class Type(val verdi: String) {
         DNR("D-nummer"), FNR("Fødselsnummer")
@@ -148,20 +142,16 @@ value class Postnummer(private val raw: Int) {
     val verdi get() = format("%04d", raw)
 }
 
-data class Orgnummer(@get:JsonValue val verdi: String) {
+@JvmInline
+value class Orgnummer(@get:JsonValue val verdi: String) {
 
     constructor(orgnr: Int) : this("$orgnr")
-
-    private val log: Logger = getLogger(javaClass)
 
     init {
         require(verdi.length == 9) { "Orgnummer må ha lengde 9, $verdi har lengde ${verdi.length} " }
         if (currentCluster() == PROD_GCP) {
-            log.trace("Vi er i cluster {}, gjør validering av {}", currentCluster(), verdi)
             require(verdi.first() in listOf('8', '9')) { "ç må begynne med 8 eller 9" }
             require(verdi[8].code - 48 == mod11(verdi.substring(0, 8))) { "Kontrollsiffer ${verdi[8]} ikke validert" }
-        } else {
-            log.trace("Vi er i cluster {}, ingen validering av {}", currentCluster(), verdi)
         }
     }
 
