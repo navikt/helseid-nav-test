@@ -13,7 +13,7 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
-    fun navn(id: HerId) = "Samhandling Arbeids- og velferdsetaten" //adapter.nameForId(id.verdi)
+    fun navn(id: HerId) = adapter.nameForId(id)
 
     fun detajer(id: HerId) = adapter.detaljer(id)
 
