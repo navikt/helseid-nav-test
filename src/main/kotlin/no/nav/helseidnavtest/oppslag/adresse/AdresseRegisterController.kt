@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RestController
 class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
     @GetMapping("/idForOrgNummer")
     fun search(@RequestParam orgnr: Orgnummer) = adresse.herIdForOrgnummer(orgnr)
+
     @GetMapping("/navnForHerid")
     fun navn(@RequestParam id: HerId) = adresse.navn(id)
+
+    @GetMapping("/detaljer")
+    fun detaljer(@RequestParam id: HerId) = adresse.detajer(id)
 
 }

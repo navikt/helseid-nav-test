@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
@@ -17,6 +18,8 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     private val client = client<ICommunicationPartyService>()
 
     fun herIdForId(id: String): Int = party(id).herId
+
+    fun detaljer(herId: HerId) = client.getCommunicationPartyDetails(herId.verdi.toInt())
 
     fun nameForId(id: String): String = party(id).name.value //getServiceDetails(id.toInt()).name.value
 
