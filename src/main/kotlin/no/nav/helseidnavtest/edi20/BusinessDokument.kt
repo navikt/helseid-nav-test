@@ -72,7 +72,7 @@ data class Status(
     val herId: HerId,
     val acknowledged: Boolean,
     val appRecReceived: Boolean,
-    val appRecResult: ApprecResult,
+    val appRecResult: ApprecResult?,
     val appRecErrorList: List<ErrorDetail> = emptyList())
 
 data class DeftStatus(val receiverDownloadStatus: Map<String, Boolean>)
