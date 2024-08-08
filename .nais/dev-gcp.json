@@ -4,7 +4,7 @@
   "stshost": "helseid-sts.test.nhn.no",
   "edihost": "api.tjener.test.melding.nhn.no",
   "edidefthost": "api.deft.test.melding.nhn.no",
-  "wshost": "ws-at.test.nhn.no",
+  "wshost": "ws-web.test.nhn.no",
   "clientid": "d33dd479-12d2-493f-a8a2-f440ee9e5219",
   "clientid-test1": "0e850898-05ec-4ad2-a028-5b5988ce75dd",
   "clientid-test2": "90112420-3cc1-4452-9daa-cb1e32947ac4",
