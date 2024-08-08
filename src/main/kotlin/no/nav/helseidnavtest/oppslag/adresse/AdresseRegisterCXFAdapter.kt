@@ -18,7 +18,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     fun herIdForId(id: String): Int = party(id).herId
 
-    fun nameForId(id: String): String = client.getServiceDetails(id.toInt()).name.value
+    fun nameForId(id: String): String = party(id).name.value //getServiceDetails(id.toInt()).name.value
 
     fun party(id: String): CommunicationParty = runCatching {
         client.searchById(id).communicationParty.single()
