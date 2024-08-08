@@ -20,7 +20,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     fun herIdForId(id: String): Int = party(id).herId
 
     fun detaljer(herId: HerId) =
-        party(herId.verdi).name   //client.getCommunicationPartyDetails(herId.verdi.toInt()).name.value
+        party(herId.verdi).name.value   //client.getCommunicationPartyDetails(herId.verdi.toInt()).name.value
 
     fun nameForId(id: HerId): String = client.getServiceDetails(id.verdi.toInt()).name.value
 
