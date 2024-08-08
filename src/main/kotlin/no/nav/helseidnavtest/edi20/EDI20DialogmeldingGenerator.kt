@@ -27,7 +27,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
                 pasient(pasient),
                 vedlegg), it)
             "$it"
-        }.also { log.info("Hodemelding er $it") }
+        }
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {
@@ -36,7 +36,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
                 pasient(pasient),
                 vedlegg), it)
             "$it"
-        }.also { log.info("Hodemelding er $it") }
+        }
 
     private fun pasient(pasient: Fødselsnummer) = Pasient(pasient, pdl.navn(pasient))
 

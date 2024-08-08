@@ -14,7 +14,4 @@ class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
     @GetMapping("/navnForHerid")
     fun navn(@RequestParam id: HerId) = adresse.navn(id)
 
-    @GetMapping("/detaljer")
-    fun detaljer(@RequestParam id: HerId) = adresse.detajer(id)
-
 }
