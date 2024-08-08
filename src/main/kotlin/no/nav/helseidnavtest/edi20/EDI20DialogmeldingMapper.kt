@@ -10,6 +10,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
+import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.Part
 import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
@@ -25,12 +26,12 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: Pair<URI, String>?) =
+    fun hodemelding(fra: Part, til: Part, pasient: Pasient, vedlegg: Pair<URI, String>?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
         }
 
-    fun hodemelding(fra: HerId, til: HerId, pasient: Pasient, vedlegg: MultipartFile?) =
+    fun hodemelding(fra: Part, til: Part, pasient: Pasient, vedlegg: MultipartFile?) =
         msgInfo(msgInfo(fra, til, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
         }
@@ -39,7 +40,7 @@ class EDI20DialogmeldingMapper {
         msgInfo = info
     }
 
-    private fun msgInfo(fra: HerId, til: HerId, pasient: Pasient) =
+    private fun msgInfo(fra: Part, til: Part, pasient: Pasient) =
         HMOF.createXMLMsgInfo().apply {
             type = type()
             sender = avsender(fra)
@@ -55,26 +56,26 @@ class EDI20DialogmeldingMapper {
         msgId = "${UUID.randomUUID()}"
     }
 
-    private fun avsender(fra: HerId) =
+    private fun avsender(fra: Part) =
         HMOF.createXMLSender().apply {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "ARBEIDS- OG VELFERDSETATEN"
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = "Samhandling Arbeids- og velferdsetaten"
-                    ident.add(ident(fra.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = fra.navn
+                    ident.add(ident(fra.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
         }
 
-    private fun mottaker(til: HerId) =
+    private fun mottaker(til: Part) =
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = "ARBEIDS- OG VELFERDSETATEN"
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = "Samhandling Arbeids- og velferdsetaten"
-                    ident.add(ident(til.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = til.navn
+                    ident.add(ident(til.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
         }

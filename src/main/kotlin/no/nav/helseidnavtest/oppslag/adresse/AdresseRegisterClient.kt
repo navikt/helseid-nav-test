@@ -16,6 +16,8 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
+    fun navn(id: HerId) = adapter.nameForId(id.verdi)
+
     @Recover
     fun herIdForOrgnummer(e: Exception, nummer: Orgnummer): HerId = throw e.also {
         log.error("Recoverable exception feilet for oppslag på orgnummer {}", nummer, it)

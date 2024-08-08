@@ -1,13 +1,15 @@
 package no.nav.helse.helseidnavtest
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.helseidnavtest.edi20.Apprec
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 
 //@SpringBootTest
 class HelseIdNavTestApplicationTests {
 
-   // @Test
+    @Test
     fun contextLoads() {
+        println(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(Apprec.OK))
     }
 
 }

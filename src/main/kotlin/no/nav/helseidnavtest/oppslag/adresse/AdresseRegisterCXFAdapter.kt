@@ -4,6 +4,7 @@ import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
+import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -15,8 +16,12 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     private val client = client<ICommunicationPartyService>()
 
-    fun herIdForId(id: String): Int = runCatching {
-        client.searchById(id).communicationParty.single().herId
+    fun herIdForId(id: String): Int = party(id).herId
+
+    fun nameForId(id: String): String = party(id).name.value
+
+    private fun party(id: String): CommunicationParty = runCatching {
+        client.searchById(id).communicationParty.single()
     }.getOrElse {
         when (it) {
             is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)

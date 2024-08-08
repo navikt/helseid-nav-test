@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns6="http://www.kith.no/xmlstds/apprec/2004-11-21" xmlns:ns5="http://www.kith.no/xmlstds/base64container" xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" xmlns:ns4="http://www.kith.no/xmlstds/felleskomponent1" xmlns:ns3="http://www.kith.no/xmlstds/dialog/2006-10-11">
+<MsgHead xmlns="http://www.kith.no/xmlstds/msghead/2006-05-24" xmlns:ns5="http://www.kith.no/xmlstds/base64container"  xmlns:ns3="http://www.kith.no/xmlstds/dialog/2006-10-11">
     <MsgInfo>
         <Type V="DIALOG_NOTAT" DN="Notat"/>
         <MIGversion>v1.2 2006-05-24</MIGversion>
