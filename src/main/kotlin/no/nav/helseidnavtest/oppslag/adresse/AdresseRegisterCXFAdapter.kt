@@ -24,7 +24,9 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     }
 
     private fun party(id: String): CommunicationParty = runCatching {
-        client.getCommunicationPartyDetails(id.toInt())
+        client.getCommunicationPartyDetails(id.toInt()).also {
+            log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")
+        }
     }.getOrElse {
         when (it) {
             is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
