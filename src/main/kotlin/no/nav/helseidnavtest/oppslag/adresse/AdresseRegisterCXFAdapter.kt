@@ -19,10 +19,12 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     fun herIdForId(id: String): Int = party(id).herId
 
-    fun navn(herId: HerId) = party(herId.verdi).let { Pair(party(it.parentHerId.toString()).name.value, it.name.value) }
+    fun navn(herId: HerId) = party(herId.verdi).let {
+        Pair(party("${it.parentHerId}").name.value, it.name.value)
+    }
 
     private fun party(id: String): CommunicationParty = runCatching {
-        client.searchById(id).communicationParty.single()
+        client.getCommunicationPartyDetails(id.toInt())
     }.getOrElse {
         when (it) {
             is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
