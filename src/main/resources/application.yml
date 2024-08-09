@@ -21,6 +21,8 @@ management:
       exposure:
         include: '*'
 spring:
+  cache:
+    cache-names: "ARNavn", "ARDetails"
   servlet:
     multipart:
       max-file-size: 50MB
