@@ -62,7 +62,7 @@ class EDI20DialogmeldingMapper {
                 organisationName = "ARBEIDS- OG VELFERDSETATEN"
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = fra.navn
+                    organisationName = fra.nivå2Navn
                     ident.add(ident(fra.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
@@ -74,7 +74,7 @@ class EDI20DialogmeldingMapper {
                 organisationName = "ARBEIDS- OG VELFERDSETATEN"
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = til.navn
+                    organisationName = til.nivå2Navn
                     ident.add(ident(til.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }

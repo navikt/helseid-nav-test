@@ -15,6 +15,8 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun navn(id: HerId) = adapter.nameForId(id)
 
+    fun details(id: HerId) = adapter.details(id)
+
     /*
     @Recover
     fun herIdForOrgnummer(e: Exception, nummer: Orgnummer): HerId = throw e.also {

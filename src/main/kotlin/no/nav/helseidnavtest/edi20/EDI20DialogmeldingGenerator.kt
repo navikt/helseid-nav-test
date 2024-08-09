@@ -6,7 +6,6 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.io.StringWriter
@@ -17,8 +16,6 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
                                   private val adresse: AdresseRegisterClient,
                                   private val mapper: EDI20DialogmeldingMapper,
                                   private val pdl: PDLClient) {
-
-    private val log = getLogger(EDI20DialogmeldingGenerator::class.java)
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
@@ -38,7 +35,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
             "$it"
         }
 
-    private fun pasient(pasient: Fødselsnummer) = Pasient(pasient, pdl.navn(pasient))
+    private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
 
-    data class Part(val id: HerId, val navn: String)
+    data class Part(val id: HerId, val nivå2Navn: String)
 }

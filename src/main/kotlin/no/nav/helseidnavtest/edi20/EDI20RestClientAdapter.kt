@@ -63,16 +63,17 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, hodemelding: String) = restClient
-        .post()
-        .uri(cf::sendURI)
-        .headers { it.herId(herId.verdi) }
-        .accept(APPLICATION_JSON)
-        .body(BusinessDocument(hodemelding.encode()))
-        .retrieve()
-        .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-        .toBodilessEntity()
-        .headers.location ?: throw IllegalStateException("No location header")
+    fun send(herId: HerId, hodemelding: String) =
+        restClient
+            .post()
+            .uri(cf::sendURI)
+            .headers { it.herId(herId.verdi) }
+            .accept(APPLICATION_JSON)
+            .body(BusinessDocument(hodemelding.encode()))
+            .retrieve()
+            .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
+            .toBodilessEntity()
+            .headers.location ?: throw IllegalStateException("No location header")
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient

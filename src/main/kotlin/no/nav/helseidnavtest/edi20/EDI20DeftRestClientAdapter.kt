@@ -72,10 +72,10 @@ class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
             .toBodilessEntity()
             .headers.location ?: throw IllegalStateException("No location header")
 
-    private fun contentDisposition(originalFilename: String?) = ContentDisposition
-        .inline()
-        .filename(originalFilename)
-        .build()
+    private fun contentDisposition(originalFilename: String?) =
+        ContentDisposition.inline()
+            .filename(originalFilename)
+            .build()
 
     override fun toString() =
         "${javaClass.simpleName} [restClient=$restClient, cfg=$cfg]"
