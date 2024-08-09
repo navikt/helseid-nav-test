@@ -12,6 +12,7 @@ import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpRequest
@@ -28,6 +29,9 @@ import java.util.*
 class EDI20BeanConfig {
 
     private val log = getLogger(EDI20BeanConfig::class.java)
+
+    @Bean
+    fun cacheManager() = ConcurrentMapCacheManager()
 
     @Bean
     @Qualifier(PLAIN)
