@@ -22,7 +22,7 @@ management:
         include: '*'
 spring:
   cache:
-    cache-names: arnavn,ardetails
+    cache-names: ardetails
   servlet:
     multipart:
       max-file-size: 50MB
