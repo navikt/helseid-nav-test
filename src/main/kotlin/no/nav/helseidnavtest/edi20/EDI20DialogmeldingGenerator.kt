@@ -4,6 +4,7 @@ import jakarta.xml.bind.Marshaller
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.NAV
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import org.springframework.stereotype.Component
@@ -19,8 +20,8 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
-            marshaller.marshal(mapper.hodemelding(Part(fra, adresse.navn(fra)),
-                Part(til, adresse.navn(til)),
+            marshaller.marshal(mapper.hodemelding(Part(fra, adresse.navn(NAV), adresse.navn(fra)),
+                Part(til, adresse.navn(NAV), adresse.navn(til)),
                 pasient(pasient),
                 vedlegg), it)
             "$it"
@@ -28,8 +29,8 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {
-            marshaller.marshal(mapper.hodemelding(Part(fra, adresse.navn(fra)),
-                Part(til, adresse.navn(til)),
+            marshaller.marshal(mapper.hodemelding(Part(fra, adresse.navn(NAV), adresse.navn(fra)),
+                Part(til, adresse.navn(NAV), adresse.navn(til)),
                 pasient(pasient),
                 vedlegg), it)
             "$it"
@@ -37,5 +38,5 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
 
     private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
 
-    data class Part(val id: HerId, val nivå2Navn: String)
+    data class Part(val id: HerId, val nivå1Navn: String, val nivå2Navn: String)
 }

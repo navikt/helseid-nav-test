@@ -38,6 +38,7 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         const val PLAIN = "${EDI20}plain"
         const val EDI1_ID = "8142519"
         const val EDI2_ID = "8142520"
+        val NAV = HerId(90128)
         val EDI_1 = HerId(EDI1_ID) to "$EDI20-1"
         val EDI_2 = HerId(EDI2_ID) to "$EDI20-2"
         private const val INCLUDE_APPREC = "IncludeAppRec"

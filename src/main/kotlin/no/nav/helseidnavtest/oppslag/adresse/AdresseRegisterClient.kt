@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.oppslag.adresse
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Orgnummer
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,8 +14,10 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
+    @Cacheable("ARNavn")
     fun navn(id: HerId) = adapter.nameForId(id)
 
+    @Cacheable("ARDetails")
     fun details(id: HerId) = adapter.details(id)
 
     /*

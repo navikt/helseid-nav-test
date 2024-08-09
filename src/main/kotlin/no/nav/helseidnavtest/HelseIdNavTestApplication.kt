@@ -4,6 +4,7 @@ import no.nav.boot.conditionals.Cluster.Companion.profiler
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.jms.annotation.EnableJms
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableMethodSecurity
 @ConfigurationPropertiesScan
 @EnableRetry(proxyTargetClass = true)
+@EnableCaching
 @EnableJms
 class HelseIdNavTestApplication
 

@@ -25,6 +25,10 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.3.1</version>
@@ -43,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-                <artifactId>junit-jupiter</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>1.20.1</version>
             <scope>test</scope>
         </dependency>
@@ -201,7 +205,8 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/basecontainer/xsd/kith-base64.xsd</xsd>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/basecontainer/xjb/binding.xjb</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/basecontainer/xjb/binding.xjb
+                                        </bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.basecontainer</packagename>
                                 </xsdOption>
@@ -221,7 +226,8 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/fellesformat2/xsd/Fellesformat2_any.xsd</xsd>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/fellesformat2/xjb/binding.xjb</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/fellesformat2/xjb/binding.xjb
+                                        </bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.fellesformat2</packagename>
                                 </xsdOption>
@@ -259,8 +265,9 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsdDir>${basedir}/src/main/resources/dialogmelding/xsd</xsdDir>
-                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/dialogmelding/xjb/binding.xjb</bindingFile>
+                                    <bindingFiles>
+                                        <bindingFile>${basedir}/src/main/resources/dialogmelding/xjb/binding.xjb
+                                        </bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.dialogmelding</packagename>
                                 </xsdOption>
@@ -279,7 +286,8 @@
                                 <xsdOption>
                                     <xsdDir>${basedir}/src/main/resources/hodemelding/xsd</xsdDir>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/src/main/resources/hodemelding/xjb/binding.xjb</bindingFile>
+                                        <bindingFile>${basedir}/src/main/resources/hodemelding/xjb/binding.xjb
+                                        </bindingFile>
                                     </bindingFiles>
                                     <packagename>no.nav.helseopplysninger.hodemelding</packagename>
                                 </xsdOption>
@@ -296,11 +304,11 @@
                 <configuration>
                     <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
                     <defaultOptions>
-                      <extraargs>
-                          <extraarg>-verbose</extraarg>
-                      </extraargs>
-                </defaultOptions>
-            </configuration>
+                        <extraargs>
+                            <extraarg>-verbose</extraarg>
+                        </extraargs>
+                    </defaultOptions>
+                </configuration>
                 <executions>
                     <execution>
                         <id>flr</id>
@@ -328,7 +336,7 @@
                                     <wsdl>${basedir}/src/main/resources/ar.wsdl</wsdl>
                                     <wsdlLocation>classpath:/ar.wsdl</wsdlLocation>
                                     <extraargs>
-                                       <!-- <extraarg>-all</extraarg> -->
+                                        <!-- <extraarg>-all</extraarg> -->
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
