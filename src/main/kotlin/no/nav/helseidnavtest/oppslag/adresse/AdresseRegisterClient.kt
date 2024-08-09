@@ -14,10 +14,10 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
-    @Cacheable("ARNavn")
+    @Cacheable("arnavn")
     fun navn(id: HerId) = adapter.nameForId(id)
 
-    @Cacheable("ARDetails")
+    @Cacheable("ardetails")
     fun details(id: HerId) = adapter.details(id)
 
     /*
