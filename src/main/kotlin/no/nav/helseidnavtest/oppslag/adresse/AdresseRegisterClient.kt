@@ -12,6 +12,7 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     private val log = getLogger(AdresseRegisterClient::class.java)
 
+    fun parent(herId: HerId) = adapter.parent(herId)
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
     @Cacheable("ardetails")

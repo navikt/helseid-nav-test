@@ -17,4 +17,7 @@ class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
     @GetMapping("/details")
     fun details(@RequestParam id: HerId) = adresse.details(id)
 
+    @GetMapping("/parent")
+    fun parent(@RequestParam id: HerId) = adresse.parent(id)
+
 }
