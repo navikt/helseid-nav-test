@@ -12,15 +12,11 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     private val log = getLogger(AdresseRegisterClient::class.java)
 
-    fun parent(herId: HerId) = adapter.parent(herId)
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
     @Cacheable("ardetails")
-    fun navn(id: HerId) = adapter.nameForId(id)
-
-    @Cacheable("ardetails")
-    fun details(id: HerId) = adapter.details(id)
-
+    fun navn(id: HerId) = adapter.navn(id)
+    
     /*
     @Recover
     fun herIdForOrgnummer(e: Exception, nummer: Orgnummer): HerId = throw e.also {

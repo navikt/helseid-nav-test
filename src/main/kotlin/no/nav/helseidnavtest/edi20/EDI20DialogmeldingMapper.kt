@@ -59,10 +59,10 @@ class EDI20DialogmeldingMapper {
     private fun avsender(fra: Part) =
         HMOF.createXMLSender().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = fra.nivå1Navn
+                organisationName = fra.navn.first
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = fra.nivå2Navn
+                    organisationName = fra.navn.second
                     ident.add(ident(fra.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
@@ -71,10 +71,10 @@ class EDI20DialogmeldingMapper {
     private fun mottaker(til: Part) =
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = til.nivå1Navn
+                organisationName = til.navn.first
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = til.nivå2Navn
+                    organisationName = til.navn.second
                     ident.add(ident(til.id.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }

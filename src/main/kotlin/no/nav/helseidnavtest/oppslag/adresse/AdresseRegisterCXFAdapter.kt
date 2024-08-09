@@ -19,11 +19,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     fun herIdForId(id: String): Int = party(id).herId
 
-    fun parent(herId: HerId) = details(herId).parentHerId
-    
-    fun nameForId(herId: HerId) = details(herId).name.value
-
-    fun details(id: HerId) = client.getCommunicationPartyDetails(id.verdi.toInt())
+    fun navn(herId: HerId) = party(herId.verdi).let { Pair(party(it.parentHerId.toString()).name.value, it.name.value) }
 
     private fun party(id: String): CommunicationParty = runCatching {
         client.searchById(id).communicationParty.single()
