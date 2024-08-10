@@ -38,8 +38,8 @@ data class Meldinger(val herId: HerId, val messageIds: List<UUID>)
 
 data class Apprec(
     val result: ApprecResult,
-    val errorList: List<ApprecErrorDetail> = emptyList(),
-    val properties: ApprecProperties = ApprecProperties()) {
+    val properties: ApprecProperties = ApprecProperties(),
+    val errorList: List<ApprecErrorDetail> = emptyList()) {
     data class ApprecProperties(val system: ApprecSystem = ApprecSystem()) {
         data class ApprecSystem(
             val applicationName: String = APP_NAVN,
@@ -58,7 +58,7 @@ data class Apprec(
     companion object {
         val OK = Apprec(ApprecResult.OK)
         val ERROR = Apprec(ApprecResult.ERROR)
-        val DELFEIL = Apprec(ApprecResult.DELFEIL, listOf(ApprecErrorDetail("42", "Shit happens")))
+        val DELFEIL = Apprec(ApprecResult.DELFEIL, errorList = listOf(ApprecErrorDetail("42", "Shit happens")))
     }
 }
 
