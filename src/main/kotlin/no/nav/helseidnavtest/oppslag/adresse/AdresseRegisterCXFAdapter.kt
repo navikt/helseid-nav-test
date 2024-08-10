@@ -48,7 +48,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
                     cfg.url,
                     it.message,
-                    cause = it) git p
+                    cause = it)
 
                 else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it)
             }
