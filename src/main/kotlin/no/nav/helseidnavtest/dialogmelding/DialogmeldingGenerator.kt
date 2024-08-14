@@ -3,12 +3,8 @@ package no.nav.helseidnavtest.dialogmelding
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
-import no.nav.helseidnavtest.security.ClaimsExtractor
-import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.springframework.core.io.ClassPathResource
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder.getContext
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.UUID.randomUUID
@@ -22,9 +18,10 @@ class DialogmeldingGenerator(
 
     @PreAuthorize("hasAuthority('LE_4')")
     fun hodemeldng(pasient: Fødselsnummer, uuid: UUID) {
-        genererDialogmelding(pasient, uuid).any.first { it is XMLMsgHead } as XMLMsgHead
+        //  genererDialogmelding(pasient, uuid).any.first { it is XMLMsgHead }
     }
 
+    /*
     fun genererDialogmelding(pasient: Fødselsnummer, uuid: UUID) =
         when (val auth = getContext().authentication) {
             is OAuth2AuthenticationToken -> {
@@ -43,7 +40,7 @@ class DialogmeldingGenerator(
         }
 
     private fun arbeidstaker(pasient: Fødselsnummer) = Pasient(pasient, pdl.navn(pasient))
-
+*/
     private fun dialogmelding(behandler: Behandler, uuid: UUID) =
         Dialogmelding(
             uuid, behandler, Fødselsnummer("26900799232"),

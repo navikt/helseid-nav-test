@@ -11,13 +11,16 @@ import org.springframework.stereotype.Service
 
 @Service
 @Retryable(include = [RecoverableException::class])
-class FastlegeClient(private val fastlegeAdapter: FastlegeCXFAdapter, private val adresseClient: AdresseRegisterClient, private val partnerClient: DialogmeldingClient) {
-    fun kontorForPasient(pasient: Fødselsnummer) = fastlegeAdapter.kontorViaPasient(pasient.verdi).apply {
-        adresseClient.herIdForOrgnummer(orgnummer).let {
-            herId = it
-         // TODO Trengs ikke for EDI 2.0 partnerId = partnerClient.partnerId(it, this)
-        }
-    }
+class FastlegeClient(private val fastlegeAdapter: FastlegeCXFAdapter,
+                     private val adresseClient: AdresseRegisterClient,
+                     private val partnerClient: DialogmeldingClient) {
+    /*
+       fun kontorForPasient(pasient: Fødselsnummer) = fastlegeAdapter.kontorViaPasient(pasient.verdi).apply {
+           adresseClient.herIdForOrgnummer(orgnummer).let {
+               herId = it
+            // TODO Trengs ikke for EDI 2.0 partnerId = partnerClient.partnerId(it, this)
+           }
+       }*/
 
     fun pasienterForAvtale(id: AvtaleId) = fastlegeAdapter.pasienterForAvtale(id)
 

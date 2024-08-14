@@ -15,9 +15,9 @@ class DialogmeldingSender(private val template: JmsTemplate,
 
     fun send(pasient: Fødselsnummer) {
         val uuid = randomUUID()
-        val melding = generator.genererDialogmelding(pasient, uuid)
+        //  val melding = generator.genererDialogmelding(pasient, uuid)
         log.info("Sender dialogmelding for pasient $pasient for $cfg")
-        template.convertAndSend(cfg.request, melding)
-        lager.lagre(uuid, melding)
+        //  template.convertAndSend(cfg.request, melding)
+        //  lager.lagre(uuid, melding)
     }
 }

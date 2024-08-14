@@ -75,7 +75,7 @@ class EDI20DialogmeldingMapper {
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = til.parentNavn
-                ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
+                ident.add(ident(til.parentHerId.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
                     organisationName = til.navn
                     ident.add(ident(til.herId.verdi, type(NAV_OID, HER, HER_DESC)))

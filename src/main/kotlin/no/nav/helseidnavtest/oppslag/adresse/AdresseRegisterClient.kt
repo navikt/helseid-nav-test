@@ -15,13 +15,11 @@ import org.springframework.stereotype.Service
 class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     private val log = getLogger(AdresseRegisterClient::class.java)
-
-    fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
-
+    
     fun kommunikasjonsParter(fra: HerId, til: HerId) =
         KommunikasjonsParter(kommunikasjonsPart(fra), kommunikasjonsPart(til))
 
-    fun kommunikasjonsPart(herId: HerId) = adapter.getParty(herId.verdi)
+    fun kommunikasjonsPart(herId: HerId) = adapter.kommunikasjonsPart(herId.verdi)
 
     @Throws(Exception::class)
     @Recover
