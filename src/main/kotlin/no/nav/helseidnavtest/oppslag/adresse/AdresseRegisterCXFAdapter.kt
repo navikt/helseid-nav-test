@@ -23,9 +23,9 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     fun kommunikasjonsPart(id: String) =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
-                log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")
+                log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type.single()}")
             }.let {
-                when (Type.valueOf(it.type.first())) {
+                when (Type.valueOf(it.type.single())) {
                     Organization -> Virksomhet(it)
                     Person -> VirksomhetPerson(it)
                     Service -> Tjeneste(it)
@@ -64,17 +64,20 @@ abstract class KommunikasjonsPart(party: CommunicationParty) {
     val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE
     val parentNavn: String = party.parentName.value
 
-    enum class Type {
-        Organization, Person, Service
-    }
-
     data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)
 
     data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party)
 
     data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party)
 
+    enum class Type {
+        Organization, Person, Service
+    }
+
     data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
+
+    override fun toString() =
+        javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
 
 }
 
