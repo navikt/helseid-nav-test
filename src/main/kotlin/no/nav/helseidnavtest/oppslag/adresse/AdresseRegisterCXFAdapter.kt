@@ -25,7 +25,8 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")
             }.let {
-                when (Type.valueOf(it.name.value)) {
+                log.info("Types are ${it.type}")
+                when (Type.valueOf(it.type.first())) {
                     Organization -> Virksomhet(it)
                     Person -> VirksomhetPerson(it)
                     Service -> Tjeneste(it)
