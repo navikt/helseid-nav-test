@@ -18,28 +18,28 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
 
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
 
-    fun sendRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+    fun sendRef(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         vedlegg?.let {
-            adapter.send(herId, hodemelding(herId, pasient, Pair(deft.upload(herId, it), it.contentType!!)))
-        } ?: adapter.send(herId, hodemelding(herId, pasient))
+            adapter.send(fra, hodemelding(fra, til, pasient, Pair(deft.upload(fra, it), it.contentType!!)))
+        } ?: adapter.send(fra, hodemelding(fra, til, pasient))
 
-    fun sendInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
-        adapter.send(herId, hodemelding(herId, pasient, vedlegg))
+    fun sendInline(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+        adapter.send(fra, hodemelding(fra, til, pasient, vedlegg))
 
-    fun showRef(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile) =
-        hodemelding(herId, pasient, Pair(deft.upload(herId, vedlegg), vedlegg.contentType!!))
+    fun showRef(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile) =
+        hodemelding(fra, til, pasient, Pair(deft.upload(fra, vedlegg), vedlegg.contentType!!))
 
-    fun showInline(herId: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
-        hodemelding(herId, pasient, vedlegg)
+    fun showInline(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+        hodemelding(fra, til, pasient, vedlegg)
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
-    private fun hodemelding(fra: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>? = null) =
-        generator.hodemelding(fra, fra.other(), pasient, vedlegg)
+    private fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>? = null) =
+        generator.hodemelding(fra, til, pasient, vedlegg)
 
-    private fun hodemelding(fra: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
-        generator.hodemelding(fra, fra.other(), pasient, vedlegg)
+    private fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+        generator.hodemelding(fra, til, pasient, vedlegg)
 
 }

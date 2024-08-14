@@ -36,6 +36,7 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         const val HERID = "herId"
         const val EDI20 = "edi20"
         const val PLAIN = "${EDI20}plain"
+        const val VALIDATOR = "8095225"
         const val EDI1_ID = "8142519"
         const val EDI2_ID = "8142520"
         val NAV = HerId(90128)

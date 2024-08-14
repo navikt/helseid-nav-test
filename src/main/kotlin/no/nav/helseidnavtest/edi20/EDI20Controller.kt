@@ -9,6 +9,7 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.*
@@ -42,43 +43,54 @@ class EDI20Controller(private val edi: EDI20Service) {
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendRef(@Herid
-                @RequestParam herId: HerId,
+                @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.sendRef(herId, Fødselsnummer(pasient), vedlegg)
+        edi.sendRef(fra, fra.other(), Fødselsnummer(pasient), vedlegg)
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
     fun showRef(@Herid
-                @RequestParam herId: HerId,
+                @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        edi.showRef(herId, Fødselsnummer(pasient), vedlegg)
+        edi.showRef(fra, fra.other(), Fødselsnummer(pasient), vedlegg)
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendInline(@Herid
-                   @RequestParam herId: HerId,
+                   @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.sendInline(herId, Fødselsnummer(pasient), vedlegg)
+        edi.sendInline(fra, fra.other(), Fødselsnummer(pasient), vedlegg)
+
+    @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
+    @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
+    fun sendInlineTilValidering(@Herid
+                                @RequestParam fra: HerId,
+                                @RequestParam(defaultValue = VALIDATOR) til: HerId,
+                                @Parameter(description = "Pasientens fødselsnummer")
+                                @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
+                                @Parameter(description = "Valgfritt vedlegg")
+                                @RequestPart("file", required = false) vedlegg: MultipartFile?) =
+        edi.sendInline(fra, til, Fødselsnummer(pasient), vedlegg)
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun showInline(@Herid
-                   @RequestParam herId: HerId,
+                   @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        edi.showInline(herId, Fødselsnummer(pasient), vedlegg)
+        edi.showInline(fra, fra.other(), Fødselsnummer(pasient), vedlegg)
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")

@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentia
 import org.springframework.stereotype.Component
 
 @Component
+@Qualifier("delegating")
 class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI20) private val dpop: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
                                                                   @Qualifier(PLAIN) private val plain: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
                                                                   private val detector: DPopDetector) :
@@ -24,5 +25,4 @@ class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI
 
 interface DPopDetector {
     fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest): Boolean
-
 }

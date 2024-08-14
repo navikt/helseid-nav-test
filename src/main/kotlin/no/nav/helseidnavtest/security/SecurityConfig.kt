@@ -160,7 +160,7 @@ class SecurityConfig(
 
     @Bean
     fun authorizedClientServiceOAuth2AuthorizedClientManager(
-        delegatingResponseClient: DelegatingDPoPDetectingClientCredentialsTokenResponseClient,
+        @Qualifier("delegating") responseClient: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
         repo: ClientRegistrationRepository,
         service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
@@ -168,7 +168,7 @@ class SecurityConfig(
                 OAuth2AuthorizedClientProviderBuilder.builder()
                     .refreshToken()
                     .clientCredentials {
-                        it.accessTokenResponseClient(delegatingResponseClient)
+                        it.accessTokenResponseClient(responseClient)
                     }
                     .build()
             )

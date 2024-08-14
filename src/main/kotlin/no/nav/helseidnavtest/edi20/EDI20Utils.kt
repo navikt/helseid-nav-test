@@ -11,7 +11,7 @@ import java.net.URI
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
 fun HerId.other() = HerId.of(verdi.other())
-fun String.other() =
+private fun String.other() =
     when (this) {
         EDI1_ID -> EDI2_ID
         EDI2_ID -> EDI1_ID
