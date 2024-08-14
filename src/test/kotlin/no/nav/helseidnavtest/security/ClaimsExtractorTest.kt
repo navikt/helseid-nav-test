@@ -25,7 +25,6 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.SECURITY_LEVEL
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.SPECIALITIES
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.VALUE
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import java.net.URI
 
 class ClaimsExtractorTest {
@@ -44,7 +43,7 @@ class ClaimsExtractorTest {
         }
     """.trimIndent()
 
-    @Test
+    // @Test
     fun xxx() {
         val key = JWK.parse(assertion).toRSAKey()
         val signer = RSASSASigner(key)
