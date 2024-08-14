@@ -73,7 +73,7 @@ class EDI20RestClientAdapter(
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
-            .headers.location ?: throw IllegalStateException("No location header")
+            .headers.location?.key() ?: throw IllegalStateException("No location header")
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient
