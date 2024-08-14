@@ -11,6 +11,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartInfo
+import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartsInfo
 import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
@@ -26,13 +27,13 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemelding(parts: Pair<PartInfo, PartInfo>, pasient: Pasient, vedlegg: Pair<URI, String>?) =
-        msgInfo(msgInfo(parts.first, parts.second, pasient)).apply {
+    fun hodemelding(parts: PartsInfo, pasient: Pasient, vedlegg: Pair<URI, String>?) =
+        msgInfo(msgInfo(parts, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
         }
 
-    fun hodemelding(parts: Pair<PartInfo, PartInfo>, pasient: Pasient, vedlegg: MultipartFile?) =
-        msgInfo(msgInfo(parts.first, parts.second, pasient)).apply {
+    fun hodemelding(parts: PartsInfo, pasient: Pasient, vedlegg: MultipartFile?) =
+        msgInfo(msgInfo(parts, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
         }
 
@@ -40,11 +41,11 @@ class EDI20DialogmeldingMapper {
         msgInfo = info
     }
 
-    private fun msgInfo(fra: PartInfo, til: PartInfo, pasient: Pasient) =
+    private fun msgInfo(parts: PartsInfo, pasient: Pasient) =
         HMOF.createXMLMsgInfo().apply {
             type = type()
-            sender = avsender(fra)
-            receiver = mottaker(til)
+            sender = avsender(parts.fra)
+            receiver = mottaker(parts.til)
             patient = pasient(pasient)
         }
 

@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Orgnummer
+import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.*
 import no.nav.helseidnavtest.error.RecoverableException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.retry.annotation.Recover
@@ -18,7 +19,7 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
     fun partInfo(id: HerId) = adapter.partiesNavn(id)
 
-    fun partInfo(fra: HerId, til: HerId) = Pair(partInfo(fra), partInfo(til))
+    fun partInfo(fra: HerId, til: HerId) = PartsInfo(partInfo(fra), partInfo(til))
     fun kommunikasjonsPart(herId: HerId) = adapter.getParty(herId.verdi)
 
     @Throws(Exception::class)

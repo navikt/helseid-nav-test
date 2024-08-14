@@ -32,4 +32,6 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
     private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
 
     data class PartInfo(val id: HerId, val navn: Pair<String, String>)
+    data class PartsInfo(val fra: PartInfo, val til: PartInfo)
+
 }
