@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartInfo
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
@@ -22,11 +23,11 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     fun herIdForId(id: String): Int = getParty(id).herId.verdi.toInt()
 
     fun partiesNavn(herId: HerId) =
-        getParty(herId.verdi).let { p ->
-            Pair(p.navn, p.parentHerId?.let { p.parentNavn } ?: "")
+        with(getParty(herId.verdi)) {
+            PartInfo(herId, Pair(navn, parentHerId?.let { parentNavn } ?: ""))
         }
 
-    private fun getParty(id: String) =
+    fun getParty(id: String) =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")

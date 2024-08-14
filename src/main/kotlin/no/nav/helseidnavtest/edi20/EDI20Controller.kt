@@ -73,7 +73,7 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInlineMedMottaker(@Herid
+    fun sendInlineTilValidering(@Herid
                               @RequestParam fra: HerId,
                               @RequestParam(defaultValue = VALIDATOR) til: HerId,
                               @Parameter(description = "Pasientens fødselsnummer")
