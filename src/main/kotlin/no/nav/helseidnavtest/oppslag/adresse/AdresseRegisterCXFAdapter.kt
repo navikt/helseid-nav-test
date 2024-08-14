@@ -1,7 +1,7 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartInfo
+import no.nav.helseidnavtest.dialogmelding.HerId.Companion.NONE
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
@@ -21,11 +21,6 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     private val client = client<ICommunicationPartyService>()
 
     fun herIdForId(id: String): Int = getParty(id).herId.verdi.toInt()
-
-    fun partiesNavn(herId: HerId) =
-        with(getParty(herId.verdi)) {
-            PartInfo(herId, Pair(navn, parentHerId?.let { parentNavn } ?: ""))
-        }
 
     fun getParty(id: String) =
         runCatching {
@@ -68,7 +63,7 @@ abstract class KommunikasjonsPart(party: CommunicationParty) {
     val visningsNavn = party.displayName.value
     val herId = HerId(party.herId)
     val navn = party.name.value
-    val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) }
+    val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE
     val parentNavn: String = party.parentName.value
 
     enum class Type {
@@ -80,6 +75,8 @@ abstract class KommunikasjonsPart(party: CommunicationParty) {
     class VirksomhetPerson(party: CommunicationParty) : KommunikasjonsPart(party)
 
     class Tjeneste(party: CommunicationParty) : KommunikasjonsPart(party)
+
+    data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
 
 }
 

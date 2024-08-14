@@ -11,7 +11,7 @@ class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
     @GetMapping("/idForOrgNummer")
     fun search(@RequestParam orgnr: Orgnummer) = adresse.herIdForOrgnummer(orgnr)
 
-    @GetMapping("/navn")
-    fun navn(@RequestParam id: HerId) = adresse.partInfo(id)
+    @GetMapping("/part")
+    fun part(@RequestParam id: HerId) = adresse.kommunikasjonsPart(id)
 
 }

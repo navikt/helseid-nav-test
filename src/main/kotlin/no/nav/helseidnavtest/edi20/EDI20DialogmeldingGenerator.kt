@@ -19,19 +19,18 @@ class EDI20DialogmeldingGenerator(private val marshaller: Marshaller,
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
-            marshaller.marshal(mapper.hodemelding(adresse.partInfo(fra, til), pasient(pasient), vedlegg), it)
+            marshaller.marshal(mapper.hodemelding(adresse.kommunikasjonsParter(fra, til), pasient(pasient), vedlegg),
+                it)
             "$it"
         }
 
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {
-            marshaller.marshal(mapper.hodemelding(adresse.partInfo(fra, til), pasient(pasient), vedlegg), it)
+            marshaller.marshal(mapper.hodemelding(adresse.kommunikasjonsParter(fra, til), pasient(pasient), vedlegg),
+                it)
             "$it"
         }
 
     private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
-
-    data class PartInfo(val id: HerId, val navn: Pair<String, String>)
-    data class PartsInfo(val fra: PartInfo, val til: PartInfo)
 
 }

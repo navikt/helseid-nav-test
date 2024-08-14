@@ -10,8 +10,8 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
-import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartInfo
-import no.nav.helseidnavtest.edi20.EDI20DialogmeldingGenerator.PartsInfo
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.KommunikasjonsParter
 import no.nav.helseopplysninger.hodemelding.XMLCV
 import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
@@ -27,13 +27,15 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemelding(parts: PartsInfo, pasient: Pasient, vedlegg: Pair<URI, String>?) =
-        msgInfo(msgInfo(parts, pasient)).apply {
+    fun hodemelding(parter: KommunikasjonsParter, pasient: Pasient, vedlegg: Pair<URI, String>?) =
+        msgInfo(msgInfo(parter, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
         }
 
-    fun hodemelding(parts: PartsInfo, pasient: Pasient, vedlegg: MultipartFile?) =
-        msgInfo(msgInfo(parts, pasient)).apply {
+    fun hodemelding(parter: KommunikasjonsParter,
+                    pasient: Pasient,
+                    vedlegg: MultipartFile?) =
+        msgInfo(msgInfo(parter, pasient)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
         }
 
@@ -41,11 +43,11 @@ class EDI20DialogmeldingMapper {
         msgInfo = info
     }
 
-    private fun msgInfo(parts: PartsInfo, pasient: Pasient) =
+    private fun msgInfo(parter: KommunikasjonsParter, pasient: Pasient) =
         HMOF.createXMLMsgInfo().apply {
             type = type()
-            sender = avsender(parts.fra)
-            receiver = mottaker(parts.til)
+            sender = avsender(parter.fra)
+            receiver = mottaker(parter.til)
             patient = pasient(pasient)
         }
 
@@ -57,26 +59,26 @@ class EDI20DialogmeldingMapper {
         msgId = "${UUID.randomUUID()}"
     }
 
-    private fun avsender(fra: PartInfo) =
+    private fun avsender(fra: KommunikasjonsPart) =
         HMOF.createXMLSender().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = fra.navn.first
-                ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
+                organisationName = fra.parentNavn
+                ident.add(ident(fra.parentHerId.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = fra.navn.second
-                    ident.add(ident(fra.id.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = fra.navn
+                    ident.add(ident(fra.herId.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
         }
 
-    private fun mottaker(til: PartInfo) =
+    private fun mottaker(til: KommunikasjonsPart) =
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = til.navn.first
+                organisationName = til.parentNavn
                 ident.add(ident(NAV_HERID.verdi, type(NAV_OID, HER, HER_DESC)))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = til.navn.second
-                    ident.add(ident(til.id.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = til.navn
+                    ident.add(ident(til.herId.verdi, type(NAV_OID, HER, HER_DESC)))
                 }
             }
         }

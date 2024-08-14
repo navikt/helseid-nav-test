@@ -120,6 +120,7 @@ value class HerId(val verdi: String) {
     constructor(verdi: Int) : this("$verdi")
 
     companion object {
+        val NONE = HerId(0)
         fun of(verdi: String) = HerId(verdi)
     }
 }
