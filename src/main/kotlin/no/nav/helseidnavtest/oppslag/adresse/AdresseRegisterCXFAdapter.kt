@@ -64,20 +64,26 @@ abstract class KommunikasjonsPart(party: CommunicationParty) {
     val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE
     val parentNavn: String = party.parentName.value
 
-    data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)
+    data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party) {
+        override fun toString() =
+            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
+    }
 
-    data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party)
+    data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party) {
+        override fun toString() =
+            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
+    }
 
-    data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party)
+    data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party) {
+        override fun toString() =
+            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
+    }
 
     enum class Type {
         Organization, Person, Service
     }
 
     data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
-
-    override fun toString() =
-        javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
 
 }
 
