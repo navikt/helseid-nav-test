@@ -5,6 +5,9 @@ import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Type.*
+import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -16,22 +19,23 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     private val client = client<ICommunicationPartyService>()
 
-    fun herIdForId(id: String): Int = getParty(id).herId
+    fun herIdForId(id: String): Int = getParty(id).herId.verdi.toInt()
 
-    fun partyNavn(herId: HerId): Pair<String, String> {
-        val party = getParty(herId.verdi)
-        val parentParty = if (party.parentHerId.toInt() > 0) {
-            getParty("${party.parentHerId}").name.value
-        } else {
-            "Ingen parent"
+    fun partiesNavn(herId: HerId) =
+        getParty(herId.verdi).let { p ->
+            Pair(p.navn, p.parentHerId?.let { p.parentNavn } ?: "")
         }
-        return Pair(parentParty, party.name.value)
-    }
 
     private fun getParty(id: String) =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")
+            }.let {
+                when (Type.valueOf(it.name.value)) {
+                    Organization -> Virksomhet(it)
+                    Person -> VirksomhetPerson(it)
+                    Service -> Tjeneste(it)
+                }
             }
         }.getOrElse {
             when (it) {
@@ -57,6 +61,28 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
     override fun ping() = mapOf(Pair("ping", client.ping()))
 
 }
+
+abstract class KommunikasjonsPart(party: CommunicationParty) {
+    val aktiv: Boolean = party.isActive
+    val visningsNavn = party.displayName.value
+    val herId = HerId(party.herId)
+    val navn = party.name.value
+    val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) }
+    val parentNavn: String = party.parentName.value
+
+    enum class Type {
+        Organization, Person, Service
+    }
+
+    class Virksomhet(party: CommunicationParty) : KommunikasjonsPart(party)
+
+    class VirksomhetPerson(party: CommunicationParty) : KommunikasjonsPart(party)
+
+    class Tjeneste(party: CommunicationParty) : KommunikasjonsPart(party)
+
+}
+
+
 
 
 

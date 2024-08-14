@@ -18,7 +18,7 @@ class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
     fun herIdForOrgnummer(nummer: Orgnummer) = HerId(adapter.herIdForId(nummer.verdi))
 
     @Cacheable("ardetails")
-    fun navn(id: HerId) = adapter.partyNavn(id)
+    fun navn(id: HerId) = adapter.partiesNavn(id)
 
     @Throws(Exception::class)
     @Recover
