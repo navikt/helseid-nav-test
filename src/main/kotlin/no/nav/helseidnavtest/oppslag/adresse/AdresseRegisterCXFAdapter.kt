@@ -25,7 +25,6 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type}")
             }.let {
-                log.info("Types are ${it.type}")
                 when (Type.valueOf(it.type.first())) {
                     Organization -> Virksomhet(it)
                     Person -> VirksomhetPerson(it)
@@ -69,11 +68,11 @@ abstract class KommunikasjonsPart(party: CommunicationParty) {
         Organization, Person, Service
     }
 
-    class Virksomhet(party: CommunicationParty) : KommunikasjonsPart(party)
+    data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)
 
-    class VirksomhetPerson(party: CommunicationParty) : KommunikasjonsPart(party)
+    data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party)
 
-    class Tjeneste(party: CommunicationParty) : KommunikasjonsPart(party)
+    data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party)
 
     data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
 
