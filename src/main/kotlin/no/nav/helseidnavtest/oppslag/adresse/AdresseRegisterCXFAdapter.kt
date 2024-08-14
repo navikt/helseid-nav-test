@@ -19,7 +19,7 @@ import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunica
 class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter(cfg) {
 
     private val client = client<ICommunicationPartyService>()
-    
+
     fun kommunikasjonsPart(id: String) =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
@@ -30,7 +30,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                     Person -> VirksomhetPerson(it)
                     Service -> Tjeneste(it)
                 }
-            }
+            }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
         }.getOrElse {
             when (it) {
                 is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
