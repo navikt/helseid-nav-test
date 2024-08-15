@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
@@ -116,9 +118,9 @@ class EDI20Controller(private val edi: EDI20Service) {
                @PathVariable id: UUID) =
         edi.status(herId, id)
 
-    @Operation(description = "MErk alle dokumenter lest for en gitt herId")
+    @Operation(description = "MErk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
     @GetMapping("${MESSAGES_PATH}/lesalle")
-    fun opprydding(@Herid herId: HerId) =
+    fun opprydding() =
         edi.lesAlle(EDI_1.first).also {
             edi.lesAlle(EDI_2.first)
         }
