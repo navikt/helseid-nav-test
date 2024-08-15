@@ -121,7 +121,5 @@ class EDI20Controller(private val edi: EDI20Service) {
     @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
     @GetMapping("${MESSAGES_PATH}/lesalle")
     fun lesalle() =
-        edi.lesAlle(EDI_1.first).also {
-            edi.lesAlle(EDI_2.first)
-        }
+        edi.lesOgAckAlle(EDI_1.first) + edi.lesOgAckAlle(EDI_2.first)
 }

@@ -34,12 +34,15 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 
-    fun lesAlle(herId: HerId) =
-        adapter.poll(herId, true)?.forEach { m ->
-            m.messageIds.forEach { id ->
-                konsumert(m.herId, id)
-            }
-        }
+    fun lesOgAckAlle(herId: HerId) =
+        mapOf(herId to (adapter.poll(herId, true)
+            ?.flatMap { m ->
+                m.messageIds.map {
+                    konsumert(m.herId, it)
+                    apprec(m.herId, it)
+                    it
+                }
+            } ?: emptyList()))
 
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
