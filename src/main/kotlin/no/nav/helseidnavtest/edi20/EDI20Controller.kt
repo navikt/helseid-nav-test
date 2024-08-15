@@ -8,6 +8,8 @@ import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
@@ -116,6 +118,8 @@ class EDI20Controller(private val edi: EDI20Service) {
 
     @Operation(description = "MErk alle dokumenter lest for en gitt herId")
     @GetMapping("${DOK_PATH}/lesalle")
-    fun opprydding(@Herid herId: HerId) =
-        edi.lesAlle(herId)
+    fun opprydding(@Herid herId: HerId) {
+        edi.lesAlle(EDI_1.first)
+        edi.lesAlle(EDI_2.first)
+    }
 }
