@@ -34,6 +34,13 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 
+    fun lesAlle(herId: HerId) =
+        adapter.poll(herId, true)?.forEach { m ->
+            m.messageIds.forEach { id ->
+                konsumert(m.herId, id)
+            }
+        }
+
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
     private fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>? = null) =
