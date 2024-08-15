@@ -39,7 +39,7 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
             ?.flatMap { m ->
                 m.messageIds.map {
                     konsumert(m.herId, it)
-                    apprec(m.herId, it)
+                    //  apprec(m.herId, it)
                     it
                 }
             } ?: emptyList()))
