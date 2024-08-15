@@ -118,9 +118,9 @@ class EDI20Controller(private val edi: EDI20Service) {
                @PathVariable id: UUID) =
         edi.status(herId, id)
 
-    @Operation(description = "MErk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
+    @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
     @GetMapping("${MESSAGES_PATH}/lesalle")
-    fun opprydding() =
+    fun lesalle() =
         edi.lesAlle(EDI_1.first).also {
             edi.lesAlle(EDI_2.first)
         }
