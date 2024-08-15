@@ -117,7 +117,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.status(herId, id)
 
     @Operation(description = "MErk alle dokumenter lest for en gitt herId")
-    @GetMapping("${DOK_PATH}/lesalle")
+    @GetMapping("${MESSAGES_PATH}/lesalle")
     fun opprydding(@Herid herId: HerId) =
         edi.lesAlle(EDI_1.first).also {
             edi.lesAlle(EDI_2.first)
