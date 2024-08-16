@@ -52,7 +52,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_XML)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .body<String>()?.let(generator::fraApprec)
+            .body<String>()?.let(generator::unmarshal)
 
     fun poll(herId: HerId, appRec: Boolean) =
         restClient
