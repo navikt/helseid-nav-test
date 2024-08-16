@@ -25,30 +25,33 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type.single()}")
             }.let {
+                log.info("Mapper kommunikasjonspart for $id")
                 when (Type.valueOf(it.type.single())) {
                     Organization -> Virksomhet(it)
                     Person -> VirksomhetPerson(it)
                     Service -> Tjeneste(it)
                 }
             }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
-        }.getOrElse {
-            when (it) {
-                is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
+        }.getOrElse { e ->
+            when (e) {
+                is CommPartyFault -> throw NotFoundException(e.message, cfg.url, cause = e)
                 is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST,
                     cfg.url,
-                    it.message,
-                    cause = it)
+                    e.message,
+                    cause = e)
 
                 is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
                     cfg.url,
-                    cause = it)
+                    cause = e)
 
                 is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
                     cfg.url,
-                    it.message,
-                    cause = it)
+                    e.message,
+                    cause = e)
 
-                else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it)
+                else -> throw RecoverableException(BAD_REQUEST, cfg.url, e.message, e).also {
+                    log.warn(e.message, e)
+                }
             }
         }
 
