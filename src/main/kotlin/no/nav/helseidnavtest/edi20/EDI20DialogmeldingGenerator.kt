@@ -24,23 +24,23 @@ class EDI20DialogmeldingGenerator(
 
     private val log = getLogger(EDI20DialogmeldingGenerator::class.java)
 
-    fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
+    fun marshal(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
             marshaller.createMarshaller()
                 .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til), pasient(pasient)),
                     vedlegg),
                     it)
             "$it"
-        }
+        }.also { log.info("Marshalled: $it") }
 
-    fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
+    fun marshal(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {
             marshaller.createMarshaller()
                 .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til), pasient(pasient)),
                     vedlegg),
                     it)
             "$it"
-        }
+        }.also { log.info("Marshalled: $it") }
 
     private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
 

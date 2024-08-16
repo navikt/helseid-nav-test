@@ -47,9 +47,9 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
     private fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>? = null) =
-        generator.hodemelding(fra, til, pasient, vedlegg)
+        generator.marshal(fra, til, pasient, vedlegg)
 
     private fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
-        generator.hodemelding(fra, til, pasient, vedlegg)
+        generator.marshal(fra, til, pasient, vedlegg)
 
 }
