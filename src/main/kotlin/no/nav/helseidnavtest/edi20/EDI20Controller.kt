@@ -14,7 +14,6 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
-import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -105,7 +104,7 @@ class EDI20Controller(private val edi: EDI20Service) {
         edi.konsumert(herId, id)
 
     @Operation(description = "Les et dokument for en gitt herId")
-    @GetMapping(DOK_PATH, produces = [APPLICATION_XML_VALUE])
+    @GetMapping(DOK_PATH)
     fun les(@Herid herId: HerId,
             @Parameter(description = "Dokument-id")
             @PathVariable id: UUID) =
