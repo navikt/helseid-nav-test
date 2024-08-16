@@ -253,7 +253,6 @@ class EDI20DialogmeldingMapper {
                 Person.Navn(givenName, middleName, familyName))
         }
 
-    fun apprec(apprec: XMLAppRec): Apprec {
-        return Apprec(result = Apprec.ApprecResult.OK) // TODO
-    }
+    fun apprec(apprec: XMLAppRec) = apprec
+    //return Apprec(result = Apprec.ApprecResult.OK) // TODO
 }
