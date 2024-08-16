@@ -19,6 +19,7 @@ import kotlin.text.Charsets.UTF_8
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
+    private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
@@ -51,7 +52,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_XML)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .body<String>()
+            .body<String>()?.let(generator::fraApprec)
 
     fun poll(herId: HerId, appRec: Boolean) =
         restClient

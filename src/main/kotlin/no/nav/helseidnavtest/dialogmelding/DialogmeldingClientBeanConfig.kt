@@ -47,6 +47,12 @@ class DialogmeldingClientBeanConfig {
     }
 
     @Bean
+    fun unmarshaller(marshaller: Jaxb2Marshaller) = marshaller.createUnmarshaller().apply {
+        setProperty(JAXB_FORMATTED_OUTPUT, true)
+        setProperty(JAXB_ENCODING, "UTF-8")
+    }
+
+    @Bean
     fun xmlMessageConverter(marshaller: Jaxb2Marshaller) = MarshallingMessageConverter(marshaller, marshaller)
 
     @Bean
