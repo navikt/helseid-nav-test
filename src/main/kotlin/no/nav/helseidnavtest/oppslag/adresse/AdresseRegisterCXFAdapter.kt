@@ -2,12 +2,12 @@ package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.HerId.Companion.NONE
+import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Type.*
+import no.nav.helseidnavtest.oppslag.adresse.Type.*
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -56,36 +56,36 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
 }
 
-abstract class KommunikasjonsPart(party: CommunicationParty) {
-    val aktiv: Boolean = party.isActive
-    val visningsNavn = party.displayName.value
-    val herId = HerId(party.herId)
-    val navn = party.name.value
-    val parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE
-    val parentNavn: String = party.parentName.value
+data class Bestilling(val parter: KommunikasjonsParter, val pasient: Pasient)
 
-    data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party) {
-        override fun toString() =
-            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
-    }
+open class KommunikasjonsPart(val aktiv: Boolean,
+                              val visningsNavn: String,
+                              val herId: HerId,
+                              val navn: String,
+                              val parentHerId: HerId,
+                              val parentNavn: String) {
 
-    data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party) {
-        override fun toString() =
-            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
-    }
-
-    data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party) {
-        override fun toString() =
-            javaClass.simpleName + " (aktiv=$aktiv, visningsNavn=$visningsNavn, herId=$herId, navn=$navn, parentHerId=$parentHerId, parentNavn=$parentNavn)"
-    }
-
-    enum class Type {
-        Organization, Person, Service
-    }
-
-    data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
-
+    constructor(party: CommunicationParty) : this(
+        aktiv = party.isActive,
+        visningsNavn = party.displayName.value,
+        herId = HerId(party.herId),
+        navn = party.name.value,
+        parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE,
+        parentNavn = party.parentName.value)
 }
+
+data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)
+
+data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party)
+
+data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party)
+
+enum class Type {
+    Organization, Person, Service
+}
+
+data class KommunikasjonsParter(val fra: KommunikasjonsPart, val til: KommunikasjonsPart)
+
 
 
 

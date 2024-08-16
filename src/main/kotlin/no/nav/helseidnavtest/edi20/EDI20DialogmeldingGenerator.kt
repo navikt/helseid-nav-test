@@ -4,7 +4,10 @@ import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
+import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import no.nav.helseidnavtest.oppslag.person.PDLClient
+import no.nav.helseopplysninger.apprec.XMLAppRec
+import no.nav.helseopplysninger.hodemelding.XMLMsgHead
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
@@ -24,7 +27,8 @@ class EDI20DialogmeldingGenerator(
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
             marshaller.createMarshaller()
-                .marshal(mapper.hodemelding(adresse.kommunikasjonsParter(fra, til), pasient(pasient), vedlegg),
+                .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til), pasient(pasient)),
+                    vedlegg),
                     it)
             "$it"
         }
@@ -32,14 +36,20 @@ class EDI20DialogmeldingGenerator(
     fun hodemelding(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {
             marshaller.createMarshaller()
-                .marshal(mapper.hodemelding(adresse.kommunikasjonsParter(fra, til), pasient(pasient), vedlegg),
+                .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til), pasient(pasient)),
+                    vedlegg),
                     it)
             "$it"
         }
 
     private fun pasient(fnr: Fødselsnummer) = Pasient(fnr, pdl.navn(fnr))
 
-    fun unmarshal(apprec: String) = marshaller.createUnmarshaller().unmarshal(apprec.byteInputStream()).also {
+    fun unmarshal(apprec: String) = marshaller.createUnmarshaller().unmarshal(apprec.byteInputStream()).let {
         log.info("Unmarshalled: $it")
+        when (it) {
+            is XMLMsgHead -> mapper.bestilling(it)
+            is XMLAppRec -> mapper.apprec(it)
+            else -> throw IllegalArgumentException("Unknown type: ${it.javaClass}")
+        }
     }
 }

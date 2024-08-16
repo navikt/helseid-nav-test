@@ -10,10 +10,12 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
+import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.KommunikasjonsParter
-import no.nav.helseopplysninger.hodemelding.XMLCV
-import no.nav.helseopplysninger.hodemelding.XMLMsgInfo
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsParter
+import no.nav.helseidnavtest.oppslag.person.Person
+import no.nav.helseopplysninger.apprec.XMLAppRec
+import no.nav.helseopplysninger.hodemelding.*
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -27,15 +29,14 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
-    fun hodemelding(parter: KommunikasjonsParter, pasient: Pasient, vedlegg: Pair<URI, String>?) =
-        msgInfo(msgInfo(parter, pasient)).apply {
+    fun hodemelding(bestilling: Bestilling, vedlegg: Pair<URI, String>?) =
+        msgInfo(msgInfo(bestilling)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
         }
 
-    fun hodemelding(parter: KommunikasjonsParter,
-                    pasient: Pasient,
+    fun hodemelding(bestilling: Bestilling,
                     vedlegg: MultipartFile?) =
-        msgInfo(msgInfo(parter, pasient)).apply {
+        msgInfo(msgInfo(bestilling)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
         }
 
@@ -43,12 +44,12 @@ class EDI20DialogmeldingMapper {
         msgInfo = info
     }
 
-    private fun msgInfo(parter: KommunikasjonsParter, pasient: Pasient) =
+    private fun msgInfo(bestilling: Bestilling) =
         HMOF.createXMLMsgInfo().apply {
             type = type()
-            sender = avsender(parter.fra)
-            receiver = mottaker(parter.til)
-            patient = pasient(pasient)
+            sender = avsender(bestilling.parter.fra)
+            receiver = mottaker(bestilling.parter.til)
+            patient = pasient(bestilling.pasient)
         }
 
     private fun XMLMsgInfo.type() = HMOF.createXMLCS().apply {
@@ -217,4 +218,42 @@ class EDI20DialogmeldingMapper {
             this.v = v
             this.dn = dn
         }
+
+    fun bestilling(hode: XMLMsgHead) =
+        with(hode.msgInfo) {
+            Bestilling(parter(sender, receiver), pasient(patient))
+        }
+
+    private fun parter(sender: XMLSender, receiver: XMLReceiver) =
+        KommunikasjonsParter(part(sender), part(receiver))
+
+    private fun part(sender: XMLSender) =
+        with(sender.organisation.organisation) {
+            KommunikasjonsPart(aktiv = true,
+                visningsNavn = organisationName,
+                herId = HerId(ident.first().id),
+                navn = organisationName,
+                parentHerId = HerId(sender.organisation.ident.first().id),
+                parentNavn = sender.organisation.organisationName)
+        }
+
+    private fun part(receiver: XMLReceiver) =
+        with(receiver.organisation.organisation) {
+            KommunikasjonsPart(aktiv = true,
+                visningsNavn = organisationName,
+                herId = HerId(ident.first().id),
+                navn = organisationName,
+                parentHerId = HerId(receiver.organisation.ident.first().id),
+                parentNavn = receiver.organisation.organisationName)
+        }
+
+    private fun pasient(patient: XMLPatient) =
+        with(patient) {
+            Pasient(Fødselsnummer(ident.first().id),
+                Person.Navn(givenName, middleName, familyName))
+        }
+
+    fun apprec(apprec: XMLAppRec): Apprec {
+        return Apprec(result = Apprec.ApprecResult.OK) // TODO
+    }
 }
