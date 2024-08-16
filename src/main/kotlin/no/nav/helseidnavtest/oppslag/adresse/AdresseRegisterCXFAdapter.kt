@@ -62,7 +62,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 data class Bestilling(val parter: KommunikasjonsParter, val pasient: Pasient)
 
 open class KommunikasjonsPart(val aktiv: Boolean,
-                              val visningsNavn: String,
+                              val visningsNavn: String?,
                               val herId: HerId,
                               val navn: String,
                               val parentHerId: HerId,
