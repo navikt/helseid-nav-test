@@ -48,7 +48,6 @@ class DialogmeldingClientBeanConfig {
 
     @Bean
     fun unmarshaller(marshaller: Jaxb2Marshaller) = marshaller.createUnmarshaller().apply {
-        setProperty(JAXB_FORMATTED_OUTPUT, true)
         setProperty(JAXB_ENCODING, "UTF-8")
     }
 
