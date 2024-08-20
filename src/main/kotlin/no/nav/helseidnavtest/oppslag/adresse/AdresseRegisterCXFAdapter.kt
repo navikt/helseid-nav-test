@@ -9,7 +9,6 @@ import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
-import no.nhn.register.communicationparty.OrganizationPerson
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Component
@@ -45,7 +44,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 log.info("Mapper kommunikasjonspart for $id")
                 when (it) {
                     is KommunikasjonsPartVirksomhet -> Virksomhet(it)
-                    is KommunikasjonsPartPerson -> VirksomhetPerson(it)
+                    is KommunikasjonsPartPerson -> VirksomhetPerson(it, virksomhet(it.parentHerId))
                     is KommunikasjonsPartTjeneste -> Tjeneste(it, virksomhet(it.parentHerId))
                     else -> throw IllegalStateException("Ukjent type kommunikasjonspart ${it.javaClass}")
                 }
@@ -93,7 +92,13 @@ class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: Stri
     constructor(v: KommunikasjonsPartVirksomhet) : this(v.isActive, v.displayName.value, v.herId(), v.name.value)
 }
 
-data class VirksomhetPerson(val person: OrganizationPerson) : KommunikasjonsPart(person)
+class VirksomhetPerson(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
+    KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+    constructor(p: KommunikasjonsPartPerson, virksomhet: KommunikasjonsPartVirksomhet) : this(p.isActive,
+        p.displayName.value,
+        p.herId(),
+        p.name.value, Virksomhet(virksomhet))
+}
 
 class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
     KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {

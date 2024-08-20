@@ -12,10 +12,14 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.*
 import no.nav.helseidnavtest.oppslag.person.Person
+import no.nav.helseidnavtest.security.ClaimsExtractor
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.net.URI
@@ -26,6 +30,8 @@ import java.util.*
 
 @Component
 class EDI20DialogmeldingMapper {
+
+    private val log = getLogger(javaClass)
 
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
@@ -74,15 +80,42 @@ class EDI20DialogmeldingMapper {
 
     private fun KommunikasjonsPart.orgNavn() = visningsNavn ?: navn
 
-    private fun mottaker(tjeneste: Tjeneste) =
+    private fun mottaker(part: KommunikasjonsPart) =
         HMOF.createXMLReceiver().apply {
-            organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = tjeneste.virksomhet.orgNavn()
-                ident.add(ident(tjeneste.virksomhet.herId, herIdType))
-                organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = tjeneste.orgNavn()
-                    ident.add(ident(tjeneste.herId, herIdType))
+            when (part) {
+                is Tjeneste -> {
+                    organisation = HMOF.createXMLOrganisation().apply {
+                        organisationName = part.virksomhet.orgNavn()
+                        ident.add(ident(part.virksomhet.herId, herIdType))
+                        organisation = HMOF.createXMLOrganisation().apply {
+                            organisationName = part.orgNavn()
+                            ident.add(ident(part.herId, herIdType))
+                            val auth = SecurityContextHolder.getContext().authentication
+                            val oidcUser = auth.oidcUser()
+                            val extractor = ClaimsExtractor(oidcUser.claims)
+                            log.info("NAME " + extractor.claim("name"))
+                        }
+                    }
                 }
+
+                is VirksomhetPerson -> {  // TODO HealthCareProfessional
+                    organisation = HMOF.createXMLOrganisation().apply {
+                        organisationName = part.virksomhet.orgNavn()
+                        ident.add(ident(part.virksomhet.herId, herIdType))
+                        organisation = HMOF.createXMLOrganisation().apply {
+                            organisationName = part.orgNavn()
+                            ident.add(ident(part.herId, herIdType))
+                            healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
+                                val auth = SecurityContextHolder.getContext().authentication
+                                val oidcUser = auth.oidcUser()
+                                val extractor = ClaimsExtractor(oidcUser.claims)
+                                log.info("NAME " + extractor.claim("name"))
+                            }
+                        }
+                    }
+                }
+
+                else -> throw IllegalArgumentException("Ukjent tjeneste $part")
             }
         }
 
