@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -42,6 +43,7 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
         val NAV = HerId(90128)
         val EDI_1 = HerId(EDI1_ID) to "$EDI20-1"
         val EDI_2 = HerId(EDI2_ID) to "$EDI20-2"
+        val LEGE = HprId("565501872")
         private const val INCLUDE_APPREC = "IncludeAppRec"
         private const val TO_HER_IDS = "ToHerIds"
         private const val DEFAULT_PING_PATH = ""

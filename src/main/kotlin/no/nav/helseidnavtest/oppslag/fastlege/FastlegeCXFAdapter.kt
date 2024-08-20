@@ -13,7 +13,7 @@ import no.nhn.schemas.reg.flr.IFlrReadOperationsGetPatientGPDetailsGenericFaultF
 @Component
 class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
 
-    private val client = client<IFlrReadOperations>()
+    val client = client<IFlrReadOperations>()
 
     fun pasienterForAvtale(avtale: AvtaleId) = runCatching {
         client.getGPPatientList(avtale.verdi)?.patientToGPContractAssociation?.map {

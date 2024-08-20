@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
@@ -21,6 +22,18 @@ import no.nhn.register.communicationparty.Service as KommunikasjonsPartTjeneste
 class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter(cfg) {
 
     private val client = client<ICommunicationPartyService>()
+
+    val write = client<ICommunicationPartyService>()
+
+    val OF = no.nhn.register.communicationparty.ObjectFactory()
+
+    fun lagLege(id: HprId, org: HerId) =
+        write.createOrganizationPerson(
+            OF.createOrganizationPersonCreate().apply {
+                hprNumber = OF.createOrganizationPersonCreateHprNumber(id.verdi)
+                parentHerId = org.verdi.toInt()
+            }
+        )
 
     private fun virksomhet(id: Int) = client.getOrganizationDetails(id)
 
