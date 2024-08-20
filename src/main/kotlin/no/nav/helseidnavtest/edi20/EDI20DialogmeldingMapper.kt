@@ -10,9 +10,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsParter
+import no.nav.helseidnavtest.oppslag.adresse.*
 import no.nav.helseidnavtest.oppslag.person.Person
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
@@ -49,8 +47,8 @@ class EDI20DialogmeldingMapper {
     private fun msgInfo(bestilling: Bestilling) =
         HMOF.createXMLMsgInfo().apply {
             type = type()
-            sender = avsender(bestilling.parter.fra)
-            receiver = mottaker(bestilling.parter.til)
+            sender = avsender(bestilling.tjenester.fra)
+            receiver = mottaker(bestilling.tjenester.til)
             patient = pasient(bestilling.pasient)
         }
 
@@ -62,30 +60,28 @@ class EDI20DialogmeldingMapper {
         msgId = "${UUID.randomUUID()}"
     }
 
-    private fun avsender(fra: KommunikasjonsPart) =
+    private fun avsender(tjeneste: Tjeneste) =
         HMOF.createXMLSender().apply {
-            val parent = fra.virksomhet!!
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = parent.orgNavn()
-                ident.add(ident(parent.herId, herIdType))
+                organisationName = tjeneste.virksomhet.orgNavn()
+                ident.add(ident(tjeneste.virksomhet.herId, herIdType))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = fra.orgNavn()
-                    ident.add(ident(fra.herId, herIdType))
+                    organisationName = tjeneste.orgNavn()
+                    ident.add(ident(tjeneste.herId, herIdType))
                 }
             }
         }
 
     private fun KommunikasjonsPart.orgNavn() = visningsNavn ?: navn
 
-    private fun mottaker(til: KommunikasjonsPart) =
+    private fun mottaker(tjeneste: Tjeneste) =
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                val parent = til.virksomhet!!
-                organisationName = parent.orgNavn()
-                ident.add(ident(parent.herId, herIdType))
+                organisationName = tjeneste.virksomhet.orgNavn()
+                ident.add(ident(tjeneste.virksomhet.herId, herIdType))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = til.orgNavn()
-                    ident.add(ident(til.herId, herIdType))
+                    organisationName = tjeneste.orgNavn()
+                    ident.add(ident(tjeneste.herId, herIdType))
                 }
             }
         }
@@ -231,15 +227,15 @@ class EDI20DialogmeldingMapper {
         }
 
     private fun parter(sender: XMLSender, receiver: XMLReceiver) =
-        KommunikasjonsParter(part(sender), part(receiver))
+        Tjenester(part(sender), part(receiver))
 
     private fun part(sender: XMLSender) =
         with(sender.organisation) {
-            KommunikasjonsPart(aktiv = true,
+            Tjeneste(aktiv = true,
                 visningsNavn = organisation.organisationName,
                 herId = organisation.ident.herId(),
                 navn = organisation.organisationName,
-                virksomhet = KommunikasjonsPart(aktiv = true,
+                virksomhet = Virksomhet(aktiv = true,
                     herId = ident.herId(),
                     navn = organisationName,
                     visningsNavn = organisationName))
@@ -250,11 +246,11 @@ class EDI20DialogmeldingMapper {
 
     private fun part(receiver: XMLReceiver) =
         with(receiver.organisation) {
-            KommunikasjonsPart(aktiv = true,
+            Tjeneste(aktiv = true,
                 visningsNavn = organisation.organisationName,
                 herId = organisation.ident.herId(),
                 navn = organisation.organisationName,
-                virksomhet = KommunikasjonsPart(aktiv = true,
+                virksomhet = Virksomhet(aktiv = true,
                     herId = ident.herId(),
                     navn = organisationName,
                     visningsNavn = organisationName))
