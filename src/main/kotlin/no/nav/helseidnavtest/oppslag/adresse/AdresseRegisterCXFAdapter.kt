@@ -34,7 +34,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                     is KommunikasjonsPartVirksomhet -> Virksomhet(it)
                     is KommunikasjonsPartPerson -> VirksomhetPerson(it)
                     is KommunikasjonsPartTjeneste -> Tjeneste(it, virksomhet(it.parentHerId))
-                    else -> throw IllegalStateException("Ukjent type kommunikasjonspart")
+                    else -> throw IllegalStateException("Ukjent type kommunikasjonspart ${it.javaClass}")
                 }
             }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
         }.getOrElse { e ->
