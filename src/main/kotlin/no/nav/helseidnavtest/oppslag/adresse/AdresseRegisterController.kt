@@ -13,5 +13,5 @@ class AdresseRegisterController(private val adresse: AdresseRegisterClient) {
     fun kommunikasjonsPart(@RequestParam id: HerId) = adresse.kommunikasjonsPart(id)
 
     @GetMapping("/laglege")
-    fun lege(@RequestParam id: HprId, @RequestParam org: HerId) = adresse.lege(id, org)
+    fun laglege(@RequestParam id: HprId, @RequestParam org: HerId) = adresse.lege(id, org)
 }
