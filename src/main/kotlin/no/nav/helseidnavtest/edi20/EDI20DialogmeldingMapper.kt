@@ -19,6 +19,7 @@ import no.nav.helseopplysninger.hodemelding.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
+import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
@@ -92,8 +93,8 @@ class EDI20DialogmeldingMapper {
                             ident.add(ident(part.herId, herIdType))
                             val auth = SecurityContextHolder.getContext().authentication
                             log.info("AUTH " + auth)
-                            if (auth.isAuthenticated) {
-                                // log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
+                            if (auth !is AnonymousAuthenticationToken) {
+                                log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
                             } else {
                                 log.warn("NOT AUTHENTICATED")
                             }
