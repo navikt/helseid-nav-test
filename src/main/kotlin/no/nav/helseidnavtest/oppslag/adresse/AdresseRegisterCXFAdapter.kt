@@ -19,16 +19,16 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     private val client = client<ICommunicationPartyService>()
 
-    fun kommunikasjonsPart(id: String) =
+    fun kommunikasjonsPart(id: String): KommunikasjonsPart =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type.single()}")
-            }.let {
+            }.let { p ->
                 log.info("Mapper kommunikasjonspart for $id")
-                when (Type.valueOf(it.type.single())) {
-                    Organization -> Virksomhet(it)
-                    Person -> VirksomhetPerson(it)
-                    Service -> Tjeneste(it)
+                when (Type.valueOf(p.type.single())) {
+                    Organization -> Virksomhet(p)
+                    Person -> VirksomhetPerson(p)
+                    Service -> Tjeneste(p, client.getCommunicationPartyDetails(p.parentHerId))
                 }
             }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
         }.getOrElse { e ->
@@ -82,7 +82,7 @@ data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)
 
 data class VirksomhetPerson(val party: CommunicationParty) : KommunikasjonsPart(party)
 
-data class Tjeneste(val party: CommunicationParty) : KommunikasjonsPart(party)
+data class Tjeneste(val party: CommunicationParty, val virk: CommunicationParty) : KommunikasjonsPart(party, virk)
 
 enum class Type {
     Organization, Person, Service
