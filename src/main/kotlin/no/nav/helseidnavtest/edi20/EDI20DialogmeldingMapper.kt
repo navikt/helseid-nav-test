@@ -91,13 +91,7 @@ class EDI20DialogmeldingMapper {
                         organisation = HMOF.createXMLOrganisation().apply {
                             organisationName = part.orgNavn()
                             ident.add(ident(part.herId, herIdType))
-                            val auth = SecurityContextHolder.getContext().authentication
-                            log.info("AUTH " + auth)
-                            if (auth !is AnonymousAuthenticationToken) {
-                                log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
-                            } else {
-                                log.warn("NOT AUTHENTICATED")
-                            }
+
                         }
                     }
                 }
@@ -111,9 +105,12 @@ class EDI20DialogmeldingMapper {
                             ident.add(ident(part.herId, herIdType))
                             healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
                                 val auth = SecurityContextHolder.getContext().authentication
-                                val oidcUser = auth.oidcUser()
-                                val extractor = ClaimsExtractor(oidcUser.claims)
-                                log.info("NAME " + extractor.claim("name"))
+                                log.info("AUTH " + auth)
+                                if (auth !is AnonymousAuthenticationToken) {
+                                    log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
+                                } else {
+                                    log.warn("NOT AUTHENTICATED")
+                                }
                             }
                         }
                     }
