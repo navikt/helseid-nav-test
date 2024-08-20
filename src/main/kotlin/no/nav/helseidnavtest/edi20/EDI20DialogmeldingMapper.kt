@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.core.annotation.CurrentSecurityContext
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
@@ -32,7 +30,7 @@ import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.*
 
 @Component
-class EDI20DialogmeldingMapper(@CurrentSecurityContext private val context: SecurityContext) {
+class EDI20DialogmeldingMapper {
 
     private val log = getLogger(javaClass)
 
