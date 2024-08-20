@@ -91,8 +91,9 @@ class EDI20DialogmeldingMapper {
                             organisationName = part.orgNavn()
                             ident.add(ident(part.herId, herIdType))
                             val auth = SecurityContextHolder.getContext().authentication
+                            log.info("AUTH " + auth)
                             if (auth.isAuthenticated) {
-                                log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
+                                // log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
                             } else {
                                 log.warn("NOT AUTHENTICATED")
                             }
