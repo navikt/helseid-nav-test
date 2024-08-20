@@ -5,7 +5,6 @@ import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
-import no.nav.helseidnavtest.oppslag.adresse.Type.*
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import no.nhn.register.communicationparty.OrganizationPerson
@@ -13,15 +12,16 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.stereotype.Component
 import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as CommPartyFault
-import no.nhn.register.communicationparty.Organization as Organisasjon
+import no.nhn.register.communicationparty.Organization as KommunikasjonsPartVirksomhet
+import no.nhn.register.communicationparty.OrganizationPerson as KommunikasjonsPartPerson
+import no.nhn.register.communicationparty.Service as KommunikasjonsPartTjeneste
 
 @Component
 class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter(cfg) {
 
     private val client = client<ICommunicationPartyService>()
 
-    fun tjeneste(id: String) = client.getServiceDetails(id.toInt())
-    fun virksomhet(id: String) = client.getOrganizationDetails(id.toInt())
+    fun virksomhet(id: Int) = client.getOrganizationDetails(id)
     fun person(id: String) = client.getOrganizationPersonDetails(id.toInt())
 
     fun kommunikasjonsPart(id: String): KommunikasjonsPart =
@@ -30,11 +30,11 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type.single()}")
             }.let {
                 log.info("Mapper kommunikasjonspart for $id")
-                when (Type.valueOf(it.type.single())) {
-                    Organization -> Virksomhet(it as Organisasjon)
-                    Person -> VirksomhetPerson(it as OrganizationPerson)
-                    Service -> Tjeneste(it as no.nhn.register.communicationparty.Service,
-                        virksomhet(it.parentHerId.toString()))
+                when (it) {
+                    is KommunikasjonsPartVirksomhet -> Virksomhet(it)
+                    is KommunikasjonsPartPerson -> VirksomhetPerson(it)
+                    is KommunikasjonsPartTjeneste -> Tjeneste(it, virksomhet(it.parentHerId))
+                    else -> throw IllegalStateException("Ukjent type kommunikasjonspart")
                 }
             }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
         }.getOrElse { e ->
@@ -74,15 +74,15 @@ open class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val her
 
     constructor(part: CommunicationParty) : this(part.isActive,
         part.displayName.value,
-        part.herId.herId(),
+        part.herId(),
         part.name.value)
 }
 
 class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
     KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-    constructor(virksomhet: Organisasjon) : this(virksomhet.isActive,
+    constructor(virksomhet: KommunikasjonsPartVirksomhet) : this(virksomhet.isActive,
         virksomhet.displayName.value,
-        virksomhet.herId.herId(),
+        virksomhet.herId(),
         virksomhet.name.value)
 }
 
@@ -91,15 +91,15 @@ data class VirksomhetPerson(val person: OrganizationPerson) : KommunikasjonsPart
 class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
     KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
     constructor(tjeneste: no.nhn.register.communicationparty.Service,
-                virksomhet: Organisasjon) : this(tjeneste.isActive,
+                virksomhet: KommunikasjonsPartVirksomhet) : this(tjeneste.isActive,
         tjeneste.displayName.value,
-        tjeneste.herId.herId(),
+        tjeneste.herId(),
         tjeneste.name.value, Virksomhet(virksomhet))
 }
 
-enum class Type {
-    Organization, Person, Service
-}
+enum class Type { Organization, Person, Service }
+
+private fun CommunicationParty.herId() = herId.herId()
 
 private fun Int.herId() = HerId(this)
 
