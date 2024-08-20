@@ -31,7 +31,7 @@ class EDI20DialogmeldingGenerator(
                     vedlegg),
                     it)
             "$it"
-        }.also { log.info("Marshalled: $it") }
+        }.also { log.run { info("Marshalled: $it") } }
 
     fun marshal(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: MultipartFile?) =
         StringWriter().let {

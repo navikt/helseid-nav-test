@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.dialogmelding.HerId.Companion.NONE
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
@@ -65,16 +64,18 @@ open class KommunikasjonsPart(val aktiv: Boolean,
                               val visningsNavn: String?,
                               val herId: HerId,
                               val navn: String,
-                              val parentHerId: HerId,
-                              val parentNavn: String) {
+                              val virksomhet: KommunikasjonsPart? = null) {
 
-    constructor(party: CommunicationParty) : this(
-        aktiv = party.isActive,
-        visningsNavn = party.displayName.value,
-        herId = HerId(party.herId),
-        navn = party.name.value,
-        parentHerId = party.parentHerId.takeIf { it.toInt() > 0 }?.let { HerId(it) } ?: NONE,
-        parentNavn = party.parentName.value)
+    init {
+        require(aktiv) { "Kommunikasjonspart er ikke aktiv" }
+    }
+
+    constructor(tjeneste: CommunicationParty, virksomhet: CommunicationParty? = null) : this(
+        aktiv = tjeneste.isActive,
+        visningsNavn = tjeneste.displayName.value,
+        herId = HerId(tjeneste.herId),
+        navn = tjeneste.name.value,
+        virksomhet = virksomhet?.let { KommunikasjonsPart(it) })
 }
 
 data class Virksomhet(val party: CommunicationParty) : KommunikasjonsPart(party)

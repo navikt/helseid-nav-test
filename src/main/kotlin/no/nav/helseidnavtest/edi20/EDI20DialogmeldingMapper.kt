@@ -29,6 +29,8 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
+    val herIdType = type(NAV_OID, HER, HER_DESC)
+
     fun hodemelding(bestilling: Bestilling, vedlegg: Pair<URI, String>?) =
         msgInfo(msgInfo(bestilling)).apply {
             vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
@@ -62,24 +64,28 @@ class EDI20DialogmeldingMapper {
 
     private fun avsender(fra: KommunikasjonsPart) =
         HMOF.createXMLSender().apply {
+            val parent = fra.virksomhet!!
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = fra.parentNavn
-                ident.add(ident(fra.parentHerId.verdi, type(NAV_OID, HER, HER_DESC)))
+                organisationName = parent.orgNavn()
+                ident.add(ident(parent.herId, herIdType))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = fra.navn
-                    ident.add(ident(fra.herId.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = fra.orgNavn()
+                    ident.add(ident(fra.herId, herIdType))
                 }
             }
         }
 
+    private fun KommunikasjonsPart.orgNavn() = visningsNavn ?: navn
+
     private fun mottaker(til: KommunikasjonsPart) =
         HMOF.createXMLReceiver().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = til.parentNavn
-                ident.add(ident(til.parentHerId.verdi, type(NAV_OID, HER, HER_DESC)))
+                val parent = til.virksomhet!!
+                organisationName = parent.orgNavn()
+                ident.add(ident(parent.herId, herIdType))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = til.navn
-                    ident.add(ident(til.herId.verdi, type(NAV_OID, HER, HER_DESC)))
+                    organisationName = til.orgNavn()
+                    ident.add(ident(til.herId, herIdType))
                 }
             }
         }
@@ -190,6 +196,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
+    private fun ident(id: HerId, type: XMLCV) = ident(id.verdi, type)
     private fun ident(id: String, type: XMLCV) = HMOF.createXMLIdent().apply {
         this.id = id
         typeId = type
@@ -201,7 +208,6 @@ class EDI20DialogmeldingMapper {
         private const val VEDLEGG = "Vedlegg"
         private const val VERSION = "v1.2 2006-05-24"
         private const val HER_DESC = "HER-id"
-        private val NAV_HERID = HerId(90128)
         private const val NAV_OID = "2.16.578.1.12.4.1.1.9051"
         private const val HER_OID = "2.16.578.1.12.4.1.1.8116"
         private const val HER = "HER"
@@ -212,7 +218,7 @@ class EDI20DialogmeldingMapper {
         this.typeId = typeId
     }
 
-    fun type(s: String, v: String, dn: String) =
+    final fun type(s: String, v: String, dn: String) =
         XMLCV().apply {
             this.s = s
             this.v = v
@@ -228,23 +234,30 @@ class EDI20DialogmeldingMapper {
         KommunikasjonsParter(part(sender), part(receiver))
 
     private fun part(sender: XMLSender) =
-        with(sender.organisation.organisation) {
+        with(sender.organisation) {
             KommunikasjonsPart(aktiv = true,
-                visningsNavn = organisationName,
-                herId = HerId(ident.first().id),
-                navn = organisationName,
-                parentHerId = HerId(sender.organisation.ident.first().id),
-                parentNavn = sender.organisation.organisationName)
+                visningsNavn = organisation.organisationName,
+                herId = organisation.ident.herId(),
+                navn = organisation.organisationName,
+                virksomhet = KommunikasjonsPart(aktiv = true,
+                    herId = ident.herId(),
+                    navn = organisationName,
+                    visningsNavn = organisationName))
         }
 
+    private fun List<XMLIdent>.herId() = HerId(first().id)
+    private fun List<XMLIdent>.fnr() = Fødselsnummer(first().id)
+
     private fun part(receiver: XMLReceiver) =
-        with(receiver.organisation.organisation) {
+        with(receiver.organisation) {
             KommunikasjonsPart(aktiv = true,
-                visningsNavn = organisationName,
-                herId = HerId(ident.first().id),
-                navn = organisationName,
-                parentHerId = HerId(receiver.organisation.ident.first().id),
-                parentNavn = receiver.organisation.organisationName)
+                visningsNavn = organisation.organisationName,
+                herId = organisation.ident.herId(),
+                navn = organisation.organisationName,
+                virksomhet = KommunikasjonsPart(aktiv = true,
+                    herId = ident.herId(),
+                    navn = organisationName,
+                    visningsNavn = organisationName))
         }
 
     private fun pasient(patient: XMLPatient) =
