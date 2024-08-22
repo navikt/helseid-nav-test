@@ -1,12 +1,12 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -22,21 +22,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
 
     private val client = client<ICommunicationPartyService>()
 
-    val write = client<ICommunicationPartyService>()
-
-    val OF = no.nhn.register.communicationparty.ObjectFactory()
-
-    fun lagLege(id: HprId, org: HerId) =
-        write.createOrganizationPerson(
-            OF.createOrganizationPersonCreate().apply {
-                hprNumber = OF.createOrganizationPersonCreateHprNumber(id.verdi)
-                parentHerId = org.verdi.toInt()
-            }
-        )
-
-    private fun virksomhet(id: Int) = client.getOrganizationDetails(id)
-
-    fun kommunikasjonsPart(id: String): KommunikasjonsPart =
+    fun kommunikasjonsPart(id: String) =
         runCatching {
             client.getCommunicationPartyDetails(id.toInt()).also {
                 log.info("Hentet kommunikasjonspart for $id fra ${cfg.url} med navn ${it.name.value} og type ${it.type.single()}")
@@ -44,75 +30,85 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig) : AbstractCXFAdapter
                 log.info("Mapper kommunikasjonspart for $id")
                 when (it) {
                     is KommunikasjonsPartVirksomhet -> Virksomhet(it)
-                    is KommunikasjonsPartPerson -> VirksomhetPerson(it, virksomhet(it.parentHerId))
-                    is KommunikasjonsPartTjeneste -> Tjeneste(it, virksomhet(it.parentHerId))
+                    is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))
+                    is KommunikasjonsPartTjeneste -> Tjeneste(it, client.getOrganizationDetails(it.parentHerId))
                     else -> throw IllegalStateException("Ukjent type kommunikasjonspart ${it.javaClass}")
                 }
-            }.also { log.info("Kommunikasjonspart etter mapping for $id er $it") }
-        }.getOrElse {
-            when (it) {
-                is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
-                is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST,
-                    cfg.url,
-                    it.message,
-                    cause = it)
-
-                is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
-                    cfg.url,
-                    cause = it)
-
-                is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
-                    cfg.url,
-                    it.message,
-                    cause = it)
-
-                else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it).also {
-                    log.warn(it.message, it)
-                }
             }
+        }.getOrElse {
+            handleError(it, id)
         }
+
+    private fun handleError(it: Throwable, id: String): Nothing = when (it) {
+        is CommPartyFault -> throw NotFoundException(it.message, cfg.url, cause = it)
+        is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST,
+            cfg.url,
+            it.message,
+            cause = it)
+
+        is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
+            cfg.url,
+            cause = it)
+
+        is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
+            cfg.url,
+            it.message,
+            cause = it)
+
+        else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it).also {
+            log.warn(it.message, it)
+        }
+    }
 
     override fun ping() = mapOf(Pair("ping", client.ping()))
 
 }
 
-data class Bestilling(val tjenester: Tjenester, val pasient: Pasient)
+data class Bestilling(val tjenester: Tjenester, val pasient: Pasient) {
+    data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
+}
 
-open class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
+abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
+
+    enum class Type { Organization, Person, Service }
 
     init {
         require(aktiv) { "Kommunikasjonspart er ikke aktiv" }
     }
 
-    constructor(p: CommunicationParty) : this(p.isActive, p.displayName.value, p.herId(), p.name.value)
+    class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
+        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+        constructor(virksomhet: KommunikasjonsPartVirksomhet) : this(virksomhet.isActive,
+            virksomhet.displayName.value,
+            virksomhet.herId(),
+            virksomhet.name.value)
+    }
+
+    class VirksomhetPerson(aktiv: Boolean,
+                           visningsNavn: String?,
+                           herId: HerId,
+                           navn: String,
+                           val virksomhet: Virksomhet) :
+        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+        constructor(person: KommunikasjonsPartPerson, virksomhet: KommunikasjonsPartVirksomhet) : this(person.isActive,
+            person.displayName.value,
+            person.herId(),
+            person.name.value, Virksomhet(virksomhet))
+    }
+
+    class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
+        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+        constructor(tjeneste: KommunikasjonsPartTjeneste, virksomhet: KommunikasjonsPartVirksomhet) :
+                this(tjeneste.isActive,
+                    tjeneste.displayName.value,
+                    tjeneste.herId(),
+                    tjeneste.name.value,
+                    Virksomhet(virksomhet))
+    }
 }
 
-class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
-    KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-    constructor(v: KommunikasjonsPartVirksomhet) : this(v.isActive, v.displayName.value, v.herId(), v.name.value)
-}
+fun CommunicationParty.herId() = HerId(herId)
 
-class VirksomhetPerson(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
-    KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-    constructor(p: KommunikasjonsPartPerson, virksomhet: KommunikasjonsPartVirksomhet) : this(p.isActive,
-        p.displayName.value,
-        p.herId(),
-        p.name.value, Virksomhet(virksomhet))
-}
-
-class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
-    KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-    constructor(t: KommunikasjonsPartTjeneste, virksomhet: KommunikasjonsPartVirksomhet) :
-            this(t.isActive, t.displayName.value, t.herId(), t.name.value, Virksomhet(virksomhet))
-}
-
-enum class Type { Organization, Person, Service }
-
-private fun CommunicationParty.herId() = herId.herId()
-
-private fun Int.herId() = HerId(this)
-
-data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
 
 
 
