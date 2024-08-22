@@ -13,7 +13,7 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
     enum class Type { Organization, Person, Service }
 
     init {
-        require(aktiv) { "Kommunikasjonspart er ikke aktiv" }
+        require(aktiv) { "Kommunikasjonspart ${herId.verdi} (${navn} er ikke aktiv" }
     }
 
     class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
@@ -33,7 +33,8 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
         constructor(person: OrganizationPerson, virksomhet: Organization) : this(person.isActive,
             person.displayName.value,
             person.herId(),
-            person.name.value, Virksomhet(virksomhet))
+            person.name.value,
+            Virksomhet(virksomhet))
     }
 
     class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
