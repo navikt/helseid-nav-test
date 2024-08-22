@@ -11,7 +11,6 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling.Tjenester
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nav.helseidnavtest.oppslag.person.Person
@@ -263,7 +262,8 @@ class EDI20DialogmeldingMapper {
             Bestilling(parter(sender, receiver), pasient(patient))
         }
 
-    private fun parter(sender: XMLSender, receiver: XMLReceiver) = Tjenester(part(sender), part(receiver))
+    private fun parter(sender: XMLSender, receiver: XMLReceiver): Bestilling.Tjenester =
+        Bestilling.Tjenester(part(sender), part(receiver))
 
     private fun part(sender: XMLSender) =
         with(sender.organisation) {

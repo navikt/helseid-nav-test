@@ -27,7 +27,8 @@ class EDI20DialogmeldingGenerator(
     fun marshal(fra: HerId, til: HerId, pasient: Fødselsnummer, vedlegg: Pair<URI, String>?) =
         StringWriter().let {
             marshaller.createMarshaller()
-                .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til), pasient(pasient)),
+                .marshal(mapper.hodemelding(Bestilling(adresse.kommunikasjonsParter(fra, til),
+                    pasient(pasient)),
                     vedlegg),
                     it)
             "$it"

@@ -5,11 +5,18 @@ import com.nimbusds.oauth2.sdk.token.AccessTokenType.BEARER
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
+import no.nav.helseidnavtest.error.IrrecoverableException
+import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
+import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
+import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterConfig
+import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpRequest
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.TEXT_PLAIN
@@ -17,6 +24,7 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withClientRegistrationId
+import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.util.*
 
@@ -150,3 +158,32 @@ open class TokenExchangingRequestInterceptor(private val clientManager: Authoriz
     }
 }
 
+@Component
+class CXFErrorHandler(private val cfg: AdresseRegisterConfig) {
+    private val log = getLogger(CXFErrorHandler::class.java)
+    fun handleError(it: Throwable, id: Int): Nothing =
+        when (it) {
+            is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
+                it.message,
+                cfg.url,
+                cause = it)
+
+            is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST,
+                cfg.url,
+                it.message,
+                cause = it)
+
+            is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
+                cfg.url,
+                cause = it)
+
+            is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,
+                cfg.url,
+                it.message,
+                cause = it)
+
+            else -> throw RecoverableException(BAD_REQUEST, cfg.url, it.message, it).also {
+                log.warn(it.message, it)
+            }
+        }
+}
