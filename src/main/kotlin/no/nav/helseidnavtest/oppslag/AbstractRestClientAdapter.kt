@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.oppslag
 
 import com.nimbusds.oauth2.sdk.token.AccessTokenType
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.BEARER
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.HERID
@@ -161,7 +162,7 @@ open class TokenExchangingRequestInterceptor(private val clientManager: Authoriz
 @Component
 class CXFErrorHandler(private val cfg: AdresseRegisterConfig) {
     private val log = getLogger(CXFErrorHandler::class.java)
-    fun handleError(it: Throwable, id: Int): Nothing =
+    fun handleError(it: Throwable, id: HerId): Nothing =
         when (it) {
             is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
                 it.message,

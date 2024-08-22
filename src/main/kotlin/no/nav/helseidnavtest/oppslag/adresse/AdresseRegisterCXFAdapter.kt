@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
+import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.oppslag.AbstractCXFAdapter
 import no.nav.helseidnavtest.oppslag.CXFErrorHandler
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
@@ -11,7 +12,7 @@ import no.nhn.register.communicationparty.OrganizationPerson as KommunikasjonsPa
 import no.nhn.register.communicationparty.Service as KommunikasjonsPartTjeneste
 
 @Component
-class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val errorHandler: CXFErrorHandler) :
+class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler: CXFErrorHandler) :
     AbstractCXFAdapter(cfg) {
 
     private val client = client<ICommunicationPartyService>()
@@ -19,9 +20,9 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val errorHan
 
     fun kommunikasjonsPart(id: Int) =
         runCatching {
-            client.getCommunicationPartyDetails(id).let { mapper.map(it, id) }
+            client.getCommunicationPartyDetails(id).let { mapper.map(it, id.herId()) }
         }.getOrElse {
-            errorHandler.handleError(it, id)
+            handler.handleError(it, id.herId())
         }
 
     override fun ping() = mapOf(Pair("ping", client.ping()))
@@ -29,7 +30,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val errorHan
 }
 
 private class KommunikasjonsPartMapper(private val client: ICommunicationPartyService) {
-    fun map(it: CommunicationParty, herId: Int) =
+    fun map(it: CommunicationParty, herId: HerId) =
         when (it) {
             is KommunikasjonsPartVirksomhet -> Virksomhet(it)
             is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))

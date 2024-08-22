@@ -53,3 +53,4 @@ data class Bestilling(val tjenester: Tjenester, val pasient: Pasient) {
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
+fun Int.herId() = HerId(this)
