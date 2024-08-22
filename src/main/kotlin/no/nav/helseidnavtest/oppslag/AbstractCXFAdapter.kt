@@ -11,7 +11,6 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
 
     protected val log = getLogger(AbstractRestClientAdapter::class.java)
 
-
     protected inline fun <reified T> client() = JaxWsProxyFactoryBean().apply {
         address = "${cfg.url}"
         with(features) {
@@ -28,4 +27,7 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
     override fun pingEndpoint() = "${cfg.url}"
 
 }
-abstract class BasicAuthConfig(val url: URI, val username: String, val password:  String)
+
+abstract class BasicAuthConfig(val url: URI, val username: String, val password: String)
+
+

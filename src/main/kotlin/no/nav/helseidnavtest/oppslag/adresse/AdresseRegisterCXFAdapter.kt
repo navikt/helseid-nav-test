@@ -19,8 +19,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val errorHan
 
     fun kommunikasjonsPart(id: Int) =
         runCatching {
-            client.getCommunicationPartyDetails(id).apply {
-            }.let(mapper::map)
+            client.getCommunicationPartyDetails(id).let(mapper::map)
         }.getOrElse {
             errorHandler.handleError(it, id)
         }
@@ -30,12 +29,13 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val errorHan
 }
 
 private class KommunikasjonsPartMapper(private val client: ICommunicationPartyService) {
-    fun map(it: CommunicationParty) = when (it) {
-        is KommunikasjonsPartVirksomhet -> Virksomhet(it)
-        is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))
-        is KommunikasjonsPartTjeneste -> Tjeneste(it, client.getOrganizationDetails(it.parentHerId))
-        else -> throw IllegalStateException("Ukjent type kommunikasjonspart ${it.javaClass}")
-    }
+    fun map(it: CommunicationParty) =
+        when (it) {
+            is KommunikasjonsPartVirksomhet -> Virksomhet(it)
+            is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))
+            is KommunikasjonsPartTjeneste -> Tjeneste(it, client.getOrganizationDetails(it.parentHerId))
+            else -> throw IllegalStateException("Ukjent type kommunikasjonspart ${it.javaClass.simpleName}")
+        }
 }
 
 
