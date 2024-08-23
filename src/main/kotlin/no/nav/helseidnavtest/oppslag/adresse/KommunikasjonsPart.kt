@@ -7,6 +7,8 @@ import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.Organization
 import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
+import org.springframework.web.multipart.MultipartFile
+import java.net.URI
 
 abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
 
@@ -48,7 +50,12 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
     }
 }
 
-data class Bestilling(val tjenester: Tjenester, val pasient: Pasient) {
+data class Bestilling(val tjenester: Tjenester,
+                      val pasient: Pasient,
+                      val vedlegg: MultipartFile? = null,
+                      val ref: Pair<URI, String>? = null) {
+    val sender = tjenester.fra.herId
+
     data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
 }
 

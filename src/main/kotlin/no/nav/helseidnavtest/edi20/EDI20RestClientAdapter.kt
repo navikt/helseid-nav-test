@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.edi20.Apprec.Companion.OK
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
+import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
@@ -64,13 +65,13 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    fun send(herId: HerId, hodemelding: String) =
+    fun send(bestilling: Bestilling) =
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { it.herId(herId.verdi) }
+            .headers { it.herId(bestilling.sender) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(hodemelding.encode()))
+            .body(BusinessDocument(generator.marshal(bestilling).encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()

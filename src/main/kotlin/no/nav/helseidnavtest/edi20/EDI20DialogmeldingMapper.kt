@@ -24,7 +24,6 @@ import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
-import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime.now
@@ -38,15 +37,16 @@ class EDI20DialogmeldingMapper {
 
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
-    fun hodemelding(bestilling: Bestilling, vedlegg: Pair<URI, String>?) =
+    fun hodemelding(bestilling: Bestilling) =
         msgInfo(msgInfo(bestilling)).apply {
-            vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second))) }
-        }
-
-    fun hodemelding(bestilling: Bestilling,
-                    vedlegg: MultipartFile?) =
-        msgInfo(msgInfo(bestilling)).apply {
-            vedlegg?.let { document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes))) }
+            bestilling.vedlegg?.let {
+                document.addAll(listOf(dialogmelding("Dialogmelding"),
+                    inlineDokument(it.bytes)))
+            }
+            bestilling.ref?.let {
+                document.addAll(listOf(dialogmelding("Dialogmelding"),
+                    refDokument(it.first, it.second)))
+            }
         }
 
     private fun msgInfo(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
