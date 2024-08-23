@@ -69,7 +69,7 @@ class EDI20RestClientAdapter(
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { it.herId(bestilling.sender) }
+            .headers { it.herId(bestilling.fra) }
             .accept(APPLICATION_JSON)
             .body(BusinessDocument(generator.marshal(bestilling).encode()))
             .retrieve()

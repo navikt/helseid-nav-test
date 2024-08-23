@@ -14,6 +14,8 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
 
     enum class Type { Organization, Person, Service }
 
+    val orgNavn = visningsNavn ?: navn
+
     init {
         require(aktiv) { "Kommunikasjonspart ${herId.verdi} (${navn} er ikke aktiv" }
     }
@@ -54,7 +56,7 @@ data class Bestilling(val tjenester: Tjenester,
                       val pasient: Pasient,
                       val vedlegg: MultipartFile? = null,
                       val ref: Pair<URI, String>? = null) {
-    val sender = tjenester.fra.herId
+    val fra = tjenester.fra.herId
 
     data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
 }

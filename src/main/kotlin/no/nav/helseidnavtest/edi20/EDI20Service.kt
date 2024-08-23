@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
-                   private val adapter: EDI20RestClientAdapter) {
+class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
 
@@ -30,5 +29,5 @@ class EDI20Service(private val generator: EDI20DialogmeldingGenerator,
             } ?: emptyList()))
 
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
-    
+
 }

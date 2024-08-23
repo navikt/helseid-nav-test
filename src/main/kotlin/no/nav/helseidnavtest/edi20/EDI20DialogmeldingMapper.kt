@@ -38,27 +38,27 @@ class EDI20DialogmeldingMapper {
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
     fun hodemelding(bestilling: Bestilling) =
-        msgInfo(msgInfo(bestilling)).apply {
+        msgHead(msgInfo(bestilling)).apply {
             bestilling.vedlegg?.let {
-                document.addAll(listOf(dialogmelding("Dialogmelding"),
-                    inlineDokument(it.bytes)))
+                document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes)))
             }
             bestilling.ref?.let {
-                document.addAll(listOf(dialogmelding("Dialogmelding"),
-                    refDokument(it.first, it.second)))
+                document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second)))
             }
         }
 
-    private fun msgInfo(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
+    private fun msgHead(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
         msgInfo = info
     }
 
     private fun msgInfo(bestilling: Bestilling) =
         HMOF.createXMLMsgInfo().apply {
-            type = type()
-            sender = avsender(bestilling.tjenester.fra)
-            receiver = mottaker(bestilling.tjenester.til)
-            patient = pasient(bestilling.pasient)
+            with(bestilling) {
+                type = type()
+                sender = avsender(tjenester.fra)
+                receiver = mottaker(tjenester.til)
+                patient = pasient(pasient)
+            }
         }
 
     private fun XMLMsgInfo.type() = HMOF.createXMLCS().apply {
@@ -72,26 +72,24 @@ class EDI20DialogmeldingMapper {
     private fun avsender(tjeneste: Tjeneste) =
         HMOF.createXMLSender().apply {
             organisation = HMOF.createXMLOrganisation().apply {
-                organisationName = tjeneste.virksomhet.orgNavn()
+                organisationName = tjeneste.virksomhet.orgNavn
                 ident.add(ident(tjeneste.virksomhet.herId, herIdType))
                 organisation = HMOF.createXMLOrganisation().apply {
-                    organisationName = tjeneste.orgNavn()
+                    organisationName = tjeneste.orgNavn
                     ident.add(ident(tjeneste.herId, herIdType))
                 }
             }
         }
-
-    private fun KommunikasjonsPart.orgNavn() = visningsNavn ?: navn
 
     private fun mottaker(part: KommunikasjonsPart) =
         HMOF.createXMLReceiver().apply {
             when (part) {
                 is Tjeneste -> {
                     organisation = HMOF.createXMLOrganisation().apply {
-                        organisationName = part.virksomhet.orgNavn()
+                        organisationName = part.virksomhet.orgNavn
                         ident.add(ident(part.virksomhet.herId, herIdType))
                         organisation = HMOF.createXMLOrganisation().apply {
-                            organisationName = part.orgNavn()
+                            organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
 
                         }
@@ -100,10 +98,10 @@ class EDI20DialogmeldingMapper {
 
                 is VirksomhetPerson -> {  // TODO HealthCareProfessional
                     organisation = HMOF.createXMLOrganisation().apply {
-                        organisationName = part.virksomhet.orgNavn()
+                        organisationName = part.virksomhet.orgNavn
                         ident.add(ident(part.virksomhet.herId, herIdType))
                         organisation = HMOF.createXMLOrganisation().apply {
-                            organisationName = part.orgNavn()
+                            organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
                             healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
                                 val auth = SecurityContextHolder.getContext().authentication
