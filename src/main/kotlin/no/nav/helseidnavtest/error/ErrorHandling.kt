@@ -22,7 +22,6 @@ class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
         throw when (val code = res.statusCode as HttpStatus) {
             BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri, m.readValue<ErrorResponse>(res.body))
-
             else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
         }
     }
