@@ -18,16 +18,6 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 
-    fun lesOgAckAlle(herId: HerId) =
-        mapOf(herId to (adapter.poll(herId, true)
-            ?.flatMap { m ->
-                m.messageIds.map {
-                    konsumert(m.herId, it)
-                    //  apprec(m.herId, it)
-                    it
-                }
-            } ?: emptyList()))
-
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
 }

@@ -132,8 +132,17 @@ class EDI20Controller(
 
     @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
     @GetMapping("${MESSAGES_PATH}/lesalle")
-    fun lesOgAckAlle() =
-        edi.lesOgAckAlle(EDI_1.first) + edi.lesOgAckAlle(EDI_2.first)
+    fun lesOgAckAlle() = lesOgAck(EDI_1.first) + lesOgAck(EDI_2.first)
+
+    private fun lesOgAck(herId: HerId) =
+        edi.poll(herId, true)
+            ?.flatMap { m ->
+                m.messageIds.map {
+                    konsumert(m.herId, it)
+                    //  apprec(m.herId, it)
+                    it
+                }
+            } ?: emptyList()
 
     private fun inline(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
         Bestilling(adresse.kommunikasjonsParter(fra, til),
