@@ -18,14 +18,15 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     private val client = client<ICommunicationPartyService>()
     private val mapper = KommunikasjonsPartMapper(client)
 
-    fun kommunikasjonsPart(id: Int) =
+    fun kommunikasjonsPart(herId: Int) =
         runCatching {
-            client.getCommunicationPartyDetails(id).let { mapper.map(it, id.herId()) }
+            client.getCommunicationPartyDetails(herId).let { mapper.map(it, herId.herId()) }
         }.getOrElse {
-            handler.handleError(it, id.herId())
+            handler.handleError(it, herId.herId())
         }
 
     override fun ping() = mapOf(Pair("ping", client.ping()))
+    private fun Int.herId() = HerId(this)
 
 }
 

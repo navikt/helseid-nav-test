@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component
 import java.io.StringWriter
 
 @Component
-class EDI20DialogmeldingGenerator(
-    private val marshaller: Jaxb2Marshaller,
-    private val mapper: EDI20DialogmeldingMapper) {
+class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
+                                  private val mapper: EDI20DialogmeldingMapper) {
 
     fun marshal(bestilling: Bestilling) =
         StringWriter().run {

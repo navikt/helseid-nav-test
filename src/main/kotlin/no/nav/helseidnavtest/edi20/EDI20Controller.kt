@@ -61,10 +61,7 @@ class EDI20Controller(
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        vedlegg?.let {
-            edi.send(ref(fra, pasient = pasient, vedlegg = it))
-        } ?: edi.send(Bestilling(adresse.kommunikasjonsParter(fra),
-            Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient)))))
+        edi.send(refBestilling(fra, pasient = pasient, vedlegg = vedlegg))
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
@@ -75,7 +72,7 @@ class EDI20Controller(
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(ref(fra, pasient = pasient, vedlegg = vedlegg))
+        generator.marshal(refBestilling(fra, pasient = pasient, vedlegg = vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -85,7 +82,7 @@ class EDI20Controller(
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inline(fra, pasient = pasient, vedlegg = vedlegg))
+        edi.send(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -96,7 +93,7 @@ class EDI20Controller(
                                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                                 @Parameter(description = "Valgfritt vedlegg")
                                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inline(fra, til, pasient, vedlegg))
+        edi.send(inlineBestilling(fra, til, pasient, vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -106,7 +103,7 @@ class EDI20Controller(
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(inline(fra, pasient = pasient, vedlegg = vedlegg))
+        generator.marshal(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg))
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")
@@ -144,13 +141,13 @@ class EDI20Controller(
                 }
             } ?: emptyList()
 
-    private fun inline(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
+    private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
         Bestilling(adresse.kommunikasjonsParter(fra, til),
             Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
             vedlegg)
 
-    private fun ref(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile) =
+    private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
         Bestilling(adresse.kommunikasjonsParter(fra, til),
             Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
-            ref = Pair(deft.upload(fra, vedlegg), vedlegg.contentType!!))
+            ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }

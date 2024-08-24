@@ -22,10 +22,11 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
 
     class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-        constructor(virksomhet: Organization) : this(virksomhet.isActive,
-            virksomhet.displayName.value,
-            virksomhet.herId(),
-            virksomhet.name.value)
+        constructor(virksomhet: Organization) :
+                this(virksomhet.isActive,
+                    virksomhet.displayName.value,
+                    virksomhet.herId(),
+                    virksomhet.name.value)
     }
 
     class VirksomhetPerson(aktiv: Boolean,
@@ -34,11 +35,12 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
                            navn: String,
                            val virksomhet: Virksomhet) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
-        constructor(person: OrganizationPerson, virksomhet: Organization) : this(person.isActive,
-            person.displayName.value,
-            person.herId(),
-            person.name.value,
-            Virksomhet(virksomhet))
+        constructor(person: OrganizationPerson, virksomhet: Organization) :
+                this(person.isActive,
+                    person.displayName.value,
+                    person.herId(),
+                    person.name.value,
+                    Virksomhet(virksomhet))
     }
 
     class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
@@ -56,10 +58,10 @@ data class Bestilling(val tjenester: Tjenester,
                       val pasient: Pasient,
                       val vedlegg: MultipartFile? = null,
                       val ref: Pair<URI, String>? = null) {
+
     val fra = tjenester.fra.herId
 
     data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
-fun Int.herId() = HerId(this)
