@@ -13,8 +13,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
 
     fun marshal(bestilling: Bestilling) =
         StringWriter().run {
-            marshaller.createMarshaller()
-                .marshal(mapper.hodemelding(bestilling), this)
+            marshaller.createMarshaller().marshal(mapper.hodemelding(bestilling), this)
             toString()
         }
 

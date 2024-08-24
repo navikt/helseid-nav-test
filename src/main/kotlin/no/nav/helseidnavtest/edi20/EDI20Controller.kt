@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.ExternalDocumentation
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.helseidnavtest.dialogmelding.Fødselsnummer
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
@@ -22,6 +21,7 @@ import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
+import no.nav.helseidnavtest.dialogmelding.Fødselsnummer as Fnr
 
 @RestController(EDI20)
 @RequestMapping("/$EDI20/")
@@ -142,10 +142,9 @@ class EDI20Controller(
             } ?: emptyList()
 
     private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(adresse.tjenester(fra, til), Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
-            vedlegg)
+        Bestilling(adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))), vedlegg)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(adresse.tjenester(fra, til), Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
+        Bestilling(adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }

@@ -15,8 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.net.URI
 
 @Component
-class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient,
-                                 private val cf: EDI20DeftConfig,
+class EDI20DeftRestClientAdapter(@Qualifier(EDI20DEFT) restClient: RestClient, private val cf: EDI20DeftConfig,
                                  @Qualifier(EDI20) private val handler: ErrorHandler) :
     AbstractRestClientAdapter(restClient, cf) {
 
