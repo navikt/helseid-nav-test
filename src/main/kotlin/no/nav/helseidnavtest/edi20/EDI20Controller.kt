@@ -142,12 +142,10 @@ class EDI20Controller(
             } ?: emptyList()
 
     private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(adresse.kommunikasjonsParter(fra, til),
-            Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
+        Bestilling(adresse.tjenester(fra, til), Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
             vedlegg)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(adresse.kommunikasjonsParter(fra, til),
-            Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
+        Bestilling(adresse.tjenester(fra, til), Pasient(Fødselsnummer(pasient), pdl.navn(Fødselsnummer(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }
