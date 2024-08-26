@@ -18,7 +18,6 @@ import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy.SINGL
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
 import org.springframework.kafka.support.KafkaHeaders.RECEIVED_TOPIC
 import org.springframework.messaging.handler.annotation.Header
-import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -37,7 +36,7 @@ data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingT
         val retries: Int = DEFAULT_RETRIES
     ) {
 
-        val all = listOf(retry, dlt)
+        val all = listOf(main, retry, dlt)
     }
 
     companion object {
@@ -97,7 +96,7 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
 
     @KafkaListener(topics = ["#{@bestillingConfig.topics.main}"], containerFactory = BESTILLING)
     @RetryableTopic(attempts = "#{@bestillingConfig.topics.retries}",
-        backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.backoff}"),
+        // backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.backoff}"),
         sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
         exclude = [IrrecoverableException::class],
         dltStrategy = FAIL_ON_ERROR,
