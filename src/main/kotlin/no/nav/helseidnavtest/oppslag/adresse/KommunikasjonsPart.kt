@@ -10,7 +10,7 @@ import no.nhn.register.communicationparty.Service
 import java.net.URI
 import java.util.*
 
-abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
+abstract class KommunikasjonsPart(val aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
 
     enum class Type { Organization, Person, Service }
 
@@ -43,7 +43,7 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
                     Virksomhet(virksomhet))
     }
 
-    class Tjeneste(aktiv: Boolean = true,
+    class Tjeneste(aktiv: Boolean,
                    visningsNavn: String?,
                    herId: HerId,
                    navn: String,
