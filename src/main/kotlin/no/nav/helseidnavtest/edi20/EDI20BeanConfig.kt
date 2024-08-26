@@ -25,6 +25,8 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties.AckMode.RECORD
+import org.springframework.kafka.retrytopic.RetryTopicComponentFactory
+import org.springframework.kafka.retrytopic.RetryTopicConfigurationSupport
 import org.springframework.kafka.support.serializer.JsonDeserializer.TRUSTED_PACKAGES
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
@@ -33,7 +35,12 @@ import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
 @Configuration(proxyBeanMethods = true)
-class EDI20BeanConfig {
+class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNamingProviderFactory) :
+    RetryTopicConfigurationSupport() {
+
+    override fun createComponentFactory() = object : RetryTopicComponentFactory() {
+        override fun retryTopicNamesProviderFactory() = namingProviderFactory
+    }
 
     @Bean(BESTILLING)
     fun bestillingListenerContainerFactory(p: KafkaProperties) =

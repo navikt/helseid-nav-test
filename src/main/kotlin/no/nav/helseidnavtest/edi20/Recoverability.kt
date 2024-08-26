@@ -106,7 +106,5 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
     fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) {
         log.info("Retrying bestilling $bestilling")
-        cfg.topics.main
-
     }
 }
