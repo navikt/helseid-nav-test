@@ -41,7 +41,7 @@ class EDI20BeanConfig {
             containerProperties.isObservationEnabled = true
             containerProperties.ackMode = RECORD
             consumerFactory = DefaultKafkaConsumerFactory(p.buildConsumerProperties(null).apply {
-                put(TRUSTED_PACKAGES, "no.nav.helseidnavtest")
+                put(TRUSTED_PACKAGES, "no.nav.helseidnavtest.oppslag.adresse")
             })
         }
 
