@@ -10,6 +10,8 @@ on:
 
 jobs:
   deploy:
+    permissions:
+      id-token: write
     strategy:
       matrix:
         cluster: [ dev-gcp ]
