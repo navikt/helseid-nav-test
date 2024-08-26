@@ -11,7 +11,10 @@ import no.nhn.register.communicationparty.Service
 import java.net.URI
 import java.util.*
 
-abstract class KommunikasjonsPart(val aktiv: Boolean, val visningsNavn: String?, val herId: HerId, val navn: String) {
+abstract class KommunikasjonsPart(open val aktiv: Boolean,
+                                  open val visningsNavn: String?,
+                                  open val herId: HerId,
+                                  open val navn: String) {
 
     enum class Type { Organization, Person, Service }
 
@@ -79,9 +82,7 @@ data class Bestilling(val id: UUID,
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode() = id.hashCode()
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
