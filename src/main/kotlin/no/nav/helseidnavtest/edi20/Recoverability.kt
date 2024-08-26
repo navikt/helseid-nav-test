@@ -97,13 +97,13 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
 
     @KafkaListener(topics = ["#{@bestillingConfig.topics.main}"], containerFactory = BESTILLING)
     @RetryableTopic(attempts = "#{@bestillingConfig.topics.retries}",
-        backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.retries}"),
+        backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.backoff}"),
         sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
         exclude = [IrrecoverableException::class],
         dltStrategy = FAIL_ON_ERROR,
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
-    fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antallForsøk: Int?,
+    fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) {
         log.info("Retrying bestilling $bestilling")
         cfg.topics.main
