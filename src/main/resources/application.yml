@@ -46,10 +46,14 @@ spring:
       key-store-location: file:${kafka.keystore.path}
       key-store-type: PKCS12
       key-store-password: ${kafka.credstore.password}
+    consumer:
+      group-id: ${spring.application.name}-${env}
+      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     producer:
       client-id: ${spring.application.name}
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: 1
       properties:
         max:

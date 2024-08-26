@@ -54,19 +54,19 @@ class EDI20DialogmeldingMapper {
     private fun msgInfo(bestilling: Bestilling) =
         HMOF.createXMLMsgInfo().apply {
             with(bestilling) {
-                type = type()
+                type = type(bestilling.id)
                 sender = avsender(tjenester.fra)
                 receiver = mottaker(tjenester.til)
                 patient = pasient(pasient)
             }
         }
 
-    private fun XMLMsgInfo.type() = HMOF.createXMLCS().apply {
+    private fun XMLMsgInfo.type(uuid: UUID) = HMOF.createXMLCS().apply {
         dn = "Notat"
         v = DIALOG_NOTAT.name
         miGversion = VERSION
         genDate = now()
-        msgId = "${UUID.randomUUID()}"
+        msgId = "$uuid"
     }
 
     private fun avsender(tjeneste: Tjeneste) =
@@ -257,7 +257,7 @@ class EDI20DialogmeldingMapper {
 
     fun bestilling(hode: XMLMsgHead) =
         with(hode.msgInfo) {
-            Bestilling(parter(sender, receiver), pasient(patient))
+            Bestilling(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
 
     private fun parter(sender: XMLSender, receiver: XMLReceiver): Bestilling.Tjenester =
