@@ -7,6 +7,6 @@ config:
   retentionBytes: -1
   retentionHours: 120
 acl:
-  -   team: aap
-      application: routing
+  -   team: helseopplysninger
+      application: helseid-nav-test
       access: readwrite

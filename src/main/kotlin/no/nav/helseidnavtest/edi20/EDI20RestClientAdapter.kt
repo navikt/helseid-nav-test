@@ -4,11 +4,14 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.Apprec.Companion.OK
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
+import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
+import org.springframework.retry.annotation.Recover
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -20,6 +23,7 @@ import kotlin.text.Charsets.UTF_8
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
+    private val recoverer: Recoverer,
     private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
@@ -65,6 +69,10 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
+    @Recover
+    fun sendRecover(t: Throwable, bestilling: Bestilling) = recoverer.recover(bestilling)
+
+    @Retryable(recover = "sendRecover", retryFor = [RecoverableException::class])
     fun send(bestilling: Bestilling) =
         restClient
             .post()

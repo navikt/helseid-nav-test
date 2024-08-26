@@ -3,10 +3,10 @@ kind: Topic
 metadata:
     annotations:
         kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-    name: routing.retry
-    namespace: aap
+    name: edi20.retry
+    namespace: helseopplysninger
     labels:
-        team: aap
+        team: helseopplysninger
 spec:
     pool: {{pool}}
     config:

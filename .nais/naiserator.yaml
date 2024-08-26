@@ -12,6 +12,8 @@ metadata:
   labels:
     team: helseopplysninger
 spec:
+  kafka:
+    pool: nav-{{env}}
   gcp:
     sqlInstances:
       - name: helseid-nav-test-dev
