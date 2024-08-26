@@ -158,6 +158,7 @@ fastlege:
 authserver:
   url: https://${stshost}
 
+
 dialogmelding:
   base-uri: https://${dialogmelding.partnerhost}
 ibm:
@@ -178,5 +179,7 @@ springdoc:
   swagger-ui:
     csrf:
       enabled: true
-
+bestilling:
+  topics:
+    main: edi20.main
 
