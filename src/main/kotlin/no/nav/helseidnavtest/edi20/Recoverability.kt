@@ -11,14 +11,18 @@ import org.springframework.kafka.annotation.RetryableTopic
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
 import org.springframework.kafka.retrytopic.DltStrategy.FAIL_ON_ERROR
+import org.springframework.kafka.retrytopic.RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
 import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy.SINGLE_TOPIC
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
+import org.springframework.kafka.support.KafkaHeaders.RECEIVED_TOPIC
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 import java.util.*
 
+@Component
 @ConfigurationProperties(BESTILLING)
 data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingTopics = BestillingTopics(),
                             val enabled: Boolean = true) : KafkaConfig(BESTILLING, enabled) {
@@ -99,8 +103,10 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
         dltStrategy = FAIL_ON_ERROR,
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
-    fun listen(bestilling: Bestilling) {
+    fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antallForsøk: Int?,
+               @Header(RECEIVED_TOPIC) topic: String) {
         log.info("Retrying bestilling $bestilling")
+        cfg.topics.main
 
     }
 }
