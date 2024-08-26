@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.oppslag.adresse
 
+import net.minidev.json.annotate.JsonIgnore
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Tjeneste
@@ -64,6 +65,7 @@ data class Bestilling(val id: UUID,
                       val vedlegg: ByteArray? = null,
                       val ref: Pair<URI, String>? = null) {
 
+    @JsonIgnore
     val fra = tjenester.fra.herId
 
     data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
