@@ -17,7 +17,7 @@ jobs:
 
     name: Deploy ${{matrix.topic}} til ${{matrix.cluster}}
     runs-on: ubuntu-latest
-    environment: ${{matrix.cluster}}:aap
+    environment: ${{matrix.cluster}}:helseopplysninger
     env:
       PRINT_PAYLOAD: true
     steps:
