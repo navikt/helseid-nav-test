@@ -91,7 +91,7 @@ class RecoverableBestillingProdusent(private val cfg: BestillingConfig,
 }
 
 @Component
-class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
+class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: BestillingConfig) {
 
     private val log = getLogger(BestillingHendelseKonsument::class.java)
 
@@ -106,5 +106,6 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
     fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) {
         log.info("Retrying bestilling $bestilling with attempts $antall om topic $topic")
+        edi.send(bestilling)
     }
 }
