@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: deploy ${{matrix.topic}} to ${{matrix.cluster}}
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: ${{matrix.cluster}}
           RESOURCE: .nais/topics/${{matrix.topic}}/topic.yaml
