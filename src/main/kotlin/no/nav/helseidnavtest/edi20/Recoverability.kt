@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
 import org.springframework.kafka.retrytopic.DltStrategy.FAIL_ON_ERROR
 import org.springframework.kafka.retrytopic.RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS
@@ -20,7 +19,6 @@ import org.springframework.kafka.support.KafkaHeaders.RECEIVED_TOPIC
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 @ConfigurationProperties(BESTILLING)
@@ -79,18 +77,6 @@ class BestillingRetryTopicNamingProviderFactory(private val cf: BestillingConfig
 }
 
 @Component
-class RecoverableBestillingProdusent(private val cfg: BestillingConfig,
-                                     private val kafkaTemplate: KafkaTemplate<UUID, Bestilling>) {
-
-    private val log = getLogger(RecoverableBestillingProdusent::class.java)
-
-    fun send(bestiling: Bestilling) {
-        log.info("Sender bestilling $bestiling")
-        kafkaTemplate.send(cfg.topics.main, bestiling.id, bestiling)
-    }
-}
-
-@Component
 class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: BestillingConfig) {
 
     private val log = getLogger(BestillingHendelseKonsument::class.java)
@@ -104,8 +90,8 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Bestil
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
     fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
-               @Header(RECEIVED_TOPIC) topic: String) {
-        log.info("Retrying bestilling $bestilling with attempts $antall om topic $topic")
-        edi.send(bestilling)
-    }
+               @Header(RECEIVED_TOPIC) topic: String) =
+        log.info("Retrying bestilling $bestilling on topic $topic").also {
+            edi.send(bestilling)
+        }
 }
