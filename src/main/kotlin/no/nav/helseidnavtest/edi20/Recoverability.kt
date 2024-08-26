@@ -95,9 +95,9 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
 
     private val log = getLogger(BestillingHendelseKonsument::class.java)
 
-    @KafkaListener(topics = ["#{@cfg.topics.main}"], containerFactory = BESTILLING)
-    @RetryableTopic(attempts = "#{@cfg.topics.retries}",
-        backoff = Backoff(delayExpression = "#{@cfg.topics.retries}"),
+    @KafkaListener(topics = ["#{@bestillingConfig.topics.main}"], containerFactory = BESTILLING)
+    @RetryableTopic(attempts = "#{@bestillingConfig.topics.retries}",
+        backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.retries}"),
         sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
         exclude = [IrrecoverableException::class],
         dltStrategy = FAIL_ON_ERROR,
