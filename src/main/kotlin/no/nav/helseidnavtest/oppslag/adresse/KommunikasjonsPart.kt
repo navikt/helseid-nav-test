@@ -95,6 +95,9 @@ data class Bestilling(val id: UUID,
     }
 
     override fun hashCode() = id.hashCode()
+    override fun toString(): String {
+        return javaClass.simpleName + "(id=$id, tjenester=$tjenester, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
+    }
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
