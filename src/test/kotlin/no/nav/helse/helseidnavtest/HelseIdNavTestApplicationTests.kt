@@ -1,7 +1,11 @@
 package no.nav.helse.helseidnavtest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.helseidnavtest.edi20.Apprec
+import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.NAV
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Tjeneste
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Virksomhet
 import org.junit.jupiter.api.Test
 
 //@SpringBootTest
@@ -9,7 +13,16 @@ class HelseIdNavTestApplicationTests {
 
     @Test
     fun contextLoads() {
-        println(jacksonObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(Apprec.OK))
+        val m1 = jacksonObjectMapper()
+        val m = m1.writerWithDefaultPrettyPrinter()
+        val t = Tjeneste(true,
+            "visningsnavn",
+            EDI_1.first,
+            "navn",
+            Virksomhet(true, "visningsnavn", NAV, "NAV"))
+        val s = m.writeValueAsString(t)
+        val t1 = m1.readValue<Tjeneste>(s)
+        println(t1)
     }
 
 }

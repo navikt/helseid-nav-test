@@ -73,7 +73,10 @@ class BestillingRetryTopicNamingProviderFactory(private val cf: BestillingConfig
 class RecoverableBestillingProdusent(private val cfg: BestillingConfig,
                                      private val kafkaTemplate: KafkaTemplate<UUID, Bestilling>) {
 
+    private val log = getLogger(RecoverableBestillingProdusent::class.java)
+
     fun send(bestiling: Bestilling) {
+        log.info("Sender bestilling $bestiling")
         kafkaTemplate.send(cfg.topics.main, bestiling.id, bestiling)
     }
 }

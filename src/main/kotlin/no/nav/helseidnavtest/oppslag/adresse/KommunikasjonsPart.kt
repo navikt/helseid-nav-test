@@ -11,10 +11,10 @@ import no.nhn.register.communicationparty.Service
 import java.net.URI
 import java.util.*
 
-abstract class KommunikasjonsPart(open val aktiv: Boolean,
-                                  open val visningsNavn: String?,
-                                  open val herId: HerId,
-                                  open val navn: String) {
+abstract class KommunikasjonsPart(val aktiv: Boolean = true,
+                                  val visningsNavn: String?,
+                                  val herId: HerId,
+                                  val navn: String) {
 
     enum class Type { Organization, Person, Service }
 
@@ -24,10 +24,10 @@ abstract class KommunikasjonsPart(open val aktiv: Boolean,
         require(aktiv) { "Kommunikasjonspart ${herId.verdi} (${navn} er ikke aktiv" }
     }
 
-    class Virksomhet(override val aktiv: Boolean,
-                     override val visningsNavn: String?,
-                     override val herId: HerId,
-                     override val navn: String) :
+    class Virksomhet(aktiv: Boolean,
+                     visningsNavn: String?,
+                     herId: HerId,
+                     navn: String) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
         constructor(virksomhet: Organization) :
                 this(virksomhet.isActive,
@@ -50,10 +50,10 @@ abstract class KommunikasjonsPart(open val aktiv: Boolean,
                     Virksomhet(virksomhet))
     }
 
-    class Tjeneste(override val aktiv: Boolean,
-                   override val visningsNavn: String?,
-                   override val herId: HerId,
-                   override val navn: String,
+    class Tjeneste(aktiv: Boolean,
+                   visningsNavn: String?,
+                   herId: HerId,
+                   navn: String,
                    val virksomhet: Virksomhet) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
         constructor(tjeneste: Service, virksomhet: Organization) :
@@ -62,7 +62,16 @@ abstract class KommunikasjonsPart(open val aktiv: Boolean,
                     tjeneste.herId(),
                     tjeneste.name.value,
                     Virksomhet(virksomhet))
+
+        override fun toString(): String {
+            return super.toString() + " " + virksomhet
+        }
     }
+
+    override fun toString(): String {
+        return herId.verdi + " " + navn + " " + visningsNavn + " " + aktiv
+    }
+
 }
 
 data class Bestilling(val id: UUID,
