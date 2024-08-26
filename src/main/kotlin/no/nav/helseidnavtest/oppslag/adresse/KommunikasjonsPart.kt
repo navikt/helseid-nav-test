@@ -43,7 +43,11 @@ abstract class KommunikasjonsPart(aktiv: Boolean, val visningsNavn: String?, val
                     Virksomhet(virksomhet))
     }
 
-    class Tjeneste(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String, val virksomhet: Virksomhet) :
+    class Tjeneste(aktiv: Boolean = true,
+                   visningsNavn: String?,
+                   herId: HerId,
+                   navn: String,
+                   val virksomhet: Virksomhet) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
         constructor(tjeneste: Service, virksomhet: Organization) :
                 this(tjeneste.isActive,
@@ -63,6 +67,19 @@ data class Bestilling(val id: UUID,
     val fra = tjenester.fra.herId
 
     data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Bestilling
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
