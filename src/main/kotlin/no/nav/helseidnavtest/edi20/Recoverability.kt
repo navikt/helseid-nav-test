@@ -1,16 +1,21 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.BestillingConfig.Companion.BESTILLING
+import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.annotation.RetryableTopic
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
+import org.springframework.kafka.retrytopic.DltStrategy.FAIL_ON_ERROR
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy.SINGLE_TOPIC
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
+import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -86,8 +91,14 @@ class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
 
     private val log = getLogger(BestillingHendelseKonsument::class.java)
 
-    @KafkaListener(topics = ["#{'\${bestilling.topics.main}'}"], containerFactory = BESTILLING)
-
+    @KafkaListener(topics = ["#{@cfg.topics.main}"], containerFactory = BESTILLING)
+    @RetryableTopic(attempts = "#{@cfg.topics.retries}",
+        backoff = Backoff(delayExpression = "#{@cfg.topics.retries}"),
+        sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
+        exclude = [IrrecoverableException::class],
+        dltStrategy = FAIL_ON_ERROR,
+        autoStartDltHandler = "true",
+        autoCreateTopics = "false")
     fun listen(bestilling: Bestilling) {
         log.info("Retrying bestilling $bestilling")
 

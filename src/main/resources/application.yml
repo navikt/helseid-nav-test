@@ -179,7 +179,4 @@ springdoc:
   swagger-ui:
     csrf:
       enabled: true
-bestilling:
-  topics:
-    main: helseopplysninger.edi20.main
 
