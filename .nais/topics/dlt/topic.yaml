@@ -14,7 +14,7 @@ spec:
     {{key}}: {{value}}
   {{/each}}
   acl:
-  { { #each acl}}
+  {{#each acl}}
       - team: {{team}}
   application: {{application}}
   access: {{access}}
