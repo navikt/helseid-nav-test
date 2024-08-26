@@ -20,14 +20,12 @@ jobs:
     environment: ${{matrix.cluster}}:aap
     env:
       PRINT_PAYLOAD: true
-      APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
     steps:
-      -   uses: actions/checkout@v3
-      -   name: deploy ${{matrix.topic}} to ${{matrix.cluster}}
-          uses: nais/deploy/actions/deploy@v1
-          env:
-            APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-            CLUSTER: ${{matrix.cluster}}
-            RESOURCE: .nais/topics/${{matrix.topic}}/topic.yaml
-            VARS: .nais/topics/${{matrix.topic}}/${{matrix.cluster}}.yaml
-            PRINT_PAYLOAD: true
+      - uses: actions/checkout@v3
+      - name: deploy ${{matrix.topic}} to ${{matrix.cluster}}
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          CLUSTER: ${{matrix.cluster}}
+          RESOURCE: .nais/topics/${{matrix.topic}}/topic.yaml
+          VARS: .nais/topics/${{matrix.topic}}/${{matrix.cluster}}.yaml
+          PRINT_PAYLOAD: true
