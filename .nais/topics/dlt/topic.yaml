@@ -10,7 +10,7 @@ metadata:
 spec:
   pool: {{pool}}
   config:
-  { { #each config as |value key|}}
+  {{#each config as |value key|}}
     {{key}}: {{value}}
   {{/each}}
   acl:
