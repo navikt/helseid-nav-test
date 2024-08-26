@@ -62,16 +62,7 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                     tjeneste.herId(),
                     tjeneste.name.value,
                     Virksomhet(virksomhet))
-
-        override fun toString(): String {
-            return super.toString() + " " + virksomhet
-        }
     }
-
-    override fun toString(): String {
-        return herId.verdi + " " + navn + " " + visningsNavn + " " + aktiv
-    }
-
 }
 
 data class Bestilling(val id: UUID,
@@ -95,9 +86,8 @@ data class Bestilling(val id: UUID,
     }
 
     override fun hashCode() = id.hashCode()
-    override fun toString(): String {
-        return javaClass.simpleName + "(id=$id, tjenester=$tjenester, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
-    }
+    override fun toString() =
+        javaClass.simpleName + "(id=$id, tjenester=$tjenester, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
