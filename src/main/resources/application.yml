@@ -181,5 +181,5 @@ springdoc:
       enabled: true
 bestilling:
   topics:
-    main: edi20.main
+    main: helseopplysninger.edi20.main
 
