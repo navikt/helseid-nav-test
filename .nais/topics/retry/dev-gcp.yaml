@@ -1,0 +1,12 @@
+pool: nav-dev
+config:
+  cleanupPolicy: delete
+  minimumInSyncReplicas: 2
+  partitions: 3
+  replication: 3
+  retentionBytes: -1
+  retentionHours: 120
+acl:
+  -   team: aap
+      application: routing
+      access: readwrite
