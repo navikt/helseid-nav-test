@@ -24,7 +24,10 @@ abstract class KommunikasjonsPart(open val aktiv: Boolean,
         require(aktiv) { "Kommunikasjonspart ${herId.verdi} (${navn} er ikke aktiv" }
     }
 
-    class Virksomhet(aktiv: Boolean, visningsNavn: String?, herId: HerId, navn: String) :
+    class Virksomhet(override val aktiv: Boolean,
+                     override val visningsNavn: String?,
+                     override val herId: HerId,
+                     override val navn: String) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
         constructor(virksomhet: Organization) :
                 this(virksomhet.isActive,
@@ -47,10 +50,10 @@ abstract class KommunikasjonsPart(open val aktiv: Boolean,
                     Virksomhet(virksomhet))
     }
 
-    class Tjeneste(aktiv: Boolean,
-                   visningsNavn: String?,
-                   herId: HerId,
-                   navn: String,
+    class Tjeneste(override val aktiv: Boolean,
+                   override val visningsNavn: String?,
+                   override val herId: HerId,
+                   override val navn: String,
                    val virksomhet: Virksomhet) :
         KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
         constructor(tjeneste: Service, virksomhet: Organization) :
