@@ -145,7 +145,7 @@ class EDI20Controller(
         Bestilling(UUID.randomUUID(),
             adresse.tjenester(fra, til),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
-            vedlegg)
+            vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
         Bestilling(UUID.randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),

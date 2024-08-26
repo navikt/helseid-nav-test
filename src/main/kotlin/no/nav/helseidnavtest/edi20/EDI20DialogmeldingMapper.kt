@@ -40,7 +40,7 @@ class EDI20DialogmeldingMapper {
     fun hodemelding(bestilling: Bestilling) =
         msgHead(msgInfo(bestilling)).apply {
             bestilling.vedlegg?.let {
-                document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it.bytes)))
+                document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it)))
             }
             bestilling.ref?.let {
                 document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second)))
