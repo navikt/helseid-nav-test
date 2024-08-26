@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class EDI20Service(private val adapter: EDI20RestClientAdapter) {
+class EDI20Service(private val adapter: EDI20RestClientAdapter,
+                   private val recoverer: RecoverableBestillingProdusent) {
 
     fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
 
@@ -14,7 +15,7 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
 
-    fun send(bestilling: Bestilling) = adapter.send(bestilling)
+    fun send(bestilling: Bestilling) = adapter.send(bestilling).also { recoverer.send(bestilling) }
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 

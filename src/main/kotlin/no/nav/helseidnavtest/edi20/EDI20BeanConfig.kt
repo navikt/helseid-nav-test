@@ -5,13 +5,16 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
+import no.nav.helseidnavtest.edi20.BestillingConfig.Companion.BESTILLING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
+import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +22,9 @@ import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.converter.FormHttpMessageConverter
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.ContainerProperties.AckMode.RECORD
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter
 import org.springframework.stereotype.Component
@@ -27,6 +33,14 @@ import java.util.*
 
 @Configuration(proxyBeanMethods = true)
 class EDI20BeanConfig {
+
+    @Bean(BESTILLING)
+    fun bestillingListenerContainerFactory(p: KafkaProperties) =
+        ConcurrentKafkaListenerContainerFactory<UUID, Bestilling>().apply {
+            containerProperties.isObservationEnabled = true
+            containerProperties.ackMode = RECORD
+            consumerFactory = DefaultKafkaConsumerFactory(p.buildConsumerProperties(null))
+        }
 
     @Bean
     fun cacheManager() = ConcurrentMapCacheManager()

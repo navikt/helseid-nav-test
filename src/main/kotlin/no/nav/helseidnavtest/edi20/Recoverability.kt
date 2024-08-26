@@ -2,8 +2,10 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.edi20.BestillingConfig.Companion.BESTILLING
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
+import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
@@ -73,5 +75,18 @@ class RecoverableBestillingProdusent(private val cfg: BestillingConfig,
 
     fun send(bestiling: Bestilling) {
         kafkaTemplate.send(cfg.topics.main, bestiling.id, bestiling)
+    }
+}
+
+@Component
+class BestillingHendelseKonsument(private val cfg: BestillingConfig) {
+
+    private val log = getLogger(BestillingHendelseKonsument::class.java)
+
+    @KafkaListener(topics = ["#{'\${bestilling.topics.main}'}"], containerFactory = BESTILLING)
+
+    fun listen(bestilling: Bestilling) {
+        log.info("Retrying bestilling $bestilling")
+
     }
 }
