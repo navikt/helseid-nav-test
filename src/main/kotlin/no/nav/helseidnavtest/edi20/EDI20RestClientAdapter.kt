@@ -74,7 +74,7 @@ class EDI20RestClientAdapter(
     @Recover
     fun sendRecover(t: Throwable, bestilling: Bestilling): String {
         log.warn("Recovering from", t)
-        recoverer.recover(bestilling)
+        return recoverer.recover(bestilling)
     }
 
     @Retryable(listeners = ["loggingRetryListener"],
