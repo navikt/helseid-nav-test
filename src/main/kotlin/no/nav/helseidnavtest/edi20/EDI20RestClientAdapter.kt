@@ -8,6 +8,7 @@ import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.retry.annotation.Recover
@@ -17,13 +18,14 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.util.*
 import java.util.Base64.getEncoder
+import kotlin.random.Random
 import kotlin.text.Charsets.UTF_8
 
 @Component
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
-    private val recoverer: Recoverer,
+    private val recoverer: KafkaRecoverer,
     private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
@@ -69,11 +71,13 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    @Recover
+    @Recover()
     fun sendRecover(t: Throwable, bestilling: Bestilling) = recoverer.recover(bestilling)
 
-    @Retryable(recover = "sendRecover", retryFor = [RecoverableException::class])
-    fun send(bestilling: Bestilling) =
+    @Retryable(listeners = arrayOf("loggingRetryListener"),
+        recover = "sendRecover",
+        retryFor = [RecoverableException::class])
+    fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
         restClient
             .post()
             .uri(cf::sendURI)
@@ -84,6 +88,9 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
             .headers.location?.key() ?: throw IllegalStateException("No location header")
+    } else {
+        throw RecoverableException(BAD_REQUEST, cf.baseUri, "Random failure")
+    }
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient

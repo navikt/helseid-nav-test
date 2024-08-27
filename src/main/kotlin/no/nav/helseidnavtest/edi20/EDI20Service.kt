@@ -3,8 +3,6 @@ package no.nav.helseidnavtest.edi20
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.slf4j.LoggerFactory.getLogger
-import org.springframework.retry.annotation.Recover
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -20,15 +18,7 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter,
 
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
 
-    @Retryable(listeners = ["loggingRetryListener"])
-    fun send(bestilling: Bestilling): Nothing = throw IllegalStateException("OOPS") // adapter.send(bestilling)
-
-    @Recover
-    fun send(e: Throwable, bestilling: Bestilling): String {
-        log.info("Recovering bestilling: $bestilling from exception", e)
-        recoverer.recover(bestilling)
-        return "OK"  // Must return something
-    }
+    fun send(bestilling: Bestilling) = adapter.send(bestilling)
 
     fun konsumert(herId: HerId, id: UUID) = adapter.konsumert(herId, id)
 
