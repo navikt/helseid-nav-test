@@ -6,6 +6,7 @@ import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
+import org.springframework.kafka.annotation.DltHandler
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
@@ -91,7 +92,11 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Bestil
         autoCreateTopics = "false")
     fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) =
-        log.info("Retrying bestilling $bestilling on topic $topic").also {
+        log.info("Retrying bestilling ${bestilling.id} on topic $topic").also {
             edi.send(bestilling)
         }
+
+    @DltHandler
+    fun dlt(bestilling: Bestilling) =
+        log.error("Gir opp bestilling ${bestilling.id} etter ${cfg.topics.retries} forsøk")
 }
