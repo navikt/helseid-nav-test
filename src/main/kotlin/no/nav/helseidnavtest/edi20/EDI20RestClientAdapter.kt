@@ -18,7 +18,6 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.util.*
 import java.util.Base64.getEncoder
-import kotlin.random.Random
 import kotlin.text.Charsets.UTF_8
 
 @Component
@@ -83,7 +82,7 @@ class EDI20RestClientAdapter(
         retryFor = [RecoverableException::class],
         maxAttemptsExpression = "#{@edi20-no.nav.helseidnavtest.edi20.EDI20Config.retries}"
     )
-    fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
+    fun send(bestilling: Bestilling) = if (true) {
         log.info("Invoking send")
         restClient
             .post()
