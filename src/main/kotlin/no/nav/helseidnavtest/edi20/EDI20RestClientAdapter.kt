@@ -80,8 +80,7 @@ class EDI20RestClientAdapter(
         listeners = ["loggingRetryListener"],
         recover = "sendRecover",
         retryFor = [RecoverableException::class],
-        maxAttemptsExpression = "#{@edi20-no.nav.helseidnavtest.edi20.EDI20Config.retries}"
-    )
+        maxAttempts = 3)
     fun send(bestilling: Bestilling) = if (true) {
         log.info("Invoking send")
         restClient
