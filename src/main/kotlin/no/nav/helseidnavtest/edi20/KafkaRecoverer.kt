@@ -30,28 +30,28 @@ class KafkaRecoverer(private val cfg: BestillingConfig,
 class LoggingRetryListener : RetryListener {
     private val log = getLogger(RetryListener::class.java)
     override fun <T : Any?, E : Throwable?> open(context: RetryContext?, callback: RetryCallback<T, E>?): Boolean {
-        log.info("open")
+        log.info("første med retry")
         return super.open(context, callback)
     }
 
     override fun <T : Any?, E : Throwable?> close(context: RetryContext?,
                                                   callback: RetryCallback<T, E>?,
-                                                  throwable: Throwable?) {
-        log.info("close", throwable)
-        super.close(context, callback, throwable)
+                                                  t: Throwable?) {
+        log.info("ferdig med retry", t)
+        super.close(context, callback, t)
     }
 
     override fun <T : Any?, E : Throwable?> onSuccess(context: RetryContext?,
                                                       callback: RetryCallback<T, E>?,
                                                       result: T) {
-        log.info("onSuccess")
+        log.info("retry ok")
         super.onSuccess(context, callback, result)
     }
 
     override fun <T : Any?, E : Throwable?> onError(context: RetryContext?,
                                                     callback: RetryCallback<T, E>?,
-                                                    throwable: Throwable?) {
-        log.info("onError", throwable)
-        super.onError(context, callback, throwable)
+                                                    t: Throwable?) {
+        log.info("retry feilet", t)
+        super.onError(context, callback, t)
     }
 }

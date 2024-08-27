@@ -43,7 +43,7 @@ data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingT
 
         const val BESTILLING = "bestilling"
         private const val DEFAULT_BACKOFF = 30000
-        private const val DEFAULT_RETRIES = 24
+        private const val DEFAULT_RETRIES = 3
         private const val MAIN_TOPIC = "helseopplysninger.edi20.main"
         private const val RETRY_TOPIC = "helseopplysninger.edi20.retry"
         private const val DLT_TOPIC = "helseopplysninger.edi20.dlt"
