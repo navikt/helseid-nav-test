@@ -77,9 +77,11 @@ class EDI20RestClientAdapter(
         return recoverer.recover(bestilling)
     }
 
-    @Retryable(listeners = ["loggingRetryListener"],
+    @Retryable(
+        listeners = ["loggingRetryListener"],
         recover = "sendRecover",
-        retryFor = [RecoverableException::class], maxAttempts = 1)
+        retryFor = [RecoverableException::class], /*maxAttemptsExpression = "#{@eDI20Config.retries}"*/
+    )
     fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
         log.info("Invoking send")
         restClient

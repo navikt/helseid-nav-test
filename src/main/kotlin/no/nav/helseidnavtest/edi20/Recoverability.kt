@@ -16,7 +16,7 @@ import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
 import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy.SINGLE_TOPIC
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
-import org.springframework.kafka.support.KafkaHeaders.RECEIVED_TOPIC
+import org.springframework.kafka.support.KafkaHeaders.*
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
@@ -41,12 +41,13 @@ data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingT
 
     companion object {
 
+        private const val PREFIX = "helseopplysninger.edi20."
         const val BESTILLING = "bestilling"
         private const val DEFAULT_BACKOFF = 30000
         private const val DEFAULT_RETRIES = 3
-        private const val MAIN_TOPIC = "helseopplysninger.edi20.main"
-        private const val RETRY_TOPIC = "helseopplysninger.edi20.retry"
-        private const val DLT_TOPIC = "helseopplysninger.edi20.dlt"
+        private const val MAIN_TOPIC = PREFIX + "main"
+        private const val RETRY_TOPIC = PREFIX + "retry"
+        private const val DLT_TOPIC = PREFIX + "dlt"
     }
 }
 
@@ -92,11 +93,12 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Bestil
         autoCreateTopics = "false")
     fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) =
-        log.info("Retrying bestilling ${bestilling.id} on topic $topic").also {
-            edi.send(bestilling)
-        }
+        (antall?.let { log.info("Retrying bestilling ${bestilling.id} on topic $topic, attempt $it") }
+            ?: log.info("Retrying bestilling ${bestilling.id} on topic $topic").also { edi.send(bestilling) })
 
     @DltHandler
-    fun dlt(bestilling: Bestilling) =
-        log.error("Gir opp bestilling ${bestilling.id} etter ${cfg.topics.retries} forsøk")
+    fun dlt(bestilling: Bestilling,
+            @Header(DLT_EXCEPTION_MESSAGE) msg: String,
+            @Header(DLT_EXCEPTION_STACKTRACE) trace: String) =
+        log.error("$msg ${bestilling.id}  ${cfg.topics.retries} forsøk ($trace)")
 }
