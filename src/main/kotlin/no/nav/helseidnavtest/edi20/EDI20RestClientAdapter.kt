@@ -18,7 +18,6 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.util.*
 import java.util.Base64.getEncoder
-import kotlin.random.Random
 import kotlin.text.Charsets.UTF_8
 
 @Component
@@ -71,13 +70,13 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<List<Meldinger>>()
 
-    @Recover()
+    @Recover
     fun sendRecover(t: Throwable, bestilling: Bestilling) = recoverer.recover(bestilling)
 
-    @Retryable(listeners = arrayOf("loggingRetryListener"),
+    @Retryable(listeners = ["loggingRetryListener"],
         recover = "sendRecover",
-        retryFor = [RecoverableException::class])
-    fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
+        retryFor = [RecoverableException::class], maxAttempts = 10)
+    fun send(bestilling: Bestilling) = if (false /*Random.nextBoolean()*/) {
         restClient
             .post()
             .uri(cf::sendURI)
@@ -89,6 +88,7 @@ class EDI20RestClientAdapter(
             .toBodilessEntity()
             .headers.location?.key() ?: throw IllegalStateException("No location header")
     } else {
+        log.warn("Random failure")
         throw RecoverableException(BAD_REQUEST, cf.baseUri, "Random failure")
     }
 

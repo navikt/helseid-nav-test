@@ -37,7 +37,7 @@ class LoggingRetryListener : RetryListener {
     override fun <T : Any?, E : Throwable?> close(context: RetryContext?,
                                                   callback: RetryCallback<T, E>?,
                                                   throwable: Throwable?) {
-        log.info("close")
+        log.info("close", throwable)
         super.close(context, callback, throwable)
     }
 
@@ -51,7 +51,7 @@ class LoggingRetryListener : RetryListener {
     override fun <T : Any?, E : Throwable?> onError(context: RetryContext?,
                                                     callback: RetryCallback<T, E>?,
                                                     throwable: Throwable?) {
-        log.info("onError")
+        log.info("onError", throwable)
         super.onError(context, callback, throwable)
     }
 }
