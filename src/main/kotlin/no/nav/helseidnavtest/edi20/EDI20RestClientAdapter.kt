@@ -81,6 +81,7 @@ class EDI20RestClientAdapter(
         recover = "sendRecover",
         retryFor = [RecoverableException::class], maxAttempts = 1)
     fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
+        log.info("Invoking send")
         restClient
             .post()
             .uri(cf::sendURI)
