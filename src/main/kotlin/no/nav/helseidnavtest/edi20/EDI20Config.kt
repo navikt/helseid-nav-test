@@ -10,7 +10,10 @@ import java.net.URI
 import java.util.*
 
 @ConfigurationProperties(EDI20)
-class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: Boolean = true) :
+class EDI20Config(baseUri: URI,
+                  pingPath: String = DEFAULT_PING_PATH,
+                  enabled: Boolean = true,
+                  val retries: Int = DEFAULT_RETRIES) :
     AbstractRestConfig(baseUri, pingPath, EDI20, enabled) {
 
     fun sendURI(b: UriBuilder) = b.path(MESSAGES_PATH).build()
@@ -20,8 +23,6 @@ class EDI20Config(baseUri: URI, pingPath: String = DEFAULT_PING_PATH, enabled: B
             .queryParam(INCLUDE_APPREC, "$appRec")
             .queryParam(TO_HER_IDS, herId.verdi)
             .build()
-
-    val retries = DEFAULT_RETRIES
 
     fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id")
 
