@@ -72,11 +72,14 @@ class EDI20RestClientAdapter(
             .body<List<Meldinger>>()
 
     @Recover
-    fun sendRecover(t: Throwable, bestilling: Bestilling) = recoverer.recover(bestilling)
+    fun sendRecover(t: Throwable, bestilling: Bestilling): String {
+        log.warn("Recovering from", t)
+        recoverer.recover(bestilling)
+    }
 
     @Retryable(listeners = ["loggingRetryListener"],
         recover = "sendRecover",
-        retryFor = [RecoverableException::class], maxAttempts = 10)
+        retryFor = [RecoverableException::class], maxAttempts = 1)
     fun send(bestilling: Bestilling) = if (Random.nextBoolean()) {
         restClient
             .post()

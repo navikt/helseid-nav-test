@@ -17,12 +17,9 @@ class KafkaRecoverer(private val cfg: BestillingConfig,
 
     fun recover(bestilling: Bestilling) =
         with(bestilling) {
-            if (cfg.enabled) {
-                log.info("Recovering bestilling $id via kafka: $this")
-                kafkaTemplate.send(cfg.topics.main, id, this)
-            } else {
-                log.info("Recovery disabled for bestilling $id")
-            }
+            log.info("Recovering bestilling $id via kafka: $this")
+            kafkaTemplate.send(cfg.topics.main, id, this)
+            id.toString()
         }
 }
 
