@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.error
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
@@ -19,7 +20,10 @@ import java.net.URI
 @Component
 @Qualifier(EDI20)
 class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
+    private val log = getLogger(BodyConsumingErrorHandler::class.java)
+
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
+        log.info("Handling error response ${res.statusCode} from ${req.uri}")
         throw when (val code = res.statusCode as HttpStatus) {
             BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri, m.readValue<ErrorResponse>(res.body))
             else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
