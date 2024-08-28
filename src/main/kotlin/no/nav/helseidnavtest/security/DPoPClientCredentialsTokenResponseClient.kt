@@ -57,17 +57,16 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun handleMissingNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         with(res) {
-            headers[DPOP_NONCE]?.single().let {
-                if (BAD_REQUEST == statusCode) {
-                    log.info("Received nonce $it in response")
-                    runCatching {
-                        retryWithNonce(request, Nonce(it))
-                    }.getOrElse { e ->
-                        if (e is OAuth2AuthorizationException) throw e
-                        authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, e)
-                    }
-                } else {
-                    authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
+            Nonce(headers[DPOP_NONCE]?.single()).let {
+                require(BAD_REQUEST == statusCode, {
+                    "Unexpected response ${statusCode}from token endpoint ${req.uri}"
+                })
+                runCatching {
+                    log.info("Received nonce $it in response, retrying")
+                    retryWithNonce(request, it)
+                }.getOrElse { e ->
+                    if (e is OAuth2AuthorizationException) throw e
+                    authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, e)
                 }
             }
         }
