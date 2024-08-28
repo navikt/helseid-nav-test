@@ -16,6 +16,8 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter,
 
     fun les(herId: HerId, id: UUID) = adapter.les(herId, id)
 
+    fun raw(herId: HerId, id: UUID) = adapter.raw(herId, id)
+
     fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
 
     fun send(bestilling: Bestilling) = adapter.send(bestilling)

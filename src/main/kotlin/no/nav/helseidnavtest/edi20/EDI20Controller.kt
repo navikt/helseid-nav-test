@@ -118,7 +118,7 @@ class EDI20Controller(
     fun les(@Herid herId: HerId,
             @Parameter(description = "Dokument-id")
             @PathVariable id: UUID) =
-        edi.les(herId, id)
+        edi.raw(herId, id)
 
     @Operation(description = "Les status for et dokument for en gitt herId")
     @GetMapping("${DOK_PATH}/status")

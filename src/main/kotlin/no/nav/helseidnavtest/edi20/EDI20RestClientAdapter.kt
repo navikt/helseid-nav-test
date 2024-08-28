@@ -51,6 +51,9 @@ class EDI20RestClientAdapter(
             .body<List<Status>>()
 
     fun les(herId: HerId, id: UUID) =
+        raw(herId, id)?.let(generator::unmarshal)
+
+    fun raw(herId: HerId, id: UUID) =
         restClient
             .get()
             .uri { cf.lesURI(it, id) }
@@ -58,7 +61,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_XML)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .body<String>()?.let(generator::unmarshal)
+            .body<String>()
 
     fun poll(herId: HerId, appRec: Boolean) =
         restClient
