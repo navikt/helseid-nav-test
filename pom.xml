@@ -21,7 +21,7 @@
         <kotlin.version>2.0.20</kotlin.version>
         <kotlin.mockito.version>5.4.0</kotlin.mockito.version>
         <springdoc.version>2.6.0</springdoc.version>
-        <swagger.annotations.version>2.2.22</swagger.annotations.version>
+        <swagger.annotations.version>2.2.23</swagger.annotations.version>
     </properties>
 
     <dependencies>
