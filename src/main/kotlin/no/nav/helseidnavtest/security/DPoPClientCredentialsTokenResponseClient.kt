@@ -21,8 +21,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse.withToken
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.EXPIRES_IN
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.SCOPE
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.io.InputStream
@@ -116,7 +115,7 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun deserialize(body: InputStream) =
         mapper.readValue<Map<String, Any>>(body).run {
-            withToken(this["access_token"] as String)
+            withToken(this[ACCESS_TOKEN] as String)
                 .expiresIn((this[EXPIRES_IN] as Int).toLong())
                 .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
