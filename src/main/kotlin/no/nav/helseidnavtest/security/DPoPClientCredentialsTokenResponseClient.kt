@@ -20,9 +20,12 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentia
 import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.oauth2.core.OAuth2Error
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse.withToken
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.EXPIRES_IN
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.SCOPE
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import java.io.InputStream
 import java.net.URI
 import kotlin.reflect.jvm.isAccessible
 
@@ -86,7 +89,8 @@ class DPoPClientCredentialsTokenResponseClient(
         with(req) {
             log.info("Received nonce ${nonce.value} in response, retrying")
             body?.let {
-                restClient.method(POST)
+                restClient
+                    .method(POST)
                     .uri(url)
                     .headers { headers ->
                         headers.add(DPOP.value, generator.proofFor(POST, url, nonce = nonce))
@@ -103,19 +107,18 @@ class DPoPClientCredentialsTokenResponseClient(
             }
             runCatching {
                 log.info("Exchange after nonce successful, deserialize response")
-                deserialize(this)
+                deserialize(this.body)
             }.getOrElse {
                 authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
             }
         }
-
     }
 
-    private fun deserialize(res: ClientHttpResponse) =
-        mapper.readValue<Map<String, Any>>(res.body).run {
-            OAuth2AccessTokenResponse.withToken(this["access_token"] as String)
-                .expiresIn((this["expires_in"] as Int).toLong())
-                .scopes(setOf(this["scope"] as String))
+    private fun deserialize(body: InputStream) =
+        mapper.readValue<Map<String, Any>>(body).run {
+            withToken(this["access_token"] as String)
+                .expiresIn((this[EXPIRES_IN] as Int).toLong())
+                .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
                 .additionalParameters(this)
                 .build()
