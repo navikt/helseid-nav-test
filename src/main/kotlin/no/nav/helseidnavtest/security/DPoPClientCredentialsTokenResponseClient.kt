@@ -78,7 +78,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 restClient.method(POST)
                     .uri(url)
                     .headers { headers ->
-                        headers.add(DPOP.value, generator.proofFor(POST, req.url, nonce = nonce))
+                        headers.add(DPOP.value, generator.proofFor(POST, url, nonce = nonce))
                     }
                     .body(it)
                     .exchange(exchangeEtterNonce())
