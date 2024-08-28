@@ -62,7 +62,6 @@ class DPoPClientCredentialsTokenResponseClient(
                     "Unexpected response ${statusCode}from token endpoint ${req.uri}"
                 })
                 runCatching {
-                    log.info("Received nonce $it in response, retrying")
                     retryWithNonce(request, it)
                 }.getOrElse { e ->
                     if (e is OAuth2AuthorizationException) throw e
@@ -74,6 +73,7 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun retryWithNonce(req: RequestEntity<*>, nonce: Nonce) =
         with(req) {
+            log.info("Received nonce ${nonce.value} in response, retrying")
             body?.let {
                 restClient.method(POST)
                     .uri(url)
