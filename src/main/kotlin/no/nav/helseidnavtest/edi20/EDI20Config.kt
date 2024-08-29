@@ -37,6 +37,7 @@ class EDI20Config(baseUri: URI,
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
     companion object {
+        const val DELEGATING = "delegating"
         private const val DEFAULT_RETRIES = 3
         const val MESSAGES_PATH = "messages"
         const val DOK_PATH = "$MESSAGES_PATH/{id}"

@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.security
 
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DELEGATING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import org.springframework.beans.factory.annotation.Qualifier
@@ -9,10 +10,10 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2ClientCredentia
 import org.springframework.stereotype.Component
 
 @Component
-@Qualifier("delegating")
+@Qualifier(DELEGATING)
 class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI20) private val dpop: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
                                                                   @Qualifier(PLAIN) private val plain: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
-                                                                  private val detector: DPopDetector) :
+                                                                  private val detector: DPoPDetector) :
     OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
     override fun getTokenResponse(req: OAuth2ClientCredentialsGrantRequest) =
@@ -23,6 +24,7 @@ class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI
         }
 }
 
-interface DPopDetector {
-    fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest): Boolean
+interface DPoPDetector {
+    fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest): Boolean =
+        req.clientRegistration.registrationId.startsWith(EDI20)
 }

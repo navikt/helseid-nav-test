@@ -6,7 +6,7 @@ import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import com.nimbusds.openid.connect.sdk.Nonce
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
-import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.convert.converter.Converter
 import org.springframework.http.HttpMethod.POST
@@ -142,7 +142,6 @@ class DPoPClientCredentialsTokenResponseClient(
         const val INVALID_RES = "invalid_token_response"
         const val INVALID_REQ = "invalid_token_request"
 
-        private val log =
-            LoggerFactory.getLogger(DelegatingDPoPDetectingClientCredentialsTokenResponseClient::class.java)
+        private val log = getLogger(DelegatingDPoPDetectingClientCredentialsTokenResponseClient::class.java)
     }
 }

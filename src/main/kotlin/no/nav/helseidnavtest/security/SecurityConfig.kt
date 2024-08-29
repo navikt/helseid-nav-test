@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
@@ -109,9 +108,6 @@ class SecurityConfig(
                 jwt {}
             }
             oauth2Client {
-                authorizationCodeGrant {
-                    accessTokenResponseClient = DefaultAuthorizationCodeTokenResponseClient()
-                }
             }
             logout {
                 logoutSuccessHandler = successHandler
@@ -139,10 +135,7 @@ class SecurityConfig(
     fun plainClientCredentialsTokenResponseClient() = DefaultClientCredentialsTokenResponseClient()
 
     @Bean
-    fun dPopDetector() = object : DPopDetector {
-        override fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest) =
-            req.clientRegistration.registrationId.startsWith(EDI20)
-    }
+    fun dPoPDetector() = object : DPoPDetector {}
 
     @Bean
     fun traceRepo() = InMemoryHttpExchangeRepository()
