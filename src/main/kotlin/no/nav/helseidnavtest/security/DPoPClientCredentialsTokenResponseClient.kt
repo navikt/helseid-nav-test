@@ -62,7 +62,7 @@ class DPoPClientCredentialsTokenResponseClient(
             Nonce(headers[DPOP_NONCE]?.single()).let {
                 runCatching {
                     check(BAD_REQUEST == statusCode,
-                        { "Unexpected response ${statusCode}from token endpoint ${req.uri}" })
+                        { "Unexpected response ${statusCode} from token endpoint ${req.uri}" })
                     retryWithNonce(request, it)
                 }.getOrElse {
                     when (it) {
