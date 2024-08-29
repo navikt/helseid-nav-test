@@ -13,7 +13,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.stereotype.Component
 import java.net.URI
-import java.security.MessageDigest
+import java.security.MessageDigest.getInstance
 import java.time.Instant.now
 import java.util.*
 import java.util.Base64.getUrlEncoder
@@ -50,8 +50,7 @@ class DPoPProofGenerator(private val keyPair: ECKey) {
         private fun OAuth2AccessToken.hash() =
             getUrlEncoder()
                 .withoutPadding()
-                .encodeToString(MessageDigest
-                    .getInstance("SHA-256")
+                .encodeToString(getInstance("SHA-256")
                     .digest(tokenValue.toByteArray()))
 
         private fun URI.stripQuery() =
