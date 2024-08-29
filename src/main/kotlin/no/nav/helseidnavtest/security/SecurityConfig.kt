@@ -108,7 +108,11 @@ class SecurityConfig(
             oauth2ResourceServer {
                 jwt {}
             }
-            oauth2Client {}
+            oauth2Client {
+                authorizationCodeGrant {
+                    accessTokenResponseClient = DefaultAuthorizationCodeTokenResponseClient()
+                }
+            }
             logout {
                 logoutSuccessHandler = successHandler
             }
