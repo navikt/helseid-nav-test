@@ -120,7 +120,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
                 .additionalParameters(this)
-                .build()
+                .build().also { log.info("Deserialize ok to $it") }
         }
 
     companion object {
