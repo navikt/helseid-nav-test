@@ -13,6 +13,7 @@ import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.adresse.Bestilling
 import no.nav.helseidnavtest.security.DPoPProofGenerator
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
@@ -38,6 +39,8 @@ import java.util.*
 class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNamingProviderFactory) :
     RetryTopicConfigurationSupport() {
 
+    val log = getLogger(EDI20BeanConfig::class.java)
+
     override fun createComponentFactory() = object : RetryTopicComponentFactory() {
         override fun retryTopicNamesProviderFactory() = namingProviderFactory
     }
@@ -60,6 +63,12 @@ class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNam
     fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) =
         b.baseUrl("${cfg.baseUri}")
             .messageConverters {
+                log.info("Message converters $it")
+                /*   it.add(0, MappingJackson2HttpMessageConverter().apply {
+                       objectMapper = jacksonObjectMapper().apply {
+
+                       }
+                   })*/
                 it.addAll(listOf(FormHttpMessageConverter(),
                     OAuth2AccessTokenResponseHttpMessageConverter()))
             }
