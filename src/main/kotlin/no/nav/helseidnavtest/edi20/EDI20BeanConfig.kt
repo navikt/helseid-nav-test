@@ -58,13 +58,7 @@ class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNam
 
     @Bean
     @Qualifier(PLAIN)
-    fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) =
-        b.baseUrl("${cfg.baseUri}")
-            .messageConverters {
-                log.info("Message converters $it")
-                //  it.add(OAuth2AccessTokenResponseHttpMessageConverter())
-            }
-            .build()
+    fun plainEdi20RestClient(b: Builder, cfg: EDI20Config) = b.baseUrl("${cfg.baseUri}").build()
 
     @Bean
     @Qualifier(EDI20)
