@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest
 
-
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class HelseopplysningerController {
-
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication) = dump(authentication)
@@ -29,6 +27,8 @@ class HelseopplysningerController {
 
         return """
             <h1>/hello1</h1>
+            <p>${authentication.javaClass}
+            <p>${authentication.oidcUser().javaClass}
             <p>Hello from <b>${extractor.claim("name")}</b></p>
             <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>
             <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}</b></p>
