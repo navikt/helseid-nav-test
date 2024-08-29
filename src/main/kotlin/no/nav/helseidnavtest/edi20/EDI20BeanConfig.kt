@@ -63,8 +63,7 @@ class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNam
         b.baseUrl("${cfg.baseUri}")
             .messageConverters {
                 log.info("Message converters $it")
-                it.addAll(listOf(/*FormHttpMessageConverter(),*/
-                    OAuth2AccessTokenResponseHttpMessageConverter()))
+                it.add(OAuth2AccessTokenResponseHttpMessageConverter())
             }
             .build()
 
