@@ -115,7 +115,6 @@ spring:
             scope:
               - api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default
           helse-id:
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
             client-id: ${clientid}
