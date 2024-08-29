@@ -97,7 +97,7 @@ class SecurityConfig(
             csrf { disable() }
             oauth2Login {
                 authorizationEndpoint {
-                    baseUri = authorizationEndpoint
+                    //  baseUri = authorizationEndpoint
                     authorizationRequestResolver = pkceAddingResolver(repo)
                 }
                 tokenEndpoint {
