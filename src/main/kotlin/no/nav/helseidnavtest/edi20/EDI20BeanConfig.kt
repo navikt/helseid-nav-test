@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties.AckMode.RECORD
@@ -64,12 +63,7 @@ class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNam
         b.baseUrl("${cfg.baseUri}")
             .messageConverters {
                 log.info("Message converters $it")
-                /*   it.add(0, MappingJackson2HttpMessageConverter().apply {
-                       objectMapper = jacksonObjectMapper().apply {
-
-                       }
-                   })*/
-                it.addAll(listOf(FormHttpMessageConverter(),
+                it.addAll(listOf(/*FormHttpMessageConverter(),*/
                     OAuth2AccessTokenResponseHttpMessageConverter()))
             }
             .build()
