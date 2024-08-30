@@ -116,7 +116,7 @@ class DPoPClientCredentialsTokenResponseClient(
     private fun deserialize(body: InputStream) =
         mapper.readValue<Map<String, Any>>(body).run {
             withToken(this[ACCESS_TOKEN] as String)
-                .expiresIn((this[EXPIRES_IN] as Long))
+                .expiresIn((this[EXPIRES_IN] as Int).toLong())
                 .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
                 .additionalParameters(this)
