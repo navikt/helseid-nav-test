@@ -97,7 +97,6 @@ class SecurityConfig(
             csrf { disable() }
             oauth2Login {
                 authorizationEndpoint {
-                    //  baseUri = authorizationEndpoint
                     authorizationRequestResolver = pkceAddingResolver(repo)
                 }
                 tokenEndpoint {
@@ -133,9 +132,6 @@ class SecurityConfig(
     @Bean
     @Qualifier(PLAIN)
     fun plainClientCredentialsTokenResponseClient() = DefaultClientCredentialsTokenResponseClient()
-
-    @Bean
-    fun dPoPDetector() = object : DPoPDetector {}
 
     @Bean
     fun traceRepo() = InMemoryHttpExchangeRepository()

@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component
 @Qualifier(DELEGATING)
 class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI20) private val dpop: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
                                                                   @Qualifier(PLAIN) private val plain: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
-                                                                  private val detector: DPoPDetector) :
+                                                                  private val detector: DPoPDetector = object :
+                                                                      DPoPDetector {}) :
     OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
     override fun getTokenResponse(req: OAuth2ClientCredentialsGrantRequest) =
