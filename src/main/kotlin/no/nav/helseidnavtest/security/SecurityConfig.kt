@@ -140,8 +140,7 @@ class SecurityConfig(
     @Bean
     fun clientCredentialsRequestEntityConverter() = OAuth2ClientCredentialsGrantRequestEntityConverter().apply {
         addParametersConverter(
-            NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(
-                jwkResolver()
+            NimbusJwtClientAuthenticationParametersConverter<OAuth2ClientCredentialsGrantRequest>(jwkResolver()
             ).apply {
                 setJwtClientAssertionCustomizer { it.claims.notBefore(now()) }
             })
