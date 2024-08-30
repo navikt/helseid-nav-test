@@ -38,7 +38,7 @@ class DPoPClientCredentialsTokenResponseClient(
 
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let(::getResponse)
-            ?: authErrorRequest("No request entity")
+            ?: reqError("No request entity")
 
     private fun getResponse(req: RequestEntity<*>) =
         with(req) {
@@ -54,7 +54,7 @@ class DPoPClientCredentialsTokenResponseClient(
                     }
                     .body(this)
                     .exchange(withoutNonce(this@with))
-            } ?: authErrorResponse("No body in response", null, req.url)
+            } ?: resError("No body in response", null, req.url)
         }
 
     private fun withoutNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
@@ -62,22 +62,14 @@ class DPoPClientCredentialsTokenResponseClient(
             Nonce(headers[DPOP_NONCE]?.single()).let {
                 runCatching {
                     check(BAD_REQUEST == statusCode,
-                        { "Unexpected response ${statusCode} from token endpoint ${req.uri}" })
+                        { "Unexpected response $statusCode from token endpoint ${req.uri}" })
                     withNonce(request, it)
                 }.getOrElse {
                     when (it) {
-                        is IllegalStateException -> authErrorResponse("Unexpected response code",
-                            res.statusCode,
-                            req.uri,
-                            it)
-
-                        is IllegalArgumentException -> authErrorResponse("Multiple nonces in response",
-                            BAD_REQUEST,
-                            req.uri,
-                            it)
-
+                        is IllegalStateException -> resError("Unexpected response code", res.statusCode, req.uri, it)
+                        is IllegalArgumentException -> resError("Multiple nonces in response", BAD_REQUEST, req.uri, it)
                         is OAuth2AuthorizationException -> throw it
-                        else -> authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
+                        else -> resError("Unexpected response from token endpoint", statusCode, req.uri, it)
                     }
                 }
             }
@@ -91,30 +83,30 @@ class DPoPClientCredentialsTokenResponseClient(
                 restClient
                     .method(POST)
                     .uri(url)
-                    .headers { headers ->
-                        headers.add(DPOP.value, generator.proofFor(POST, url, nonce = nonce))
+                    .headers {
+                        it.add(DPOP.value, generator.proofFor(POST, url, nonce = nonce))
                     }
                     .body(this)
                     .exchange(response())
-            } ?: authErrorResponse("No body in request", null, req.url)
+            } ?: resError("No body in request", null, req.url)
         }
 
     private fun response() = { req: HttpRequest, res: ClientHttpResponse ->
         with(res) {
             if (!statusCode.is2xxSuccessful) {
-                authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
+                resError("Unexpected response from token endpoint", statusCode, req.uri)
             }
             runCatching {
-                log.info("Exchange after nonce successful, deserialize response")
                 deserialize(body)
             }.getOrElse {
-                authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri, it)
+                resError("Unexpected response from token endpoint", statusCode, req.uri, it)
             }
         }
     }
 
     private fun deserialize(body: InputStream) =
         mapper.readValue<Map<String, Any>>(body).run {
+            log.info("Exchange after nonce successful, deserialize response")
             withToken(this[ACCESS_TOKEN] as String)
                 .expiresIn((this[EXPIRES_IN] as Int).toLong())
                 .scopes(setOf(this[SCOPE] as String))
@@ -129,13 +121,13 @@ class DPoPClientCredentialsTokenResponseClient(
             call(DPOP.value)
         }
 
-        private fun authErrorResponse(txt: String,
-                                      code: HttpStatusCode? = null,
-                                      uri: URI? = null,
-                                      e: Throwable? = null): Nothing =
+        private fun resError(txt: String,
+                             code: HttpStatusCode? = null,
+                             uri: URI? = null,
+                             e: Throwable? = null): Nothing =
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_RES, "$txt $code", "$uri"), e)
 
-        private fun authErrorRequest(txt: String, uri: URI? = null): Nothing =
+        private fun reqError(txt: String, uri: URI? = null): Nothing =
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_REQ, txt, "$uri"))
 
         const val DPOP_NONCE = "dpop-nonce"
