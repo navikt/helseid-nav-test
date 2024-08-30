@@ -42,7 +42,7 @@ class DPoPClientCredentialsTokenResponseClient(
 
     private fun getResponse(req: RequestEntity<*>) =
         with(req) {
-            body?.let {
+            body?.run {
                 log.info("Requesting DPoP token from $url")
                 restClient.method(POST)
                     .uri(url)
@@ -52,18 +52,18 @@ class DPoPClientCredentialsTokenResponseClient(
                             add(DPOP.value, generator.proofFor(POST, url))
                         }
                     }
-                    .body(it)
-                    .exchange(handleMissingNonce(this))
+                    .body(this)
+                    .exchange(withoutNonce(this@with))
             } ?: authErrorResponse("No body in response", null, req.url)
         }
 
-    private fun handleMissingNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
+    private fun withoutNonce(request: RequestEntity<*>) = { req: HttpRequest, res: ClientHttpResponse ->
         with(res) {
             Nonce(headers[DPOP_NONCE]?.single()).let {
                 runCatching {
                     check(BAD_REQUEST == statusCode,
                         { "Unexpected response ${statusCode} from token endpoint ${req.uri}" })
-                    retryWithNonce(request, it)
+                    withNonce(request, it)
                 }.getOrElse {
                     when (it) {
                         is IllegalStateException -> authErrorResponse("Unexpected response code",
@@ -84,22 +84,22 @@ class DPoPClientCredentialsTokenResponseClient(
         }
     }
 
-    private fun retryWithNonce(req: RequestEntity<*>, nonce: Nonce) =
+    private fun withNonce(req: RequestEntity<*>, nonce: Nonce) =
         with(req) {
             log.info("Received nonce ${nonce.value} in response, retrying")
-            body?.let {
+            body?.run {
                 restClient
                     .method(POST)
                     .uri(url)
                     .headers { headers ->
                         headers.add(DPOP.value, generator.proofFor(POST, url, nonce = nonce))
                     }
-                    .body(it)
-                    .exchange(exchangeEtterNonce())
+                    .body(this)
+                    .exchange(response())
             } ?: authErrorResponse("No body in request", null, req.url)
         }
 
-    private fun exchangeEtterNonce() = { req: HttpRequest, res: ClientHttpResponse ->
+    private fun response() = { req: HttpRequest, res: ClientHttpResponse ->
         with(res) {
             if (!statusCode.is2xxSuccessful) {
                 authErrorResponse("Unexpected response from token endpoint", statusCode, req.uri)
@@ -116,7 +116,7 @@ class DPoPClientCredentialsTokenResponseClient(
     private fun deserialize(body: InputStream) =
         mapper.readValue<Map<String, Any>>(body).run {
             withToken(this[ACCESS_TOKEN] as String)
-                .expiresIn((this[EXPIRES_IN] as Int).toLong())
+                .expiresIn((this[EXPIRES_IN] as Long))
                 .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
                 .additionalParameters(this)

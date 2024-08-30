@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.security
 
 import com.nimbusds.jose.jwk.JWK
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DELEGATING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
@@ -152,18 +153,16 @@ class SecurityConfig(
     }
 
     @Bean
-    fun authorizedClientServiceOAuth2AuthorizedClientManager(
-        @Qualifier("delegating") responseClient: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
-        repo: ClientRegistrationRepository,
-        service: OAuth2AuthorizedClientService) =
+    fun authorizedClientServiceOAuth2AuthorizedClientManager(@Qualifier(DELEGATING) responseClient: OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest>,
+                                                             repo: ClientRegistrationRepository,
+                                                             service: OAuth2AuthorizedClientService) =
         AuthorizedClientServiceOAuth2AuthorizedClientManager(repo, service).apply {
-            setAuthorizedClientProvider(
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                    .refreshToken()
-                    .clientCredentials {
-                        it.accessTokenResponseClient(responseClient)
-                    }
-                    .build()
+            setAuthorizedClientProvider(OAuth2AuthorizedClientProviderBuilder.builder()
+                .refreshToken()
+                .clientCredentials {
+                    it.accessTokenResponseClient(responseClient)
+                }
+                .build()
             )
         }
 
