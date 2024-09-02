@@ -53,7 +53,7 @@ jobs:
         uses: nais/attest-sign@v1.3.4
         with:
           image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
-          sbom: target/bom.json
+          sbom: target/classes/META-INF/sbom/application.cdx.json
   deploy:
     permissions:
       contents: write
