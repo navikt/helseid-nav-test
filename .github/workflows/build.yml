@@ -31,8 +31,8 @@ jobs:
       - name: Login GAR
         uses: nais/login@v0
         with:
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{vars.NAIS_MANAGEMENT_PROJECT_ID}}
+          identity_provider: ${{secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER}}
           team: helseopplysninger
 
       - name: Setter opp Java 21
@@ -48,14 +48,14 @@ jobs:
       - name: Bygg og push image
         id: build_push
         run: |
-          echo "image=${{ env.IMAGE }}:${{ env.TAG }}" >> $GITHUB_OUTPUT
+          echo "image=${{env.IMAGE}}:${{env.TAG}}" >> $GITHUB_OUTPUT
           ./mvnw  --settings .github/.m2/settings.xml -Dspring.profiles.active=local -DGAR_TOKEN=${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} -Djib.to.tags=latest,${TAG} -Drevision=${TAG}  package jib:build
           echo "::set-output name=digest::$(cat target/jib-image.digest)"
 
       - name: "Attest and sign"
         uses: nais/attest-sign@v1.3.4
         with:
-          image_ref: ${{ env.IMAGE }}@${{ steps.build_push.outputs.digest }}
+          image_ref: ${{env.IMAGE}}@${{steps.build_push.outputs.digest}}
   
   deploy:
     permissions:
