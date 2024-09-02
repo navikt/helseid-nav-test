@@ -46,13 +46,10 @@ jobs:
         id: kompiler
 
       - name: Bygg og push image
-        id: build_push
         run: |
           echo "image=${{env.IMAGE}}:${{env.TAG}}" >> $GITHUB_OUTPUT
           ./mvnw  --settings .github/.m2/settings.xml -Dspring.profiles.active=local -DGAR_TOKEN=${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} -Djib.to.tags=latest,${TAG} -Drevision=${TAG}  package jib:build
           echo "::set-output name=digest::$(cat target/jib-image.digest)"
-       
-  
   
   deploy:
     permissions:
