@@ -47,11 +47,12 @@ jobs:
           echo "image=${{env.IMAGE}}:${{env.TAG}}" >> $GITHUB_OUTPUT
           ./mvnw  --settings .github/.m2/settings.xml -Dspring.profiles.active=local -DGAR_TOKEN=${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} -Djib.to.tags=latest,${TAG} -Drevision=${TAG}  package jib:build
           echo "::set-output name=digest::$(cat target/jib-image.digest)"
+          echo "DIGEST=$(cat target/jib-image.digest)" >> $GITHUB_ENV
 
       - name: "Attest and sign"
         uses: nais/attest-sign@v1.3.4
         with:
-          image_ref: ${{env.IMAGE}}@${{steps.build_push.outputs.digest}}
+          image_ref: ${{env.IMAGE}}@${{env.DIGEST}}
 
   deploy:
     permissions:
