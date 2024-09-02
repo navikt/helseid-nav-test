@@ -66,7 +66,7 @@ class DPoPClientCredentialsTokenResponseClient(
                     withNonce(request, it)
                 }.getOrElse {
                     when (it) {
-                        is IllegalStateException -> resError("Unexpected response code", res.statusCode, req.uri, it)
+                        is IllegalStateException -> resError("Unexpected response code", statusCode, req.uri, it)
                         is IllegalArgumentException -> resError("Multiple nonces in response", BAD_REQUEST, req.uri, it)
                         is OAuth2AuthorizationException -> throw it
                         else -> resError("Unexpected response from token endpoint", statusCode, req.uri, it)
@@ -112,7 +112,7 @@ class DPoPClientCredentialsTokenResponseClient(
                 .scopes(setOf(this[SCOPE] as String))
                 .tokenType(DPOP_TOKEN_TYPE)
                 .additionalParameters(this)
-                .build().also { log.info("Deserialize ok to $it") }
+                .build()
         }
 
     companion object {

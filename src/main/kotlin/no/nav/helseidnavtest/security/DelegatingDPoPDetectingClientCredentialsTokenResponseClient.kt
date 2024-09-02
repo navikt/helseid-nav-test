@@ -26,6 +26,6 @@ class DelegatingDPoPDetectingClientCredentialsTokenResponseClient(@Qualifier(EDI
 }
 
 interface DPoPDetector {
-    fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest): Boolean =
+    fun isDPoP(req: AbstractOAuth2AuthorizationGrantRequest) =
         req.clientRegistration.registrationId.startsWith(EDI20)
 }
