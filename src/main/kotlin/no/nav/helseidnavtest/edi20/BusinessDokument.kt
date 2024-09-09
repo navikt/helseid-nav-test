@@ -33,9 +33,8 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
             val middlewareVersion: String? = VERSJON)
     }
 
-    override fun toString(): String {
-        return "BusinessDocument(businessDocument='${businessDocument.length} bytes', properties=$properties)"
-    }
+    override fun toString() =
+        "BusinessDocument(businessDocument='${businessDocument.length} bytes', properties=$properties)"
 }
 
 data class Meldinger(val herId: HerId, val messageIds: List<UUID>)

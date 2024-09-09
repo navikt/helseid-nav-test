@@ -19,7 +19,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
 
     fun unmarshal(xml: String) = marshaller.createUnmarshaller().unmarshal(xml.byteInputStream()).let {
         when (it) {
-            is XMLMsgHead -> mapper.bestilling(it)
+            is XMLMsgHead -> mapper.innsending(it)
             is XMLAppRec -> mapper.apprec(it)
             else -> throw IllegalArgumentException("Unknown type: ${it.javaClass}")
         }

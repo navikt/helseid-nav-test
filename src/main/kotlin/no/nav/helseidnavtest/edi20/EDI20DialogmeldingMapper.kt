@@ -255,7 +255,7 @@ class EDI20DialogmeldingMapper {
             this.dn = dn
         }
 
-    fun bestilling(hode: XMLMsgHead) =
+    fun innsending(hode: XMLMsgHead) =
         with(hode.msgInfo) {
             Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
