@@ -10,11 +10,9 @@ import org.springframework.kafka.annotation.DltHandler
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
-import org.springframework.kafka.retrytopic.DltStrategy.FAIL_ON_ERROR
 import org.springframework.kafka.retrytopic.RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
-import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy.SINGLE_TOPIC
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
 import org.springframework.kafka.support.KafkaHeaders.*
 import org.springframework.messaging.handler.annotation.Header
@@ -86,14 +84,14 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Innsen
     @KafkaListener(topics = ["#{@innsendingConfig.topics.main}"], containerFactory = INNSENDING)
     @RetryableTopic(attempts = "#{@innsendingConfig.topics.retries}",
         backoff = Backoff(delayExpression = "#{@innsendingConfig.topics.backoff}"),
-        sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
         exclude = [IrrecoverableException::class],
-        dltStrategy = FAIL_ON_ERROR,
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
     fun listen(innsending: Innsending, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) =
-        (antall?.let { log.info("Retrying innsending ${innsending.id} on topic $topic, attempt $it") }
+        (antall?.let {
+            log.info("Retrying innsending ${innsending.id} on topic $topic, attempt $it")
+        }
             ?: log.info("Retrying innsending ${innsending.id} on topic $topic").also { edi.send(innsending) })
 
     @DltHandler

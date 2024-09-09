@@ -19,7 +19,7 @@ class KafkaRecoverer(private val cfg: InnsendingConfig,
         with(innsending) {
             log.info("Recovering innsending $id via kafka: $this")
             kafkaTemplate.send(cfg.topics.main, id, this)
-            id.toString()
+            "$id"
         }
 }
 
