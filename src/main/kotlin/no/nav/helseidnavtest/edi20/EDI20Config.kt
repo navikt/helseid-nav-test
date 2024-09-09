@@ -4,14 +4,12 @@ import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
 import java.net.URI
 import java.util.*
 
 @ConfigurationProperties(EDI20)
-@Qualifier("xxxxxxx")
 class EDI20Config(baseUri: URI,
                   pingPath: String = DEFAULT_PING_PATH,
                   enabled: Boolean = true,

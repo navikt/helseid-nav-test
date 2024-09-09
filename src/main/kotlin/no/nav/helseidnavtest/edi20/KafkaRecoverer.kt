@@ -1,6 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.retry.RetryCallback
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class KafkaRecoverer(private val cfg: BestillingConfig,
-                     private val kafkaTemplate: KafkaTemplate<UUID, Bestilling>) {
+class KafkaRecoverer(private val cfg: InnsendingConfig,
+                     private val kafkaTemplate: KafkaTemplate<UUID, Innsending>) {
 
     private val log = getLogger(KafkaRecoverer::class.java)
 
-    fun recover(bestilling: Bestilling) =
-        with(bestilling) {
-            log.info("Recovering bestilling $id via kafka: $this")
+    fun recover(innsending: Innsending) =
+        with(innsending) {
+            log.info("Recovering innsending $id via kafka: $this")
             kafkaTemplate.send(cfg.topics.main, id, this)
             id.toString()
         }

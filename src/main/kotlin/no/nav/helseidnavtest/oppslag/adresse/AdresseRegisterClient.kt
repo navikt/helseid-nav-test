@@ -2,7 +2,7 @@ package no.nav.helseidnavtest.oppslag.adresse
 
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.other
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling.Tjenester
+import no.nav.helseidnavtest.oppslag.adresse.Innsending.Tjenester
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Tjeneste
 import org.springframework.stereotype.Service
 

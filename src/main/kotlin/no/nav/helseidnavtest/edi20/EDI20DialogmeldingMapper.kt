@@ -10,7 +10,7 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.DMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nav.helseidnavtest.oppslag.person.Person
@@ -37,12 +37,12 @@ class EDI20DialogmeldingMapper {
 
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
-    fun hodemelding(bestilling: Bestilling) =
-        msgHead(msgInfo(bestilling)).apply {
-            bestilling.vedlegg?.let {
+    fun hodemelding(innsending: Innsending) =
+        msgHead(msgInfo(innsending)).apply {
+            innsending.vedlegg?.let {
                 document.addAll(listOf(dialogmelding("Dialogmelding"), inlineDokument(it)))
             }
-            bestilling.ref?.let {
+            innsending.ref?.let {
                 document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second)))
             }
         }
@@ -51,10 +51,10 @@ class EDI20DialogmeldingMapper {
         msgInfo = info
     }
 
-    private fun msgInfo(bestilling: Bestilling) =
+    private fun msgInfo(innsending: Innsending) =
         HMOF.createXMLMsgInfo().apply {
-            with(bestilling) {
-                type = type(bestilling.id)
+            with(innsending) {
+                type = type(innsending.id)
                 sender = avsender(tjenester.fra)
                 receiver = mottaker(tjenester.til)
                 patient = pasient(pasient)
@@ -257,11 +257,11 @@ class EDI20DialogmeldingMapper {
 
     fun bestilling(hode: XMLMsgHead) =
         with(hode.msgInfo) {
-            Bestilling(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
+            Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
 
-    private fun parter(sender: XMLSender, receiver: XMLReceiver): Bestilling.Tjenester =
-        Bestilling.Tjenester(part(sender), part(receiver))
+    private fun parter(sender: XMLSender, receiver: XMLReceiver): Innsending.Tjenester =
+        Innsending.Tjenester(part(sender), part(receiver))
 
     private fun part(sender: XMLSender) =
         with(sender.organisation) {

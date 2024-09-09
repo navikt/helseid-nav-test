@@ -15,7 +15,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.web.bind.annotation.*
@@ -142,12 +142,12 @@ class EDI20Controller(
             } ?: emptyList()
 
     private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(UUID.randomUUID(),
+        Innsending(UUID.randomUUID(),
             adresse.tjenester(fra, til),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Bestilling(UUID.randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+        Innsending(UUID.randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }

@@ -5,13 +5,13 @@ import com.nimbusds.jose.jwk.Curve.P_256
 import com.nimbusds.jose.jwk.KeyUse.SIGNATURE
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
-import no.nav.helseidnavtest.edi20.BestillingConfig.Companion.BESTILLING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
 import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
+import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.security.DPoPProofGenerator
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
@@ -34,7 +34,7 @@ import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
 @Configuration(proxyBeanMethods = true)
-class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNamingProviderFactory) :
+class EDI20BeanConfig(private val namingProviderFactory: InnsendingRetryTopicNamingProviderFactory) :
     RetryTopicConfigurationSupport() {
 
     val log = getLogger(EDI20BeanConfig::class.java)
@@ -43,9 +43,9 @@ class EDI20BeanConfig(private val namingProviderFactory: BestillingRetryTopicNam
         override fun retryTopicNamesProviderFactory() = namingProviderFactory
     }
 
-    @Bean(BESTILLING)
+    @Bean(INNSENDING)
     fun bestillingListenerContainerFactory(p: KafkaProperties) =
-        ConcurrentKafkaListenerContainerFactory<UUID, Bestilling>().apply {
+        ConcurrentKafkaListenerContainerFactory<UUID, Innsending>().apply {
             containerProperties.isObservationEnabled = true
             containerProperties.ackMode = RECORD
             consumerFactory = DefaultKafkaConsumerFactory(p.buildConsumerProperties(null).apply {

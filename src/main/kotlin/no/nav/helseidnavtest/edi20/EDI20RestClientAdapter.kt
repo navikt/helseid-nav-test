@@ -6,7 +6,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -74,9 +74,9 @@ class EDI20RestClientAdapter(
             .body<List<Meldinger>>()
 
     @Recover
-    fun sendRecover(t: Throwable, bestilling: Bestilling): String {
+    fun sendRecover(t: Throwable, innsending: Innsending): String {
         log.warn("Recovering from", t)
-        return recoverer.recover(bestilling)
+        return recoverer.recover(innsending)
     }
 
     @Retryable(
@@ -84,14 +84,14 @@ class EDI20RestClientAdapter(
         recover = "sendRecover",
         retryFor = [RecoverableException::class],
         maxAttempts = 3)
-    fun send(bestilling: Bestilling) = if (true) {
+    fun send(innsending: Innsending) = if (true) {
         log.info("Invoking send")
         restClient
             .post()
             .uri(cf::sendURI)
-            .headers { it.herId(bestilling.fra) }
+            .headers { it.herId(innsending.fra) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(generator.marshal(bestilling).encode()))
+            .body(BusinessDocument(generator.marshal(innsending).encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()

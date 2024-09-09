@@ -1,8 +1,8 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.edi20.BestillingConfig.Companion.BESTILLING
+import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.error.IrrecoverableException
-import no.nav.helseidnavtest.oppslag.adresse.Bestilling
+import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
@@ -22,13 +22,13 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
 @Component
-@ConfigurationProperties(BESTILLING)
-data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingTopics = BestillingTopics(),
-                            val enabled: Boolean = true) : KafkaConfig(BESTILLING, enabled) {
+@ConfigurationProperties(INNSENDING)
+data class InnsendingConfig(@NestedConfigurationProperty val topics: InnsendingTopics = InnsendingTopics(),
+                            val enabled: Boolean = true) : KafkaConfig(INNSENDING, enabled) {
 
     override fun topics() = topics.all
 
-    data class BestillingTopics(
+    data class InnsendingTopics(
         val retry: String = RETRY_TOPIC,
         val dlt: String = DLT_TOPIC,
         val main: String = MAIN_TOPIC,
@@ -42,7 +42,7 @@ data class BestillingConfig(@NestedConfigurationProperty val topics: BestillingT
     companion object {
 
         private const val PREFIX = "helseopplysninger.edi20."
-        const val BESTILLING = "bestilling"
+        const val INNSENDING = "bestilling"
         private const val DEFAULT_BACKOFF = 30000
         private const val DEFAULT_RETRIES = 3
         private const val MAIN_TOPIC = PREFIX + "main"
@@ -57,7 +57,7 @@ abstract class KafkaConfig(val name: String, val isEnabled: Boolean) {
 }
 
 @Component
-class BestillingRetryTopicNamingProviderFactory(private val cf: BestillingConfig) : RetryTopicNamesProviderFactory {
+class InnsendingRetryTopicNamingProviderFactory(private val cf: InnsendingConfig) : RetryTopicNamesProviderFactory {
 
     override fun createRetryTopicNamesProvider(p: Properties): RetryTopicNamesProvider {
         with(cf.topics) {
@@ -79,26 +79,26 @@ class BestillingRetryTopicNamingProviderFactory(private val cf: BestillingConfig
 }
 
 @Component
-class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: BestillingConfig) {
+class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: InnsendingConfig) {
 
     private val log = getLogger(BestillingHendelseKonsument::class.java)
 
-    @KafkaListener(topics = ["#{@bestillingConfig.topics.main}"], containerFactory = BESTILLING)
-    @RetryableTopic(attempts = "#{@bestillingConfig.topics.retries}",
-        backoff = Backoff(delayExpression = "#{@bestillingConfig.topics.backoff}"),
+    @KafkaListener(topics = ["#{@innsendingConfig.topics.main}"], containerFactory = INNSENDING)
+    @RetryableTopic(attempts = "#{@innsendingConfig.topics.retries}",
+        backoff = Backoff(delayExpression = "#{@innsendingConfig.topics.backoff}"),
         sameIntervalTopicReuseStrategy = SINGLE_TOPIC,
         exclude = [IrrecoverableException::class],
         dltStrategy = FAIL_ON_ERROR,
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
-    fun listen(bestilling: Bestilling, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
+    fun listen(innsending: Innsending, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) =
-        (antall?.let { log.info("Retrying bestilling ${bestilling.id} on topic $topic, attempt $it") }
-            ?: log.info("Retrying bestilling ${bestilling.id} on topic $topic").also { edi.send(bestilling) })
+        (antall?.let { log.info("Retrying innsending ${innsending.id} on topic $topic, attempt $it") }
+            ?: log.info("Retrying innsending ${innsending.id} on topic $topic").also { edi.send(innsending) })
 
     @DltHandler
-    fun dlt(bestilling: Bestilling,
+    fun dlt(innsending: Innsending,
             @Header(DLT_EXCEPTION_MESSAGE) msg: String,
             @Header(DLT_EXCEPTION_STACKTRACE) trace: String) =
-        log.error("$msg ${bestilling.id}  ${cfg.topics.retries} forsøk ($trace)")
+        log.error("$msg ${innsending.id}  ${cfg.topics.retries} forsøk ($trace)")
 }

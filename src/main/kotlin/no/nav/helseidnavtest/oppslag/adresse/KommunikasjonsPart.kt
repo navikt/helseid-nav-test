@@ -65,7 +65,7 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
     }
 }
 
-data class Bestilling(val id: UUID,
+data class Innsending(val id: UUID,
                       val tjenester: Tjenester,
                       val pasient: Pasient,
                       val vedlegg: ByteArray? = null,
@@ -80,7 +80,7 @@ data class Bestilling(val id: UUID,
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Bestilling
+        other as Innsending
 
         return id == other.id
     }
