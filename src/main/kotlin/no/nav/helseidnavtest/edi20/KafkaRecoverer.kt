@@ -11,16 +11,21 @@ import java.util.*
 
 @Component
 class KafkaRecoverer(private val cfg: InnsendingConfig,
-                     private val kafkaTemplate: KafkaTemplate<UUID, Innsending>) {
+                     private val kafkaTemplate: KafkaTemplate<UUID, Innsending>) : Recoverer {
 
     private val log = getLogger(KafkaRecoverer::class.java)
 
-    fun recover(innsending: Innsending) =
+    override fun recover(innsending: Innsending) =
         with(innsending) {
             log.info("Recovering innsending $id via kafka: $this")
             kafkaTemplate.send(cfg.topics.main, id, this)
             "$id"
         }
+}
+
+interface Recoverer {
+
+    fun recover(innsending: Innsending): String
 }
 
 @Component

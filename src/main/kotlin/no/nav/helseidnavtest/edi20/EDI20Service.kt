@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class EDI20Service(private val adapter: EDI20RestClientAdapter,
-                   private val recoverer: KafkaRecoverer) {
+class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     private val log = getLogger(EDI20Service::class.java)
 

@@ -24,7 +24,7 @@ import kotlin.text.Charsets.UTF_8
 class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
-    private val recoverer: KafkaRecoverer,
+    private val recoverer: Recoverer,
     private val generator: EDI20DialogmeldingGenerator,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
