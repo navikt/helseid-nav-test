@@ -7,6 +7,8 @@ import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.stereotype.Component
+import java.io.ByteArrayInputStream
+import java.security.cert.CertificateFactory
 import no.nhn.register.communicationparty.Organization as KommunikasjonsPartVirksomhet
 import no.nhn.register.communicationparty.OrganizationPerson as KommunikasjonsPartPerson
 import no.nhn.register.communicationparty.Service as KommunikasjonsPartTjeneste
@@ -25,9 +27,28 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
             handler.handleError(it, herId.herId())
         }
 
+    fun krypteringSertifikat(herId: Int) =
+        runCatching {
+            client.getCertificateForEncryption(herId)
+                .let { certFactory.generateCertificate(ByteArrayInputStream(it)) }
+        }.getOrElse {
+            handler.handleError(it, herId.herId())
+        }
+
+    fun SigneringsValideringsSertifikat(herId: Int) =
+        runCatching {
+            client.getCertificateForValidatingSignature(herId)
+                .let { certFactory.generateCertificate(ByteArrayInputStream(it)) }
+        }.getOrElse {
+            handler.handleError(it, herId.herId())
+        }
+
     override fun ping() = mapOf(Pair("ping", client.ping()))
     private fun Int.herId() = HerId(this)
 
+    companion object {
+        private val certFactory = CertificateFactory.getInstance("X.509")
+    }
 }
 
 private class KommunikasjonsPartMapper(private val client: ICommunicationPartyService) {

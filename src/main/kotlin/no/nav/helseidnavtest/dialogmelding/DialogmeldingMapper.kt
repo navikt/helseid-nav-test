@@ -44,7 +44,7 @@ class DialogmeldingMapper(private val adresse: AdresseRegisterClient) {
             }
             FFOF.createXMLMottakenhetBlokk().apply {
                 ebRole = EBROLE
-                //partnerReferanse = melding.behandler.kontor.partnerId!!.value
+                partnerReferanse = melding.behandler.kontor.partnerId!!.value
                 ebService = EBSERVICE
                 ebAction = EBACTION
             }
