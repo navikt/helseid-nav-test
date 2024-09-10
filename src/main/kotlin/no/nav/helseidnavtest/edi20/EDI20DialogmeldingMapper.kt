@@ -49,6 +49,9 @@ class EDI20DialogmeldingMapper {
 
     private fun msgHead(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
         msgInfo = info
+        // signature = HMOF.createXMLSignatureType().apply {
+        //   signatureValue = "SIGNATURE"
+        //}
     }
 
     private fun msgInfo(innsending: Innsending) =

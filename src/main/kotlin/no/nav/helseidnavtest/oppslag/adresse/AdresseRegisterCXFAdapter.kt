@@ -7,7 +7,6 @@ import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.ICommunicationPartyService
 import org.springframework.stereotype.Component
-import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
 import no.nhn.register.communicationparty.Organization as KommunikasjonsPartVirksomhet
 import no.nhn.register.communicationparty.OrganizationPerson as KommunikasjonsPartPerson
@@ -30,7 +29,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     fun krypteringSertifikat(herId: Int) =
         runCatching {
             client.getCertificateForEncryption(herId)
-                .let { certFactory.generateCertificate(ByteArrayInputStream(it)) }
+                .let { certFactory.generateCertificate(it.inputStream()) }
         }.getOrElse {
             handler.handleError(it, herId.herId())
         }
@@ -38,7 +37,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     fun SigneringsValideringsSertifikat(herId: Int) =
         runCatching {
             client.getCertificateForValidatingSignature(herId)
-                .let { certFactory.generateCertificate(ByteArrayInputStream(it)) }
+                .let { certFactory.generateCertificate(it.inputStream()) }
         }.getOrElse {
             handler.handleError(it, herId.herId())
         }
