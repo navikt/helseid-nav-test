@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.client.RestClient
 import java.net.URI
-import java.util.*
+import java.util.Locale.getDefault
 
 abstract class AbstractGraphQLAdapter(
     client: RestClient,
@@ -42,12 +42,10 @@ interface GraphQLErrorHandler {
     fun handle(uri: URI, e: Throwable): Nothing =
         when (e) {
             is FieldAccessException -> throw e.oversett(uri)
-            is GraphQlTransportException -> throw RecoverableException(
-                INTERNAL_SERVER_ERROR,
+            is GraphQlTransportException -> throw RecoverableException(INTERNAL_SERVER_ERROR,
                 uri,
                 e.message ?: "Transport feil",
-                e
-            )
+                e)
 
             else -> throw IrrecoverableException(INTERNAL_SERVER_ERROR, uri, e.message, cause = e)
         }
@@ -66,8 +64,7 @@ interface GraphQLErrorHandler {
             }
 
         fun oversett(kode: String, msg: String, uri: URI) = IrrecoverableException(kode.tilStatus(), uri, msg)
-
-        private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(Locale.getDefault()))
+        private fun String.tilStatus() = HttpStatus.valueOf(this.uppercase(getDefault()))
 
     }
 }
