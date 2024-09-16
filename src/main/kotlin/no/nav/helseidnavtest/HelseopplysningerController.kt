@@ -1,7 +1,8 @@
 package no.nav.helseidnavtest
 
 import no.nav.helseidnavtest.security.ClaimsExtractor
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -9,12 +10,13 @@ import org.springframework.web.bind.annotation.RestController
 class HelseopplysningerController {
 
     @GetMapping("/hello1")
-    fun hello1(oidcUser: OidcUser) = dump(oidcUser)
+    fun hello1(authentication: Authentication) = dump(authentication)
 
     @GetMapping("/hello")
-    fun hello(oidcUser: OidcUser) = dump(oidcUser)
+    fun hello(authentication: Authentication) = dump(authentication)
 
-    private fun dump(oidcUser: OidcUser): String {
+    private fun dump(authentication: Authentication): String {
+        val oidcUser = authentication.oidcUser()
         val user = ClaimsExtractor(oidcUser).user
         val scopes = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
@@ -25,6 +27,8 @@ class HelseopplysningerController {
 
         return """
             <h1>/hello1</h1>
+            <p>${authentication.javaClass}
+            <p>${authentication.oidcUser().javaClass}
             <p>Hello from <b>${user.navn}</b></p>
             <p>HPR-nummer: <b>${user.hprNumber}</b></p>
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
