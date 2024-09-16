@@ -14,15 +14,12 @@ import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nav.helseidnavtest.oppslag.person.Person
-import no.nav.helseidnavtest.security.ClaimsExtractor
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
-import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.LocalDate
@@ -56,7 +53,7 @@ class EDI20DialogmeldingMapper {
             with(innsending) {
                 type = type(innsending.id)
                 sender = avsender(tjenester.fra)
-                receiver = mottaker(tjenester.til)
+                receiver = mottaker(tjenester.til, innsending.principal)
                 patient = pasient(pasient)
             }
         }
@@ -81,7 +78,7 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun mottaker(part: KommunikasjonsPart) =
+    private fun mottaker(part: KommunikasjonsPart, principal: DefaultOidcUser) =
         HMOF.createXMLReceiver().apply {
             when (part) {
                 is Tjeneste -> {
@@ -104,7 +101,7 @@ class EDI20DialogmeldingMapper {
                             organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
                             healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                lege()
+                                lege(principal)
                             }
                         }
                     }
@@ -114,14 +111,8 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun lege(): Unit {
-        val auth = SecurityContextHolder.getContext().authentication
-        log.info("AUTH " + auth)
-        if (auth !is AnonymousAuthenticationToken) {
-            log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
-        } else {
-            log.warn("NOT AUTHENTICATED")
-        }
+    private fun lege(principal: DefaultOidcUser) {
+        log.info("NAME " + principal.fullName)
     }
 
     private fun pasient(pasient: Pasient) =
@@ -259,9 +250,9 @@ class EDI20DialogmeldingMapper {
             this.dn = dn
         }
 
-    fun innsending(hode: XMLMsgHead) =
+    fun innsending(hode: XMLMsgHead, principal: DefaultOidcUser) =
         with(hode.msgInfo) {
-            Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
+            Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient), principal)
         }
 
     private fun parter(sender: XMLSender, receiver: XMLReceiver): Innsending.Tjenester =

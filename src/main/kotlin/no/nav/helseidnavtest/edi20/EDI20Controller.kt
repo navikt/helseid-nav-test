@@ -61,58 +61,60 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendRef(@Herid
+    fun sendRef(@AuthenticationPrincipal principal: DefaultOidcUser,
+                @Herid
                 @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(refBestilling(fra, pasient = pasient, vedlegg = vedlegg))
+        edi.send(refBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
-    fun showRef(@Herid
-                @RequestParam fra: HerId,
+    fun showRef(@AuthenticationPrincipal principal: DefaultOidcUser,
+                @Herid @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(refBestilling(fra, pasient = pasient, vedlegg = vedlegg))
+        generator.marshal(refBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendInline(@AuthenticationPrincipal principal: DefaultOidcUser,
-                   @Herid
-                   @RequestParam fra: HerId,
+                   @Herid @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg)).also {
+        edi.send(inlineBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg)).also {
             log.info("Principal: ${principal.userInfo.javaClass} ${principal.userInfo}")
         }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInlineTilValidering(@Herid
-                                @RequestParam fra: HerId,
-                                @RequestParam(defaultValue = VALIDATOR) til: HerId,
-                                @Parameter(description = "Pasientens fødselsnummer")
-                                @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
-                                @Parameter(description = "Valgfritt vedlegg")
-                                @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inlineBestilling(fra, til, pasient, vedlegg))
+    fun sendInlineTilValidering(
+        @AuthenticationPrincipal principal: DefaultOidcUser, @Herid
+        @RequestParam fra: HerId,
+        @RequestParam(defaultValue = VALIDATOR) til: HerId,
+        @Parameter(description = "Pasientens fødselsnummer")
+        @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
+        @Parameter(description = "Valgfritt vedlegg")
+        @RequestPart("file", required = false) vedlegg: MultipartFile?) =
+        edi.send(inlineBestilling(fra, til, pasient, principal, vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun showInline(@Herid
-                   @RequestParam fra: HerId,
-                   @Parameter(description = "Pasientens fødselsnummer")
-                   @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
-                   @Parameter(description = "Vedlegg")
-                   @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg))
+    fun showInline(
+        @AuthenticationPrincipal principal: DefaultOidcUser, @Herid
+        @RequestParam fra: HerId,
+        @Parameter(description = "Pasientens fødselsnummer")
+        @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
+        @Parameter(description = "Vedlegg")
+        @RequestPart("file", required = false) vedlegg: MultipartFile) =
+        generator.marshal(inlineBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")
@@ -149,13 +151,20 @@ class EDI20Controller(
                 }
             } ?: emptyList()
 
-    private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
+    private fun inlineBestilling(fra: HerId,
+                                 til: HerId = fra.other(),
+                                 pasient: String,
+                                 principal: DefaultOidcUser,
+                                 vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
             adresse.tjenester(fra, til),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+            principal,
             vedlegg?.bytes)
 
-    private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Innsending(randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+    private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String,
+                              principal: DefaultOidcUser,
+                              vedlegg: MultipartFile?) =
+        Innsending(randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))), principal,
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }

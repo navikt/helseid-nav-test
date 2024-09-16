@@ -8,6 +8,7 @@ import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.Organization
 import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import java.net.URI
 import java.util.*
 
@@ -68,6 +69,7 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
 data class Innsending(val id: UUID,
                       val tjenester: Tjenester,
                       val pasient: Pasient,
+                      val principal: DefaultOidcUser,
                       val vedlegg: ByteArray? = null,
                       val ref: Pair<URI, String>? = null) {
 
