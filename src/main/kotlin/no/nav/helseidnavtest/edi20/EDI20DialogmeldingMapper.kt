@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -32,7 +31,7 @@ import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.*
 
 @Component
-class EDI20DialogmeldingMapper(@AuthenticationPrincipal val user: Any) {
+class EDI20DialogmeldingMapper {
 
     private val log = getLogger(javaClass)
 
