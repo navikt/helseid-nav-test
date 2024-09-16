@@ -88,12 +88,11 @@ class EDI20DialogmeldingMapper {
                         organisation = HMOF.createXMLOrganisation().apply {
                             organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
-                            lege(principal)
                         }
                     }
                 }
 
-                is VirksomhetPerson -> {  // TODO HealthCareProfessional
+                is VirksomhetPerson -> {
                     organisation = HMOF.createXMLOrganisation().apply {
                         organisationName = part.virksomhet.orgNavn
                         ident.add(ident(part.virksomhet.herId, herIdType))
@@ -101,7 +100,9 @@ class EDI20DialogmeldingMapper {
                             organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
                             healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                lege(principal)
+                                givenName = principal.givenName
+                                principal.middleName?.let { middleName = it }
+                                familyName = principal.familyName
                             }
                         }
                     }
@@ -110,10 +111,6 @@ class EDI20DialogmeldingMapper {
                 else -> throw IllegalArgumentException("Ukjent tjeneste $part")
             }
         }
-
-    private fun lege(principal: DefaultOidcUser) {
-        log.info("NAME " + principal.fullName)
-    }
 
     private fun pasient(pasient: Pasient) =
         HMOF.createXMLPatient().apply {
