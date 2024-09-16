@@ -11,15 +11,19 @@ import no.nav.helseidnavtest.dialogmelding.ObjectFactories.HMOF
 import no.nav.helseidnavtest.dialogmelding.ObjectFactories.VOF
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
+import no.nav.helseidnavtest.oppslag.adresse.Innsending.Parter
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
-import no.nav.helseidnavtest.oppslag.person.Person
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.oauth2.core.oidc.OidcIdToken
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.LocalDate
@@ -52,8 +56,8 @@ class EDI20DialogmeldingMapper {
         HMOF.createXMLMsgInfo().apply {
             with(innsending) {
                 type = type(innsending.id)
-                sender = avsender(tjenester.fra)
-                receiver = mottaker(tjenester.til, innsending.principal)
+                sender = avsender(parter.fra)
+                receiver = mottaker(parter.til)
                 patient = pasient(pasient)
             }
         }
@@ -66,8 +70,9 @@ class EDI20DialogmeldingMapper {
         msgId = "$uuid"
     }
 
-    private fun avsender(tjeneste: Tjeneste) =
+    private fun avsender(tjeneste: KommunikasjonsPart) =
         HMOF.createXMLSender().apply {
+            tjeneste as Tjeneste
             organisation = HMOF.createXMLOrganisation().apply {
                 organisationName = tjeneste.virksomhet.orgNavn
                 ident.add(ident(tjeneste.virksomhet.herId, herIdType))
@@ -78,37 +83,40 @@ class EDI20DialogmeldingMapper {
             }
         }
 
-    private fun mottaker(part: KommunikasjonsPart, principal: DefaultOidcUser) =
+    private fun mottaker(mottaker: Mottaker) =
         HMOF.createXMLReceiver().apply {
-            when (part) {
-                is Tjeneste -> {
-                    organisation = HMOF.createXMLOrganisation().apply {
-                        organisationName = part.virksomhet.orgNavn
-                        ident.add(ident(part.virksomhet.herId, herIdType))
-                        organisation = HMOF.createXMLOrganisation().apply {
-                            organisationName = part.orgNavn
-                            ident.add(ident(part.herId, herIdType))
-                        }
-                    }
-                }
+            with(mottaker.part) {
 
-                is VirksomhetPerson -> {
-                    organisation = HMOF.createXMLOrganisation().apply {
-                        organisationName = part.virksomhet.orgNavn
-                        ident.add(ident(part.virksomhet.herId, herIdType))
+                when (this) {
+                    is Tjeneste -> {
                         organisation = HMOF.createXMLOrganisation().apply {
-                            organisationName = part.orgNavn
-                            ident.add(ident(part.herId, herIdType))
-                            healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                givenName = principal.givenName
-                                principal.middleName?.let { middleName = it }
-                                familyName = principal.familyName
+                            organisationName = virksomhet.orgNavn
+                            ident.add(ident(virksomhet.herId, herIdType))
+                            organisation = HMOF.createXMLOrganisation().apply {
+                                organisationName = orgNavn
+                                ident.add(ident(herId, herIdType))
                             }
                         }
                     }
-                }
 
-                else -> throw IllegalArgumentException("Ukjent tjeneste $part")
+                    is VirksomhetPerson -> {
+                        organisation = HMOF.createXMLOrganisation().apply {
+                            organisationName = virksomhet.orgNavn
+                            ident.add(ident(virksomhet.herId, herIdType))
+                            organisation = HMOF.createXMLOrganisation().apply {
+                                organisationName = orgNavn
+                                ident.add(ident(herId, herIdType))
+                                healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
+                                    givenName = mottaker.user.givenName
+                                    mottaker.user.middleName?.let { middleName = it }
+                                    familyName = mottaker.user.familyName
+                                }
+                            }
+                        }
+                    }
+
+                    else -> throw IllegalArgumentException("Ukjent mottaker $this")
+                }
             }
         }
 
@@ -247,13 +255,38 @@ class EDI20DialogmeldingMapper {
             this.dn = dn
         }
 
-    fun innsending(hode: XMLMsgHead, principal: DefaultOidcUser) =
+    fun innsending(hode: XMLMsgHead, helsePersonell: OidcUser) =
         with(hode.msgInfo) {
-            Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient), principal)
+            Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
 
-    private fun parter(sender: XMLSender, receiver: XMLReceiver): Innsending.Tjenester =
-        Innsending.Tjenester(part(sender), part(receiver))
+    private fun parter(sender: XMLSender, receiver: XMLReceiver): Parter =
+        Parter(part(sender), Mottaker(part(receiver), object : OidcUser {
+            override fun getName(): String {
+                TODO("Not yet implemented")
+            }
+
+            override fun getAttributes(): MutableMap<String, Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getClaims(): MutableMap<String, Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getUserInfo(): OidcUserInfo {
+                TODO("Not yet implemented")
+            }
+
+            override fun getIdToken(): OidcIdToken {
+                TODO("Not yet implemented")
+            }
+
+        }))
 
     private fun part(sender: XMLSender) =
         with(sender.organisation) {
@@ -285,7 +318,7 @@ class EDI20DialogmeldingMapper {
     private fun pasient(patient: XMLPatient) =
         with(patient) {
             Pasient(Fødselsnummer(ident.first().id),
-                Person.Navn(givenName, middleName, familyName))
+                Navn(givenName, middleName, familyName))
         }
 
     fun apprec(apprec: XMLAppRec) = apprec

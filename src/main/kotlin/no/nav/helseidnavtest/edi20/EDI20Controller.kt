@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -61,36 +62,36 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendRef(@AuthenticationPrincipal principal: DefaultOidcUser,
+    fun sendRef(@AuthenticationPrincipal helsePersonell: OidcUser,
                 @Herid
                 @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(refBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
+        edi.send(refBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
-    fun showRef(@AuthenticationPrincipal principal: DefaultOidcUser,
+    fun showRef(@AuthenticationPrincipal helsePersonell: OidcUser,
                 @Herid @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(refBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
+        generator.marshal(refBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(@AuthenticationPrincipal principal: DefaultOidcUser,
+    fun sendInline(@AuthenticationPrincipal helsePersonell: OidcUser,
                    @Herid @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inlineBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg)).also {
-            log.info("Principal: ${principal.userInfo.javaClass} ${principal.userInfo}")
+        edi.send(inlineBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg)).also {
+            log.info("Principal: ${helsePersonell.userInfo.javaClass} ${helsePersonell.userInfo}")
         }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -108,13 +109,14 @@ class EDI20Controller(
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun showInline(
-        @AuthenticationPrincipal principal: DefaultOidcUser, @Herid
+        @AuthenticationPrincipal helsePersonell: OidcUser,
+        @Herid
         @RequestParam fra: HerId,
         @Parameter(description = "Pasientens fødselsnummer")
         @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
         @Parameter(description = "Vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        generator.marshal(inlineBestilling(fra, pasient = pasient, principal = principal, vedlegg = vedlegg))
+        generator.marshal(inlineBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
     @PutMapping("${DOK_PATH}/read/{herId}")
@@ -154,17 +156,18 @@ class EDI20Controller(
     private fun inlineBestilling(fra: HerId,
                                  til: HerId = fra.other(),
                                  pasient: String,
-                                 principal: DefaultOidcUser,
+                                 helsePersonell: OidcUser,
                                  vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
-            adresse.tjenester(fra, til),
+            adresse.parter(fra, til, helsePersonell),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
-            principal,
             vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String,
-                              principal: DefaultOidcUser,
+                              helsePersonell: OidcUser,
                               vedlegg: MultipartFile?) =
-        Innsending(randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))), principal,
+        Innsending(randomUUID(),
+            adresse.parter(fra, til, helsePersonell),
+            Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }

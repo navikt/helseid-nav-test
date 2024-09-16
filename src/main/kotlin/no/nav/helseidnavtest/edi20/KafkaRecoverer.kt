@@ -32,12 +32,10 @@ interface Recoverer {
 class LoggingRetryListener : RetryListener {
     private val log = getLogger(RetryListener::class.java)
     override fun <T : Any, E : Throwable> open(context: RetryContext, cb: RetryCallback<T, E>): Boolean {
-        log.info("Første med retry")
         return super.open(context, cb)
     }
 
     override fun <T : Any, E : Throwable> close(ctx: RetryContext, cb: RetryCallback<T, E>, t: Throwable?) {
-        log.info("Ferdig med retry", t)
         super.close(ctx, cb, t)
     }
 

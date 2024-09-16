@@ -3,12 +3,12 @@ package no.nav.helseidnavtest.oppslag.adresse
 import net.minidev.json.annotate.JsonIgnore
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Tjeneste
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Mottaker
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.Organization
 import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import java.net.URI
 import java.util.*
 
@@ -64,19 +64,20 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                     tjeneste.name.value,
                     Virksomhet(virksomhet))
     }
+
+    data class Mottaker(val part: KommunikasjonsPart, val user: OidcUser)
 }
 
 data class Innsending(val id: UUID,
-                      val tjenester: Tjenester,
+                      val parter: Parter,
                       val pasient: Pasient,
-                      val principal: DefaultOidcUser,
                       val vedlegg: ByteArray? = null,
                       val ref: Pair<URI, String>? = null) {
 
     @JsonIgnore
-    val fra = tjenester.fra.herId
+    val fra = parter.fra.herId
 
-    data class Tjenester(val fra: Tjeneste, val til: Tjeneste)
+    data class Parter(val fra: KommunikasjonsPart, val til: Mottaker)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -89,7 +90,7 @@ data class Innsending(val id: UUID,
 
     override fun hashCode() = id.hashCode()
     override fun toString() =
-        javaClass.simpleName + "(id=$id, tjenester=$tjenester, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
+        javaClass.simpleName + "(id=$id, tjenester=$parter, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
 }
 
 private fun CommunicationParty.herId() = HerId(herId)
