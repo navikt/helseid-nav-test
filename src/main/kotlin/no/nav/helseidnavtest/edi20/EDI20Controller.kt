@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
@@ -19,8 +18,8 @@ import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
-import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseidnavtest.security.ClaimsExtractor
+import no.nav.helseidnavtest.security.ClaimsExtractor.User
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -74,7 +73,7 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(refBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
+            edi.send(refBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -88,7 +87,7 @@ class EDI20Controller(
         @Parameter(description = "Vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(refBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
+            generator.marshal(refBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -101,22 +100,8 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            ClaimsExtractor(it.claims).user().also {
-                log.info("User: $it")
-            }
-            edi.send(inlineBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
+            edi.send(inlineBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
-
-    data class User(val name: String, val hpr: HprId, val approvals: List<Approvals>) {
-        data class Approvals(val profession: String,
-                             val authorization: Authorization,
-                             val requisitionRights: List<Rekvisisjon> = emptyList(),
-                             val specialities: List<Spesialitet> = emptyList()) {
-            data class Spesialitet(val value: String, val description: String)
-            data class Rekvisisjon(val value: String, val description: String)
-            data class Authorization(val value: String, val description: String)
-        }
-    }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -129,7 +114,7 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, til, pasient, it.navn(), vedlegg))
+            edi.send(inlineBestilling(fra, til, pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
@@ -142,7 +127,7 @@ class EDI20Controller(
         @Parameter(description = "Vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(inlineBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
+            generator.marshal(inlineBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
@@ -181,18 +166,16 @@ class EDI20Controller(
                 }
             } ?: emptyList()
 
-    private fun inlineBestilling(fra: HerId, til: HerId, pasient: String, navn: Navn, vedlegg: MultipartFile?) =
+    private fun inlineBestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
-            adresse.parter(fra, til, navn),
+            adresse.parter(fra, til, user.navn),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
 
-    private fun refBestilling(fra: HerId, til: HerId, pasient: String, navn: Navn, vedlegg: MultipartFile?) =
+    private fun refBestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
-            adresse.parter(fra, til, navn),
+            adresse.parter(fra, til, user.navn),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
-
-    private fun OidcUser.navn() = Navn(givenName, middleName, familyName)
 
 }

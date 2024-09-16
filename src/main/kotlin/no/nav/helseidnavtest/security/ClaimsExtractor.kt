@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
 @Suppress("UNCHECKED_CAST")
 class ClaimsExtractor(private val claims: Map<String, Any>) {
+    constructor(user: OidcUser) : this(user.claims)
 
     data class User(val profession: List<String>,
                     val hprNumber: HprId,
@@ -19,18 +20,18 @@ class ClaimsExtractor(private val claims: Map<String, Any>) {
                     val fnr: Fødselsnummer)
 
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
-    val hprNumber = HprId(claim(HPR_NUMBER))
     val securityLevel = claim(SECURITY_LEVEL)
-    val navn = Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME))
-    val assuranceLevel = claim(ASSURANCE_LEVEL)
-    val fnr = Fødselsnummer(claim(PID))
 
-    fun user() = User(professions, hprNumber, securityLevel, navn, assuranceLevel, fnr)
+    val user = User(professions, HprId(claim(HPR_NUMBER)),
+        securityLevel,
+        Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME)),
+        claim(ASSURANCE_LEVEL),
+        Fødselsnummer(claim(PID)))
 
-    fun claim(claim: String) = claims[claim] as? String
+    private fun claim(claim: String) = claims[claim] as? String
         ?: throw IllegalStateException() //IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $claim", claim)
 
-    fun hprDetails(respons: Map<*, *>) =
+    private fun hprDetails(respons: Map<*, *>) =
         HPRDetails(with((respons)) {
             (this[APPROVALS] as List<*>).map {
                 it as Map<*, *>

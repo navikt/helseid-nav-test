@@ -17,7 +17,7 @@ class HelseopplysningerController {
 
     private fun dump(authentication: Authentication): String {
         val oidcUser = authentication.oidcUser()
-        val extractor = ClaimsExtractor(oidcUser.claims)
+        val user = ClaimsExtractor(oidcUser).user
         val scopes = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
         }
@@ -29,10 +29,9 @@ class HelseopplysningerController {
             <h1>/hello1</h1>
             <p>${authentication.javaClass}
             <p>${authentication.oidcUser().javaClass}
-            <p>Hello from <b>${extractor.claim("name")}</b></p>
-            <p>HPR-nummer: <b>${extractor.hprNumber}</b></p>
-            <p>Nivå: <b>${extractor.assuranceLevel}</b> - <b>${extractor.securityLevel}</b></p>
-            <p>Verifisert med: <b>${extractor.claim("idp")}</b></p>
+            <p>Hello from <b>${user.navn}</b></p>
+            <p>HPR-nummer: <b>${user.hprNumber}</b></p>
+            <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
             <br>
             <p>Requested authorities</p>
             <ul>$scopes</ul>
