@@ -103,9 +103,9 @@ class EDI20DialogmeldingMapper {
                                 organisationName = orgNavn
                                 ident.add(ident(herId, herIdType))
                                 healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                    givenName = mottaker.user.fornavn
-                                    mottaker.user.mellomnavn?.let { middleName = it }
-                                    familyName = mottaker.user.etternavn
+                                    givenName = mottaker.navn.fornavn
+                                    mottaker.navn.mellomnavn?.let { middleName = it }
+                                    familyName = mottaker.navn.etternavn
                                 }
                             }
                         }

@@ -65,7 +65,7 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                     Virksomhet(virksomhet))
     }
 
-    data class Mottaker(val part: KommunikasjonsPart, val user: Navn)
+    data class Mottaker(val part: KommunikasjonsPart, val navn: Navn)
 }
 
 data class Innsending(val id: UUID,
