@@ -20,9 +20,11 @@ import no.nav.helseidnavtest.oppslag.person.PDLClient
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
+import java.util.UUID.randomUUID
 import no.nav.helseidnavtest.dialogmelding.Fødselsnummer as Fnr
 
 @RestController(EDI20)
@@ -80,7 +82,7 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(@AuthenticationPrincipal principal: Any,
+    fun sendInline(@AuthenticationPrincipal principal: DefaultOidcUser,
                    @Herid
                    @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
@@ -88,7 +90,7 @@ class EDI20Controller(
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         edi.send(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg)).also {
-            log.info("Principal: ${principal.javaClass} $principal")
+            log.info("Principal: ${principal.userInfo.javaClass} ${principal.userInfo}")
         }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -143,18 +145,17 @@ class EDI20Controller(
             ?.flatMap { m ->
                 m.messageIds.map {
                     konsumert(m.herId, it)
-                    //  apprec(m.herId, it)
                     it
                 }
             } ?: emptyList()
 
     private fun inlineBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Innsending(UUID.randomUUID(),
+        Innsending(randomUUID(),
             adresse.tjenester(fra, til),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String, vedlegg: MultipartFile?) =
-        Innsending(UUID.randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+        Innsending(randomUUID(), adresse.tjenester(fra, til), Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 }
