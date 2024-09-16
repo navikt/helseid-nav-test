@@ -10,11 +10,11 @@ import org.springframework.kafka.annotation.DltHandler
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
+import org.springframework.kafka.retrytopic.RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
-import org.springframework.kafka.support.KafkaHeaders.DLT_EXCEPTION_MESSAGE
-import org.springframework.kafka.support.KafkaHeaders.DLT_EXCEPTION_STACKTRACE
+import org.springframework.kafka.support.KafkaHeaders.*
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
@@ -87,7 +87,9 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Innsen
         exclude = [IrrecoverableException::class],
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
-    fun listen(innsending: Innsending) = edi.send(innsending)
+    fun listen(innsending: Innsending, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
+               @Header(RECEIVED_TOPIC) topic: String) =
+        if (antall != null) edi.send(innsending) else log.info("Mottatt $innsending på $topic")
 
     @DltHandler
     fun dlt(innsending: Innsending,

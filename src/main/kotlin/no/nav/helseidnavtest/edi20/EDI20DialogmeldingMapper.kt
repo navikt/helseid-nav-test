@@ -88,7 +88,7 @@ class EDI20DialogmeldingMapper {
                         organisation = HMOF.createXMLOrganisation().apply {
                             organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
-
+                            lege(principal)
                         }
                     }
                 }
