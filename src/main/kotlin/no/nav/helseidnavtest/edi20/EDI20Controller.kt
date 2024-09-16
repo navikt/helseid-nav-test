@@ -176,12 +176,11 @@ class EDI20Controller(
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
 
-    private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String,
-                              navn: Navn,
-                              vedlegg: MultipartFile?) = Innsending(randomUUID(),
-        adresse.parter(fra, til, navn),
-        Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
-        ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
+    private fun refBestilling(fra: HerId, til: HerId, pasient: String, navn: Navn, vedlegg: MultipartFile?) =
+        Innsending(randomUUID(),
+            adresse.parter(fra, til, navn),
+            Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+            ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 
     private fun OidcUser.navn() = Navn(givenName, middleName, familyName)
 

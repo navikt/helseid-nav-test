@@ -75,9 +75,9 @@ data class Innsending(val id: UUID,
                       val ref: Pair<URI, String>? = null) {
 
     @JsonIgnore
-    val fra = parter.fra.herId
+    val avsender = parter.avsender.herId
 
-    data class Parter(val fra: KommunikasjonsPart, val til: Mottaker)
+    data class Parter(val avsender: KommunikasjonsPart, val mottaker: Mottaker)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -90,7 +90,7 @@ data class Innsending(val id: UUID,
 
     override fun hashCode() = id.hashCode()
     override fun toString() =
-        javaClass.simpleName + "(id=$id, tjenester=$parter, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
+        javaClass.simpleName + "(id=$id, parter=$parter, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
 }
 
 private fun CommunicationParty.herId() = HerId(herId)

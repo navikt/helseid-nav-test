@@ -53,8 +53,8 @@ class EDI20DialogmeldingMapper {
         HMOF.createXMLMsgInfo().apply {
             with(innsending) {
                 type = type(innsending.id)
-                sender = avsender(parter.fra)
-                receiver = mottaker(parter.til)
+                sender = avsender(parter.avsender)
+                receiver = mottaker(parter.mottaker)
                 patient = pasient(pasient)
             }
         }
