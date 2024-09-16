@@ -62,7 +62,7 @@ class ClaimsExtractor(private val claims: Map<String, Any>) {
         internal const val REQUISITION_RIGHTS = "requisition_rights"
         internal const val SPECIALITIES = "specialities"
         internal const val HPR_NUMBER = HPR_CLAIM + "hpr_number"
-        internal const val HPR_DETAILS = HPR_CLAIM + "hpr_details"
+        const val HPR_DETAILS = HPR_CLAIM + "hpr_details"
         internal const val ASSURANCE_LEVEL = IDENTITY_CLAIM + "assurance_level"
         internal const val SECURITY_LEVEL = IDENTITY_CLAIM + "security_level"
         internal const val PID = IDENTITY_CLAIM + "pid"
