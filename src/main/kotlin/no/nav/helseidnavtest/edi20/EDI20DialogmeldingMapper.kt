@@ -20,9 +20,6 @@ import no.nav.helseopplysninger.hodemelding.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.oauth2.core.oidc.OidcIdToken
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -106,9 +103,9 @@ class EDI20DialogmeldingMapper {
                                 organisationName = orgNavn
                                 ident.add(ident(herId, herIdType))
                                 healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                    givenName = mottaker.user.givenName
-                                    mottaker.user.middleName?.let { middleName = it }
-                                    familyName = mottaker.user.familyName
+                                    givenName = mottaker.user.fornavn
+                                    mottaker.user.mellomnavn?.let { middleName = it }
+                                    familyName = mottaker.user.etternavn
                                 }
                             }
                         }
@@ -260,32 +257,9 @@ class EDI20DialogmeldingMapper {
         }
 
     private fun parter(sender: XMLSender, receiver: XMLReceiver): Parter =
-        Parter(part(sender), Mottaker(part(receiver), object : OidcUser {
-            override fun getName(): String {
-                TODO("Not yet implemented")
-            }
-
-            override fun getAttributes(): MutableMap<String, Any> {
-                TODO("Not yet implemented")
-            }
-
-            override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-                TODO("Not yet implemented")
-            }
-
-            override fun getClaims(): MutableMap<String, Any> {
-                TODO("Not yet implemented")
-            }
-
-            override fun getUserInfo(): OidcUserInfo {
-                TODO("Not yet implemented")
-            }
-
-            override fun getIdToken(): OidcIdToken {
-                TODO("Not yet implemented")
-            }
-
-        }))
+        with(receiver.organisation.healthcareProfessional) {
+            Parter(part(sender), Mottaker(part(receiver), Navn(givenName, middleName, familyName)))
+        }
 
     private fun part(sender: XMLSender) =
         with(sender.organisation) {

@@ -4,11 +4,11 @@ import net.minidev.json.annotate.JsonIgnore
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Mottaker
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.Organization
 import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import java.net.URI
 import java.util.*
 
@@ -65,7 +65,7 @@ abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                     Virksomhet(virksomhet))
     }
 
-    data class Mottaker(val part: KommunikasjonsPart, val user: OidcUser)
+    data class Mottaker(val part: KommunikasjonsPart, val user: Navn)
 }
 
 data class Innsending(val id: UUID,

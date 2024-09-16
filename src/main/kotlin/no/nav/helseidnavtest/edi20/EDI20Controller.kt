@@ -18,6 +18,7 @@ import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
+import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -71,7 +72,7 @@ class EDI20Controller(
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(refBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
+            edi.send(refBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -84,7 +85,7 @@ class EDI20Controller(
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(refBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
+            generator.marshal(refBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -96,7 +97,7 @@ class EDI20Controller(
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg))
+            edi.send(inlineBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -110,7 +111,7 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, til, pasient, helsePersonell, vedlegg))
+            edi.send(inlineBestilling(fra, til, pasient, it.navn(), vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
@@ -126,7 +127,7 @@ class EDI20Controller(
         helsePersonell?.let {
             generator.marshal(inlineBestilling(fra,
                 pasient = pasient,
-                helsePersonell = helsePersonell,
+                navn = it.navn(),
                 vedlegg = vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
@@ -168,18 +169,20 @@ class EDI20Controller(
     private fun inlineBestilling(fra: HerId,
                                  til: HerId = fra.other(),
                                  pasient: String,
-                                 helsePersonell: OidcUser,
+                                 navn: Navn,
                                  vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
-            adresse.parter(fra, til, helsePersonell),
+            adresse.parter(fra, til, navn),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String,
-                              helsePersonell: OidcUser,
+                              navn: Navn,
                               vedlegg: MultipartFile?) = Innsending(randomUUID(),
-        adresse.parter(fra, til, helsePersonell),
+        adresse.parter(fra, til, navn),
         Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
         ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
+
+    private fun OidcUser.navn() = Navn(givenName, middleName, familyName)
 
 }
