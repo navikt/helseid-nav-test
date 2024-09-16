@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.net.URI
@@ -31,7 +32,7 @@ import java.time.format.DateTimeFormatter.ISO_DATE
 import java.util.*
 
 @Component
-class EDI20DialogmeldingMapper {
+class EDI20DialogmeldingMapper(@AuthenticationPrincipal val user: Any) {
 
     private val log = getLogger(javaClass)
 
@@ -49,9 +50,6 @@ class EDI20DialogmeldingMapper {
 
     private fun msgHead(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
         msgInfo = info
-        // signature = HMOF.createXMLSignatureType().apply {
-        //   signatureValue = "SIGNATURE"
-        //}
     }
 
     private fun msgInfo(innsending: Innsending) =
@@ -107,13 +105,7 @@ class EDI20DialogmeldingMapper {
                             organisationName = part.orgNavn
                             ident.add(ident(part.herId, herIdType))
                             healthcareProfessional = HMOF.createXMLHealthcareProfessional().apply {
-                                val auth = SecurityContextHolder.getContext().authentication
-                                log.info("AUTH " + auth)
-                                if (auth !is AnonymousAuthenticationToken) {
-                                    log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
-                                } else {
-                                    log.warn("NOT AUTHENTICATED")
-                                }
+                                lege()
                             }
                         }
                     }
@@ -122,6 +114,16 @@ class EDI20DialogmeldingMapper {
                 else -> throw IllegalArgumentException("Ukjent tjeneste $part")
             }
         }
+
+    private fun lege(): Unit {
+        val auth = SecurityContextHolder.getContext().authentication
+        log.info("AUTH " + auth)
+        if (auth !is AnonymousAuthenticationToken) {
+            log.info("NAME " + ClaimsExtractor(auth.oidcUser().claims).claim("name"))
+        } else {
+            log.warn("NOT AUTHENTICATED")
+        }
+    }
 
     private fun pasient(pasient: Pasient) =
         HMOF.createXMLPatient().apply {

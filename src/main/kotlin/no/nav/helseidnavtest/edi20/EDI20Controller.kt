@@ -17,7 +17,9 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -36,6 +38,8 @@ class EDI20Controller(
     private val adresse: AdresseRegisterClient,
     private val generator: EDI20DialogmeldingGenerator
 ) {
+
+    private val log = getLogger(javaClass)
 
     @Operation(description = "Sender apprec for melding for gitt mottaker")
     @PostMapping("${DOK_PATH}/apprec")
@@ -76,13 +80,16 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(@Herid
+    fun sendInline(@AuthenticationPrincipal principal: Any,
+                   @Herid
                    @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg))
+        edi.send(inlineBestilling(fra, pasient = pasient, vedlegg = vedlegg)).also {
+            log.info("Principal: $principal")
+        }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
