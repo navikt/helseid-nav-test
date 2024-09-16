@@ -11,13 +11,16 @@ import java.io.StringWriter
 class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
                                   private val mapper: EDI20DialogmeldingMapper) {
 
-    fun marshal(innsending: Innsending) =
+    fun marshal(innsending: Innsending) = marshaller.marshal(innsending)
+    fun unmarshal(xml: String) = marshaller.unmarshal(xml)
+
+    private fun Jaxb2Marshaller.marshal(innsending: Innsending) =
         StringWriter().run {
-            marshaller.createMarshaller().marshal(mapper.hodemelding(innsending), this)
-            toString()
+            createMarshaller().marshal(mapper.hodemelding(innsending), this)
+            "$this"
         }
 
-    fun unmarshal(xml: String) = marshaller.createUnmarshaller().unmarshal(xml.byteInputStream()).let {
+    private fun Jaxb2Marshaller.unmarshal(xml: String) = createUnmarshaller().unmarshal(xml.byteInputStream()).let {
         when (it) {
             is XMLMsgHead -> mapper.innsending(it)
             is XMLAppRec -> mapper.apprec(it)

@@ -29,7 +29,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     fun krypteringSertifikat(herId: Int) =
         runCatching {
             client.getCertificateForEncryption(herId)
-                .let { certFactory.generateCertificate(it.inputStream()) }
+                .let { CERT_FACTORY.generateCertificate(it.inputStream()) }
         }.getOrElse {
             handler.handleError(it, herId.herId())
         }
@@ -37,7 +37,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     fun SigneringsValideringsSertifikat(herId: Int) =
         runCatching {
             client.getCertificateForValidatingSignature(herId)
-                .let { certFactory.generateCertificate(it.inputStream()) }
+                .let { CERT_FACTORY.generateCertificate(it.inputStream()) }
         }.getOrElse {
             handler.handleError(it, herId.herId())
         }
@@ -46,7 +46,7 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
     private fun Int.herId() = HerId(this)
 
     companion object {
-        private val certFactory = CertificateFactory.getInstance("X.509")
+        private val CERT_FACTORY = CertificateFactory.getInstance("X.509")
     }
 }
 
@@ -56,7 +56,7 @@ private class KommunikasjonsPartMapper(private val client: ICommunicationPartySe
             is KommunikasjonsPartVirksomhet -> Virksomhet(it)
             is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))
             is KommunikasjonsPartTjeneste -> Tjeneste(it, client.getOrganizationDetails(it.parentHerId))
-            else -> throw IllegalStateException("Ukjent type kommunikasjonspartfor herId $herId ${it.javaClass.simpleName}")
+            else -> throw IllegalStateException("Ukjent type kommunikasjonspart for herId $herId ${it.javaClass.simpleName}")
         }
 }
 

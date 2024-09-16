@@ -2,14 +2,11 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class EDI20Service(private val adapter: EDI20RestClientAdapter) {
-
-    private val log = getLogger(EDI20Service::class.java)
 
     fun status(herId: HerId, id: UUID) = adapter.status(herId, id)
 
