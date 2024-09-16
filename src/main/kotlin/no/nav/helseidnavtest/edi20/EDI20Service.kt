@@ -22,4 +22,6 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     fun apprec(herId: HerId, id: UUID) = adapter.apprec(herId, id)
 
+    val uri = adapter.uri
+
 }

@@ -14,13 +14,14 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
+import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -62,7 +63,7 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendRef(@AuthenticationPrincipal helsePersonell: OidcUser,
+    fun sendRef(@AuthenticationPrincipal helsePersonell: OidcUser?,
                 @Herid
                 @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
@@ -74,7 +75,7 @@ class EDI20Controller(
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
-    fun showRef(@AuthenticationPrincipal helsePersonell: OidcUser,
+    fun showRef(@AuthenticationPrincipal helsePersonell: OidcUser?,
                 @Herid @RequestParam fra: HerId,
                 @Parameter(description = "Pasientens fødselsnummer")
                 @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
@@ -84,7 +85,7 @@ class EDI20Controller(
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(@AuthenticationPrincipal helsePersonell: OidcUser,
+    fun sendInline(@AuthenticationPrincipal helsePersonell: OidcUser?,
                    @Herid @RequestParam fra: HerId,
                    @Parameter(description = "Pasientens fødselsnummer")
                    @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
@@ -97,19 +98,19 @@ class EDI20Controller(
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun sendInlineTilValidering(
-        @AuthenticationPrincipal principal: DefaultOidcUser, @Herid
+        @AuthenticationPrincipal helsePersonell: OidcUser?, @Herid
         @RequestParam fra: HerId,
         @RequestParam(defaultValue = VALIDATOR) til: HerId,
         @Parameter(description = "Pasientens fødselsnummer")
         @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        edi.send(inlineBestilling(fra, til, pasient, principal, vedlegg))
+        edi.send(inlineBestilling(fra, til, pasient, helsePersonell, vedlegg))
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun showInline(
-        @AuthenticationPrincipal helsePersonell: OidcUser,
+        @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid
         @RequestParam fra: HerId,
         @Parameter(description = "Pasientens fødselsnummer")
@@ -156,7 +157,7 @@ class EDI20Controller(
     private fun inlineBestilling(fra: HerId,
                                  til: HerId = fra.other(),
                                  pasient: String,
-                                 helsePersonell: OidcUser,
+                                 helsePersonell: OidcUser?,
                                  vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
             adresse.parter(fra, til, helsePersonell),
@@ -164,10 +165,14 @@ class EDI20Controller(
             vedlegg?.bytes)
 
     private fun refBestilling(fra: HerId, til: HerId = fra.other(), pasient: String,
-                              helsePersonell: OidcUser,
-                              vedlegg: MultipartFile?) =
-        Innsending(randomUUID(),
-            adresse.parter(fra, til, helsePersonell),
-            Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
-            ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
+                              helsePersonell: OidcUser?,
+                              vedlegg: MultipartFile?): Innsending {
+        return helsePersonell?.let {
+            Innsending(randomUUID(),
+                adresse.parter(fra, til, helsePersonell),
+                Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
+                ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
+        } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
+    }
+
 }

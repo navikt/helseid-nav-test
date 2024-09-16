@@ -29,6 +29,8 @@ class EDI20RestClientAdapter(
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
+    val uri = cf.baseUri
+
     fun apprec(herId: HerId, id: UUID) =
         restClient
             .post()

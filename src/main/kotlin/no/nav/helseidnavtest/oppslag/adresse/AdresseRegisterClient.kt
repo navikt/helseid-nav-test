@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class AdresseRegisterClient(private val adapter: AdresseRegisterCXFAdapter) {
 
-    fun parter(fra: HerId, til: HerId = fra.other(), helsePersonell: OidcUser) =
+    fun parter(fra: HerId, til: HerId = fra.other(), helsePersonell: OidcUser?) =
         Parter(kommunikasjonsPart(fra) as Tjeneste,
             KommunikasjonsPart.Mottaker(kommunikasjonsPart(til), helsePersonell))
 
