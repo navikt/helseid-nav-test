@@ -92,7 +92,7 @@ class EDI20Controller(
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         edi.send(inlineBestilling(fra, pasient = pasient, helsePersonell = helsePersonell, vedlegg = vedlegg)).also {
-            log.info("Principal: ${helsePersonell.userInfo.javaClass} ${helsePersonell.userInfo}")
+            log.info("${helsePersonell?.userInfo}")
         }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
