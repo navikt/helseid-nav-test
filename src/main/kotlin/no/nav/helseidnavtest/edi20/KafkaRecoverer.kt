@@ -36,7 +36,7 @@ class LoggingRetryListener : RetryListener {
         return super.open(context, cb)
     }
 
-    override fun <T : Any, E : Throwable> close(ctx: RetryContext, cb: RetryCallback<T, E>, t: Throwable) {
+    override fun <T : Any, E : Throwable> close(ctx: RetryContext, cb: RetryCallback<T, E>, t: Throwable?) {
         log.info("Ferdig med retry", t)
         super.close(ctx, cb, t)
     }
