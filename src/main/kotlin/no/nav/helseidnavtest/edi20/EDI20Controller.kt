@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
@@ -19,7 +20,7 @@ import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
-import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.HPR_DETAILS
+import no.nav.helseidnavtest.security.ClaimsExtractor
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
@@ -100,12 +101,22 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            it.getClaimAsMap(HPR_DETAILS)?.let { log.info("HPR-details: $it") }
-            it.authorities.forEach { log.info("Authority: $it") }
-            log.info("Claims fra idtoken" + it.idToken.claims)
-            log.info("Claims fra oidcUser" + it.claims)
+            ClaimsExtractor(it.claims).user().also {
+                log.info("User: $it")
+            }
             edi.send(inlineBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
+
+    data class User(val name: String, val hpr: HprId, val approvals: List<Approvals>) {
+        data class Approvals(val profession: String,
+                             val authorization: Authorization,
+                             val requisitionRights: List<Rekvisisjon> = emptyList(),
+                             val specialities: List<Spesialitet> = emptyList()) {
+            data class Spesialitet(val value: String, val description: String)
+            data class Rekvisisjon(val value: String, val description: String)
+            data class Authorization(val value: String, val description: String)
+        }
+    }
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
