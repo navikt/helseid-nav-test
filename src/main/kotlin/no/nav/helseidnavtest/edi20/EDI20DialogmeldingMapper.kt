@@ -20,7 +20,6 @@ import no.nav.helseopplysninger.hodemelding.*
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.time.LocalDate
@@ -251,7 +250,7 @@ class EDI20DialogmeldingMapper {
             this.dn = dn
         }
 
-    fun innsending(hode: XMLMsgHead, helsePersonell: OidcUser) =
+    fun innsending(hode: XMLMsgHead) =
         with(hode.msgInfo) {
             Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
