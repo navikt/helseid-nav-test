@@ -72,7 +72,7 @@ class EDI20Controller(
                 @Parameter(description = "Valgfritt vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(refBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
+            edi.send(refBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -85,7 +85,7 @@ class EDI20Controller(
                 @Parameter(description = "Vedlegg")
                 @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(refBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
+            generator.marshal(refBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
@@ -97,7 +97,7 @@ class EDI20Controller(
                    @Parameter(description = "Valgfritt vedlegg")
                    @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, pasient = pasient, navn = it.navn(), vedlegg = vedlegg))
+            edi.send(inlineBestilling(fra, fra.other(), pasient, it.navn(), vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, "Mangler OIDC-token")
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
