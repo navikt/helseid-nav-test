@@ -86,7 +86,6 @@ class EDI20DialogmeldingMapper {
     private fun mottaker(mottaker: Mottaker) =
         HMOF.createXMLReceiver().apply {
             with(mottaker.part) {
-
                 when (this) {
                     is Tjeneste -> {
                         organisation = HMOF.createXMLOrganisation().apply {

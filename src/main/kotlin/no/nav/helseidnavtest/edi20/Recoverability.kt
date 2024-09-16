@@ -89,7 +89,9 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Innsen
         autoCreateTopics = "false")
     fun listen(innsending: Innsending, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
                @Header(RECEIVED_TOPIC) topic: String) =
-        if (antall != null) edi.send(innsending) else log.info("Mottatt $innsending på $topic")
+        log.info("Mottatt innsending ${innsending.id} på $topic for ${antall?.let { "$it." } ?: "1."} gang.").also {
+            edi.send(innsending)
+        }
 
     @DltHandler
     fun dlt(innsending: Innsending,
