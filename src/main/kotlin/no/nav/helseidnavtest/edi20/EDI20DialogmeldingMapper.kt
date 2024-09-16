@@ -17,7 +17,6 @@ import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -29,8 +28,6 @@ import java.util.*
 
 @Component
 class EDI20DialogmeldingMapper {
-
-    private val log = getLogger(javaClass)
 
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
@@ -238,11 +235,6 @@ class EDI20DialogmeldingMapper {
         private const val HER = "HER"
     }
 
-    fun idFra(id: String, typeId: XMLCV) = HMOF.createXMLIdent().apply {
-        this.id = id
-        this.typeId = typeId
-    }
-
     final fun type(s: String, v: String, dn: String) =
         XMLCV().apply {
             this.s = s
@@ -255,12 +247,12 @@ class EDI20DialogmeldingMapper {
             Innsending(UUID.fromString(hode.msgInfo.msgId), parter(sender, receiver), pasient(patient))
         }
 
-    private fun parter(sender: XMLSender, receiver: XMLReceiver): Parter =
-        with(receiver.organisation.healthcareProfessional) {
-            Parter(part(sender), Mottaker(part(receiver), Navn(givenName, middleName, familyName)))
+    private fun parter(sender: XMLSender, mottaker: XMLReceiver): Parter =
+        with(mottaker.organisation.healthcareProfessional) {
+            Parter(partFra(sender), Mottaker(partFra(mottaker), Navn(givenName, middleName, familyName)))
         }
 
-    private fun part(sender: XMLSender) =
+    private fun partFra(sender: XMLSender) =
         with(sender.organisation) {
             Tjeneste(aktiv = true,
                 visningsNavn = organisation.organisationName,
@@ -273,10 +265,9 @@ class EDI20DialogmeldingMapper {
         }
 
     private fun List<XMLIdent>.herId() = HerId(first().id)
-    private fun List<XMLIdent>.fnr() = Fødselsnummer(first().id)
 
-    private fun part(receiver: XMLReceiver) =
-        with(receiver.organisation) {
+    private fun partFra(mottaker: XMLReceiver) =
+        with(mottaker.organisation) {
             Tjeneste(aktiv = true,
                 visningsNavn = organisation.organisationName,
                 herId = organisation.ident.herId(),
@@ -287,8 +278,8 @@ class EDI20DialogmeldingMapper {
                     visningsNavn = organisationName))
         }
 
-    private fun pasient(patient: XMLPatient) =
-        with(patient) {
+    private fun pasient(pasient: XMLPatient) =
+        with(pasient) {
             Pasient(Fødselsnummer(ident.first().id),
                 Navn(givenName, middleName, familyName))
         }
