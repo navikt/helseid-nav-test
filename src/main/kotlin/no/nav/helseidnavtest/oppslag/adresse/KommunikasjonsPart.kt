@@ -12,7 +12,7 @@ import no.nhn.register.communicationparty.Service
 import java.net.URI
 import java.util.*
 
-abstract class KommunikasjonsPart(aktiv: Boolean = true,
+abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                                   visningsNavn: String?,
                                   val herId: HerId,
                                   val navn: String) {
