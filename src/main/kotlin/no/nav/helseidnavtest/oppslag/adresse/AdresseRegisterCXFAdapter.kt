@@ -26,22 +26,6 @@ class AdresseRegisterCXFAdapter(cfg: AdresseRegisterConfig, private val handler:
             handler.handleError(it, herId.herId())
         }
 
-    fun krypteringSertifikat(herId: Int) =
-        runCatching {
-            client.getCertificateForEncryption(herId)
-                .let { CERT_FACTORY.generateCertificate(it.inputStream()) }
-        }.getOrElse {
-            handler.handleError(it, herId.herId())
-        }
-
-    fun SigneringsValideringsSertifikat(herId: Int) =
-        runCatching {
-            client.getCertificateForValidatingSignature(herId)
-                .let { CERT_FACTORY.generateCertificate(it.inputStream()) }
-        }.getOrElse {
-            handler.handleError(it, herId.herId())
-        }
-
     override fun ping() = mapOf(Pair("ping", client.ping()))
     private fun Int.herId() = HerId(this)
 
