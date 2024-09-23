@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.oppslag.adresse
 import net.minidev.json.annotate.JsonIgnore
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Mottaker
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nhn.register.communicationparty.CommunicationParty
@@ -11,6 +12,7 @@ import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
 import java.net.URI
 import java.util.*
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart as Sender
 
 abstract class KommunikasjonsPart(val aktiv: Boolean = true,
                                   visningsNavn: String?,
@@ -77,7 +79,7 @@ data class Innsending(val id: UUID,
     @JsonIgnore
     val avsender = parter.avsender.herId
 
-    data class Parter(val avsender: KommunikasjonsPart, val mottaker: Mottaker)
+    data class Parter(val avsender: Sender, val mottaker: Mottaker)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
