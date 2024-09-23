@@ -3,6 +3,7 @@ package no.nav.helseidnavtest
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -30,6 +31,8 @@ class MainController {
 
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
+        val user = SecurityContextHolder.getContext().authentication.oidcUser()
+        model.addAttribute("tidspunkr", user.authenticatedAt)
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
     }
