@@ -58,10 +58,10 @@ open class IrrecoverableException(status: HttpStatusCode,
                 errors.stackTrace,
                 errors.validationErrors)
 
-    class NotFoundException(detail: String? = NOT_FOUND.reasonPhrase,
-                            uri: URI,
-                            stackTrace: String? = null,
-                            cause: Throwable? = null) :
+    class NotFoundException(uri: URI,
+                            detail: String? = NOT_FOUND.reasonPhrase,
+                            cause: Throwable? = null,
+                            stackTrace: String? = null) :
         IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace, emptyList())
 }
 

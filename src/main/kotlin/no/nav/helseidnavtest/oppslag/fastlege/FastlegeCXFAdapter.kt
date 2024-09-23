@@ -23,9 +23,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlegeliste for avtale $avtale", cfg.url,
-                cause = it)
-
+            is ReadFault -> throw NotFoundException(cfg.url, "Fant ikke fastlegeliste for avtale $avtale", it)
             else -> throw it
         }
     }
@@ -44,10 +42,10 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
                     Navn(firstName.value, middleName.value, lastName.value)
                 )
             }
-            if (d.contracts.isNil) throw NotFoundException("Fant ikke kontrakter for fastlege $navn", uri = cfg.url)
+            if (d.contracts.isNil) throw NotFoundException(uri = cfg.url, "Fant ikke kontrakter for fastlege $navn")
             if (d.contracts.value.gpOnContractAssociation.isNullOrEmpty()) throw NotFoundException(
-                "Fant ikke kontraktassosiasjoner for fastlege $navn",
-                uri = cfg.url
+                uri = cfg.url,
+                "Fant ikke kontraktassosiasjoner for fastlege $navn"
             )
             log.info("Vi har kontraktassosiasjoner for fastlege $navn ${d.contracts.value.gpOnContractAssociation.size}")
             val x = d.contracts?.value?.gpOnContractAssociation?.map { a ->
@@ -62,7 +60,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         }
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege med $navn", cfg.url, cause = it)
+            is ReadFault -> throw NotFoundException(cfg.url, "Fant ikke fastlege med $navn", it)
             else -> throw it
         }
     }
@@ -71,7 +69,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
         client.getPatientGPDetails(pasient).gpHerId.value
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", cfg.url, cause = it)
+            is ReadFault -> throw NotFoundException(cfg.url, "Fant ikke fastlege for pasient $pasient", it)
             else -> throw it
         }
     }
@@ -89,12 +87,12 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
                             )
                         )
                     }
-                } ?: throw NotFoundException("Fant ikke GP for pasient $pasient", cfg.url)
-            } ?: throw NotFoundException("Fant ikke kontraktassosiasjoner for pasient $pasient", cfg.url)
-        } ?: throw NotFoundException("Fant ikke GP detaljer for pasient $pasient", cfg.url)
+                } ?: throw NotFoundException(cfg.url, "Fant ikke GP for pasient $pasient")
+            } ?: throw NotFoundException(cfg.url, "Fant ikke kontraktassosiasjoner for pasient $pasient")
+        } ?: throw NotFoundException(cfg.url, "Fant ikke GP detaljer for pasient $pasient")
     }.getOrElse {
         when (it) {
-            is ReadFault -> throw NotFoundException("Fant ikke fastlege for pasient $pasient", cfg.url, cause = it)
+            is ReadFault -> throw NotFoundException(cfg.url, "Fant ikke fastlege for pasient $pasient", it)
             else -> throw it
         }
     }
@@ -112,7 +110,7 @@ class FastlegeCXFAdapter(cfg: FastlegeConfig) : AbstractCXFAdapter(cfg) {
             }
         }.getOrElse {
             when (it) {
-                is ReadFault -> throw NotFoundException("Fant ikke detaljer for pasient $pasient", cfg.url, cause = it)
+                is ReadFault -> throw NotFoundException(cfg.url, "Fant ikke detaljer for pasient $pasient", it)
                 else -> throw it
             }
         }

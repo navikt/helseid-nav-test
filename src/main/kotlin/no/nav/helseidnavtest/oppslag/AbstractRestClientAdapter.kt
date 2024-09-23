@@ -11,7 +11,6 @@ import no.nav.helseidnavtest.error.IrrecoverableException.NotFoundException
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.health.Pingable
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterConfig
-import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage
 import org.slf4j.LoggerFactory.getLogger
 import org.slf4j.MDC
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -28,6 +27,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest.withCli
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import java.util.*
+import no.nhn.register.communicationparty.ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage as ICommunicationPartyServiceFault
 
 abstract class AbstractRestClientAdapter(
     protected open val restClient: RestClient, protected val cfg: AbstractRestConfig,
@@ -136,10 +136,7 @@ open class TokenExchangingRequestInterceptor(private val clientManager: Authoriz
         )?.apply { ->
             req.headers.set(AUTHORIZATION, "${tokenType.value} ${accessToken.tokenValue}")
                 .also {
-                    log.info("Token {} exchanged for type {} og id {}",
-                        accessToken.tokenValue,
-                        tokenType.value,
-                        clientRegistration.registrationId)
+                    log.info("Token ${accessToken.tokenValue} exchanged for type ${tokenType.value} og id ${clientRegistration.registrationId}")
                 }
         }
 
@@ -164,18 +161,15 @@ class CXFErrorHandler(private val cfg: AdresseRegisterConfig) {
     private val log = getLogger(CXFErrorHandler::class.java)
     fun handleError(it: Throwable, id: HerId): Nothing =
         when (it) {
-            is ICommunicationPartyServiceGetCommunicationPartyDetailsGenericFaultFaultFaultMessage -> throw NotFoundException(
-                it.message,
-                cfg.url,
-                cause = it)
+            is ICommunicationPartyServiceFault -> throw NotFoundException(cfg.url, it.message, it)
 
             is IllegalArgumentException -> throw IrrecoverableException(BAD_REQUEST,
                 cfg.url,
                 it.message,
                 cause = it)
 
-            is NoSuchElementException -> throw NotFoundException("Fant ikke kommunikasjonspart for $id",
-                cfg.url,
+            is NoSuchElementException -> throw NotFoundException(cfg.url,
+                "Fant ikke kommunikasjonspart for $id",
                 cause = it)
 
             is IllegalStateException -> throw IrrecoverableException(INTERNAL_SERVER_ERROR,

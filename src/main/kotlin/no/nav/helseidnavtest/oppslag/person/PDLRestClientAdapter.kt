@@ -34,7 +34,7 @@ class PDLRestClientAdapter(@Qualifier(PDL) private val graphQlClient: GraphQlCli
         with(fnr) {
             query<PDLPersonResponse>(graphQlClient, PERSON_QUERY, mapOf(IDENT to verdi))?.active?.let {
                 pdlPersonTilPerson(it, this)
-            } ?: throw NotFoundException("Fant ikke $fnr", baseUri)
+            } ?: throw NotFoundException(baseUri, "Fant ikke $fnr")
         }
 
     override fun toString() =

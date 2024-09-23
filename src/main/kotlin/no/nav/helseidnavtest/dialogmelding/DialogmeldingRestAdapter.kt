@@ -23,8 +23,8 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig,
         if (cf.isEnabled) {
             restClient
                 .get()
-                .uri {
-                    it.path(cf.path)
+                .uri { b ->
+                    b.path(cf.path)
                         .queryParam("service", EBSERVICE)
                         .queryParam("role", EBROLE)
                         .queryParam("action", EBACTION)
@@ -38,7 +38,7 @@ class DialogmeldingRestAdapter(private val cf: DialogmeldingConfig,
                 .body<String>().also {
                     log.trace("Dialogmelding partner response {}", it)
                 }
-                ?: throw NotFoundException("Fant ikke partnerId for herId $herId for  ${behandlerKontor.navn}", baseUri)
+                ?: throw NotFoundException(baseUri, "Fant ikke partnerId for herId $herId for ${behandlerKontor.navn}")
         } else {
             throw NotImplementedError("Dialogmelding oppslag er ikke aktivert")
         }
