@@ -9,12 +9,23 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
+import java.util.*
 
 @Controller
 class MainController {
+    val searchResults = listOf("one", "two", "three", "four", "five")
+
     @GetMapping("/")
-    fun home(): String {
+    fun home(model: Model): String {
+        model.addAttribute("results", searchResults)
         return "index"
+    }
+
+    @GetMapping("/search")
+    fun search(q: String, model: Model): String {
+        val filtered = searchResults.filter { it.startsWith(q.lowercase(Locale.getDefault())) }
+        model.addAttribute("results", filtered)
+        return "search :: results"
     }
 
     @PostMapping("/clicked")
