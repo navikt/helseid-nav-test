@@ -3,15 +3,15 @@ package no.nav.helseidnavtest
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
+import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
-@RestController
-class HelseopplysningerController {
-
+@Controller
+class MainController {
     @GetMapping("/")
     fun home(): String {
         return "index"
@@ -22,6 +22,10 @@ class HelseopplysningerController {
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
     }
+}
+
+@RestController
+class HelseopplysningerController {
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication) = dump(authentication)
