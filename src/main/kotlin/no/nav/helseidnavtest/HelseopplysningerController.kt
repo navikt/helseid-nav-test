@@ -37,7 +37,7 @@ class MainController {
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
         log.info("User: ${user.javaClass.name}")
-        model.addAttribute("tidspunkt", user)
+        model.addAttribute("tidspunkt", user.oidcUser().authenticatedAt.toString())
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
     }
