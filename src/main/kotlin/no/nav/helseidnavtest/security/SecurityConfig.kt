@@ -114,10 +114,6 @@ class SecurityConfig(
             }
             authorizeRequests {
                 authorize("/hello1", authenticated)
-                authorize("/public/**", permitAll)
-                authorize("/pdl", permitAll)
-                authorize("/xml/**", permitAll)
-                authorize("/monitoring/**", permitAll)
                 authorize("/hello", hasAuthority("LE_4"))
                 authorize(anyRequest, permitAll)
             }
