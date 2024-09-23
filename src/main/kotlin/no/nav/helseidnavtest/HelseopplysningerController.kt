@@ -32,7 +32,7 @@ class MainController {
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication.oidcUser()
-        model.addAttribute("tidspunkr", user.authenticatedAt)
+        model.addAttribute("tidspunkt", user.authenticatedAt)
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
     }
