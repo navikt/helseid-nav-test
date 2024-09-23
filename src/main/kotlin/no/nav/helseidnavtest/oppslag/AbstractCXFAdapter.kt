@@ -28,8 +28,6 @@ abstract class AbstractCXFAdapter(val cfg: BasicAuthConfig) : Pingable {
 
 }
 
-abstract class AbstractAdapter
-
 abstract class BasicAuthConfig(val url: URI, val username: String, val password: String)
 
 
