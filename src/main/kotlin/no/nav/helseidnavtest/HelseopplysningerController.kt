@@ -30,14 +30,14 @@ class MainController {
     fun search(q: String, model: Model): String {
         val filtered = searchResults.filter { it.startsWith(q.lowercase(Locale.getDefault())) }
         model.addAttribute("results", filtered)
-        return "~{search::results}"
+        return "search :: results"
     }
 
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
         log.info("User: ${user.javaClass.name}")
-        model.addAttribute("tidspunkt", user.toString())
+        model.addAttribute("tidspunkt", user)
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
     }
