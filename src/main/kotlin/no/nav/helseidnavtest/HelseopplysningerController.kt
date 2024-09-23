@@ -22,19 +22,12 @@ class MainController {
         model.addAttribute("results", searchResults)
         return "index"
     }
-
-    @GetMapping("/search")
-    fun search(q: String, model: Model): String {
-        val filtered = searchResults.filter { it.startsWith(q.lowercase(Locale.getDefault())) }
-        model.addAttribute("results", filtered)
-        return "search :: results"
-    }
-
+    
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
         model.addAttribute("claims", TreeMap(user.oidcUser().claims))
-        return "clicked :: result"
+        return "claims :: result"
     }
 }
 
