@@ -7,7 +7,15 @@
 <body>
 <div th:fragment="result" id="parent-div">
     <p th:text="${now}"></p>
-    <p th:text="${tidspunkt}"></p>
+    <table>
+        <tr
+                th:each="claim, iStat : ${claims}"
+                th:style="${iStat.odd}? 'font-weight: bold;'"
+                th:alt-title="${iStat.even}? 'even' : 'odd'">
+            <td th:text="${claim}"/>
+        </tr>
+    </table>
+    <p th:text="${claims}"></p>
 </div>
 </body>
 </html>
