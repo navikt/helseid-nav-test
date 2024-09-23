@@ -12,7 +12,8 @@
                 th:each="claim, iStat : ${claims}"
                 th:style="${iStat.odd}? 'font-weight: bold;'"
                 th:alt-title="${iStat.even}? 'even' : 'odd'">
-            <td th:text="${claim}"/>
+            <td th:text="${claim.key}"/>
+            <td th:text="${claim.value}"/>
         </tr>
     </table>
 </div>
