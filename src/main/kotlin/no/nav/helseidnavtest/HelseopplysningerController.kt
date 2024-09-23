@@ -5,6 +5,7 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,13 +30,13 @@ class MainController {
     fun search(q: String, model: Model): String {
         val filtered = searchResults.filter { it.startsWith(q.lowercase(Locale.getDefault())) }
         model.addAttribute("results", filtered)
-        return "search :: results"
+        return "~{search::results}"
     }
 
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
-        log.info("User: $user")
+        log.info("User: ${user.javaClass.name}")
         model.addAttribute("tidspunkt", user.toString())
         model.addAttribute("now", LocalDateTime.now().toString())
         return "clicked :: result"
@@ -46,13 +47,12 @@ class MainController {
 class HelseopplysningerController {
 
     @GetMapping("/hello1")
-    fun hello1(authentication: Authentication) = dump(authentication)
+    fun hello1(authentication: Authentication) = dump(authentication.oidcUser())
 
     @GetMapping("/hello")
-    fun hello(authentication: Authentication) = dump(authentication)
+    fun hello(authentication: Authentication) = dump(authentication.oidcUser())
 
-    private fun dump(authentication: Authentication): String {
-        val oidcUser = authentication.oidcUser()
+    private fun dump(oidcUser: OidcUser): String {
         val user = ClaimsExtractor(oidcUser).user
         val scopes = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
@@ -63,8 +63,6 @@ class HelseopplysningerController {
 
         return """
             <h1>/hello1</h1>
-            <p>${authentication.javaClass}
-            <p>${authentication.oidcUser().javaClass}
             <p>Hello from <b>${user.navn}</b></p>
             <p>HPR-nummer: <b>${user.hprNumber}</b></p>
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
