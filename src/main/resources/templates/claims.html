@@ -6,12 +6,9 @@
 </head>
 <body>
 <div th:fragment="result" id="parent-div">
-    <p th:text="${now}"></p>
     <table>
-        <tr
-                th:each="claim, iStat : ${claims}"
-                th:style="${iStat.odd}? 'font-weight: bold;'"
-                th:alt-title="${iStat.even}? 'even' : 'odd'">
+        <tr th:each="item, iterStat : ${claims}"
+            th:style="${iterStat.odd} ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;'">
             <td th:text="${claim.key}"/>
             <td th:text="${claim.value}"/>
         </tr>
