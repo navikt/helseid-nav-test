@@ -2,7 +2,6 @@ package no.nav.helseidnavtest
 
 import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
@@ -11,12 +10,10 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
 import java.util.*
 
 @Controller
 class MainController {
-    private val log = getLogger(MainController::class.java)
 
     val searchResults = listOf("one", "two", "three", "four", "five")
 
@@ -36,9 +33,7 @@ class MainController {
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
-        log.info("User: ${user.javaClass.name}")
-        model.addAttribute("claims", user.oidcUser().claims)
-        model.addAttribute("now", LocalDateTime.now().toString())
+        model.addAttribute("claims", TreeMap(user.oidcUser().claims))
         return "clicked :: result"
     }
 }
