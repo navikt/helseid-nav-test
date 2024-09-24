@@ -14,6 +14,7 @@ import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
+import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
@@ -63,7 +64,7 @@ class EDI20Controller(
         @Herid @RequestParam herId: HerId,
         @Parameter(description = "Spesifiserer om apprec-meldinger skal inkluderes eller ikke")
         @RequestParam(defaultValue = "false") apprec: Boolean) =
-        edi.poll(herId, apprec)
+        edi.poll(PollParameters(listOf(herId)))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -160,7 +161,7 @@ class EDI20Controller(
     fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
 
     private fun lesOgAck(herId: HerId) =
-        edi.poll(herId, true)
+        edi.poll(PollParameters(listOf(herId)))
             ?.flatMap { m ->
                 m.messageIds.map {
                     konsumert(m.herId, it)

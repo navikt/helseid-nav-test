@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.edi20
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.Apprec.Companion.OK
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
 import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
@@ -65,11 +66,11 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()
 
-    fun poll(herId: HerId, appRec: Boolean) =
+    fun poll(params: PollParameters) =
         restClient
             .get()
-            .uri { cf.pollURI(it, herId, appRec) }
-            .headers { it.herId(herId) }
+            .uri { cf.pollURI(it, params) }
+            // .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }

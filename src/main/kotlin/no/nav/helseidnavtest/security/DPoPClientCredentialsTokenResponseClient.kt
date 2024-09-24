@@ -36,6 +36,8 @@ class DPoPClientCredentialsTokenResponseClient(
     private val requestEntityConverter: Converter<OAuth2ClientCredentialsGrantRequest, RequestEntity<*>>,
     private val mapper: ObjectMapper) : OAuth2AccessTokenResponseClient<OAuth2ClientCredentialsGrantRequest> {
 
+    private val log = getLogger(DelegatingDPoPDetectingClientCredentialsTokenResponseClient::class.java)
+
     override fun getTokenResponse(request: OAuth2ClientCredentialsGrantRequest) =
         requestEntityConverter.convert(request)?.let(::getResponse)
             ?: reqError("No request entity")
@@ -130,10 +132,8 @@ class DPoPClientCredentialsTokenResponseClient(
         private fun reqError(txt: String, uri: URI? = null): Nothing =
             throw OAuth2AuthorizationException(OAuth2Error(INVALID_REQ, txt, "$uri"))
 
-        const val DPOP_NONCE = "dpop-nonce"
-        const val INVALID_RES = "invalid_token_response"
-        const val INVALID_REQ = "invalid_token_request"
-
-        private val log = getLogger(DelegatingDPoPDetectingClientCredentialsTokenResponseClient::class.java)
+        private const val DPOP_NONCE = "dpop-nonce"
+        private const val INVALID_RES = "invalid_token_response"
+        private const val INVALID_REQ = "invalid_token_request"
     }
 }

@@ -111,6 +111,11 @@ value class Fødselsnummer(@get:JsonValue val verdi: String) {
 }
 
 @JvmInline
+value class DokumentId(val verdi: String) {
+    constructor(verdi: Int) : this("$verdi")
+}
+
+@JvmInline
 value class PartnerId(val value: String) {
     constructor(verdi: Int) : this("$verdi")
 }

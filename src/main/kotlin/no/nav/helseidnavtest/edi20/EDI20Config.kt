@@ -1,8 +1,10 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.dialogmelding.DokumentId
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Ordering.ASC
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
@@ -18,10 +20,15 @@ class EDI20Config(baseUri: URI,
 
     fun sendURI(b: UriBuilder) = b.path(MESSAGES_PATH).build()
 
-    fun pollURI(b: UriBuilder, herId: HerId, appRec: Boolean) =
+    fun pollURI(b: UriBuilder, params: PollParameters) =
         b.path(MESSAGES_PATH)
-            .queryParam(INCLUDE_APPREC, "$appRec")
-            .queryParam(TO_HER_IDS, herId.verdi)
+            .queryParam(RECEIVER_HER_IDS, params.receivers.first().verdi) // TODO
+            .queryParam(SENDER_HER_ID, params.sender?.verdi)
+            .queryParam(INCLUDE_APPREC, params.appRec)
+            .queryParam(INCLUDE_METADATA, params.metadata)
+            .queryParam(BUSINESS_DOKUMENT_ID, params.dokumentId?.verdi)
+            .queryParam(MESSAGES_TO_FETCH, params.messages)
+            .queryParam(ORDER_BY, params.ordering.value)
             .build()
 
     fun lesURI(b: UriBuilder, id: UUID) = b.path(DOK_PATH).build("$id")
@@ -33,6 +40,19 @@ class EDI20Config(baseUri: URI,
     fun apprecURI(b: UriBuilder, id: UUID, other: HerId) = b.path("$DOK_PATH/Apprec/${other.verdi}").build("$id")
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
+
+    enum class Ordering(val value: Int) {
+        ASC(1), DESC(2)
+    }
+
+    data class PollParameters(
+        val receivers: List<HerId>,
+        val sender: HerId? = null,
+        val appRec: Boolean = false,
+        val metadata: Boolean = true,
+        val dokumentId: DokumentId? = null,
+        val ordering: Ordering = ASC,
+        val messages: Int = 10)
 
     companion object {
         const val DELEGATING = "delegating"
@@ -50,7 +70,12 @@ class EDI20Config(baseUri: URI,
         val EDI_2 = HerId(EDI2_ID) to "$EDI20-2"
         val LEGE = HprId("565501872")
         private const val INCLUDE_APPREC = "IncludeAppRec"
-        private const val TO_HER_IDS = "ToHerIds"
+        private const val INCLUDE_METADATA = "IncludeMetadata"
+        private const val RECEIVER_HER_IDS = "ReceiverHerIds"
+        private const val BUSINESS_DOKUMENT_ID = "BusinessDocumentId"
+        private const val SENDER_HER_ID = "SenderHerId"
+        private const val MESSAGES_TO_FETCH = "MessagesToFetch"
+        private const val ORDER_BY = "OrderBy"
         private const val DEFAULT_PING_PATH = ""
     }
 }

@@ -1,6 +1,7 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.HerId
+import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ class EDI20Service(private val adapter: EDI20RestClientAdapter) {
 
     fun raw(herId: HerId, id: UUID) = adapter.raw(herId, id)
 
-    fun poll(herId: HerId, appRec: Boolean) = adapter.poll(herId, appRec)
+    fun poll(params: PollParameters) = adapter.poll(params)
 
     @PreAuthorize("hasAuthority('LE_4')")
     fun send(innsending: Innsending) = adapter.send(innsending)
