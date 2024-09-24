@@ -40,9 +40,9 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
 
 data class Melding(val id: UUID,
                    val receiverHerId: List<HerId>,
-                   val senderHerId: HerId,
-                   val businessDocumentId: UUID,
-                   val businessDocumentGenDate: LocalDateTime,
+                   val senderHerId: HerId?,
+                   val businessDocumentId: UUID?,
+                   val businessDocumentGenDate: LocalDateTime?,
                    val isApprec: Boolean)
 
 data class Apprec(
