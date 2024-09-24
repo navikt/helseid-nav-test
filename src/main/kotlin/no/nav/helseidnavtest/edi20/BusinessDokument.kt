@@ -1,7 +1,5 @@
 package no.nav.helseidnavtest.edi20
 
-import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.Apprec.ApprecResult
@@ -44,7 +42,6 @@ data class Melding(val id: UUID,
                    val receiverHerId: List<HerId>,
                    val senderHerId: HerId?,
                    val businessDocumentId: UUID?,
-                   @JsonFormat(shape = STRING, pattern = "yyyy-MM-ddTHH:mm:ss")
                    val businessDocumentGenDate: LocalDateTime?,
                    val isApprec: Boolean)
 
