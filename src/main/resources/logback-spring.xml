@@ -8,12 +8,12 @@
         <logger name="com.ibm.mq" level="info"/>
         <logger name="org.springframework.jms" level="info"/>
         <logger name="org.springframework.security" level="info"/>
-        <logger name="reactor.netty.http.client.HttpClient" level="info"/>
+        <logger name="reactor.netty.http.client.HttpClient" level="trace"/>
         <logger name="no.nav.helse" level="trace"/>
-        <logger name="org.springframework.web.client" level="info"/>
+        <logger name="org.springframework.web.client" level="trace"/>
         <logger name="org.apache.http" level="info"/>
         <logger name="org.springframework.graphql" level="info"/>
-        <logger name="org.apache.hc.client5.http.wire" level="info"/>
+        <logger name="org.apache.hc.client5.http.wire" level="trace"/>
         <logger name="org.apache.cxf.ws.security" level="info"/>
     </springProfile>
     <springProfile name="local,test">
