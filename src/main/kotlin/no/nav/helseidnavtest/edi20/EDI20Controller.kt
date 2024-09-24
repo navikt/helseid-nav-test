@@ -7,11 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
-import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
@@ -156,18 +152,20 @@ class EDI20Controller(
         @PathVariable id: UUID) =
         edi.status(herId, id)
 
-    @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
-    @GetMapping("${MESSAGES_PATH}/lesalle")
-    fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
+    //@Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
+    //@GetMapping("${MESSAGES_PATH}/lesalle")
+    //fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
 
+    /*
     private fun lesOgAck(herId: HerId) =
         edi.poll(PollParameters(herId))
             ?.flatMap { m ->
-                m.messageIds.map {
-                    konsumert(m.herId, it)
+                m.receiverHerId.map {
+                    konsumert(m.senderHerId, it)
                     it
                 }
             } ?: emptyList()
+            */
 
     private fun inlineBestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
