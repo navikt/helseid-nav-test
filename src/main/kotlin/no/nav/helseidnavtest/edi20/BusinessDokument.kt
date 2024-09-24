@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.edi20.Apprec.ApprecResult
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
+import java.time.LocalDateTime
 import java.util.*
 
 private const val APP_NAVN = "HelseIdNavTest"
@@ -37,7 +38,12 @@ data class BusinessDocument(val businessDocument: String, val properties: Proper
         "BusinessDocument(businessDocument='${businessDocument.length} bytes', properties=$properties)"
 }
 
-data class Meldinger(val herId: HerId, val messageIds: List<UUID>)
+data class Melding(val id: UUID,
+                   val receiverHerId: List<UUID>,
+                   val senderHerId: UUID,
+                   val businessDocumentId: UUID,
+                   val businessDocumentGenDate: LocalDateTime,
+                   val isApprec: Boolean)
 
 data class Apprec(
     val result: ApprecResult,

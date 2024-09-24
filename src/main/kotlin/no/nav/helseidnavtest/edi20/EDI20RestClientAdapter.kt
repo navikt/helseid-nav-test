@@ -70,11 +70,11 @@ class EDI20RestClientAdapter(
         restClient
             .get()
             .uri { cf.pollURI(it, params) }
-            .headers { it.herId(params.receivers.first().verdi) }
+            .headers { it.herId(params.receiver.verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .body<List<Meldinger>>()
+            .body<List<Melding>>()
 
     @Recover
     fun sendRecover(t: Throwable, innsending: Innsending): String {

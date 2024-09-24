@@ -64,7 +64,7 @@ class EDI20Controller(
         @Herid @RequestParam herId: HerId,
         @Parameter(description = "Spesifiserer om apprec-meldinger skal inkluderes eller ikke")
         @RequestParam(defaultValue = "false") apprec: Boolean) =
-        edi.poll(PollParameters(listOf(herId), appRec = apprec))
+        edi.poll(PollParameters(herId, apprec))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
@@ -161,7 +161,7 @@ class EDI20Controller(
     fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
 
     private fun lesOgAck(herId: HerId) =
-        edi.poll(PollParameters(listOf(herId)))
+        edi.poll(PollParameters(herId))
             ?.flatMap { m ->
                 m.messageIds.map {
                     konsumert(m.herId, it)

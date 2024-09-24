@@ -22,7 +22,7 @@ class EDI20Config(baseUri: URI,
 
     fun pollURI(b: UriBuilder, params: PollParameters) =
         b.path(MESSAGES_PATH)
-            .queryParam(RECEIVER_HER_IDS, params.receivers.first().verdi) // TODO
+            .queryParam(RECEIVER_HER_IDS, params.receiver.verdi)
             .queryParam(SENDER_HER_ID, params.sender?.verdi)
             .queryParam(INCLUDE_APPREC, params.appRec)
             .queryParam(INCLUDE_METADATA, params.metadata)
@@ -46,9 +46,9 @@ class EDI20Config(baseUri: URI,
     }
 
     data class PollParameters(
-        val receivers: List<HerId>,
-        val sender: HerId? = null,
+        val receiver: HerId,
         val appRec: Boolean = false,
+        val sender: HerId? = null,
         val metadata: Boolean = true,
         val dokumentId: DokumentId? = null,
         val ordering: Ordering = ASC,
