@@ -70,7 +70,7 @@ class EDI20RestClientAdapter(
         restClient
             .get()
             .uri { cf.pollURI(it, params) }
-            // .headers { it.herId(herId) }
+            .headers { it.herId(params.receivers.first().verdi) }
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
