@@ -19,6 +19,7 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.User
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
@@ -62,36 +63,9 @@ class EDI20Controller(
         @RequestParam(defaultValue = "false") apprec: Boolean) =
         edi.poll(PollParameters(herId, apprec))
 
-    @Operation(description = "Laster opp et vedlegg og inkluderer denne som en Deft-referanse i hodemeldingen for den gitte avsenderen")
-    @PostMapping("$MESSAGES_PATH/ref", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendRef(
-        @AuthenticationPrincipal helsePersonell: OidcUser?,
-        @Herid @RequestParam fra: HerId,
-        @Parameter(description = "Pasientens fødselsnummer")
-        @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
-        @Parameter(description = "Valgfritt vedlegg")
-        @RequestPart("file", required = false) vedlegg: MultipartFile?) =
-        helsePersonell?.let {
-            edi.send(refBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
-        } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
-
-    @PostMapping("$MESSAGES_PATH/ref/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-
-    @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt som en Deft-referanse for den gitte avsenderen")
-    fun showRef(
-        @AuthenticationPrincipal helsePersonell: OidcUser?,
-        @Herid @RequestParam fra: HerId,
-        @Parameter(description = "Pasientens fødselsnummer")
-        @RequestParam(defaultValue = DEFAULT_PASIENT) pasient: String,
-        @Parameter(description = "Vedlegg")
-        @RequestPart("file", required = false) vedlegg: MultipartFile) =
-        helsePersonell?.let {
-            generator.marshal(refBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
-        } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
-
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInline(
+    fun send(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
         @Parameter(description = "Pasientens fødselsnummer")
@@ -99,12 +73,12 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
+            edi.send(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun sendInlineTilValidering(
+    fun valider(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
         @RequestParam(defaultValue = VALIDATOR) til: HerId,
@@ -113,12 +87,12 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(inlineBestilling(fra, til, pasient, ClaimsExtractor(it).user, vedlegg))
+            edi.send(bestilling(fra, til, pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
     @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun showInline(
+    fun show(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
         @Parameter(description = "Pasientens fødselsnummer")
@@ -126,7 +100,7 @@ class EDI20Controller(
         @Parameter(description = "Vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(inlineBestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
+            generator.marshal(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
@@ -138,7 +112,7 @@ class EDI20Controller(
         edi.konsumert(herId, id)
 
     @Operation(description = "Les et dokument for en gitt herId")
-    @GetMapping(DOK_PATH)
+    @GetMapping("$DOK_PATH/business-dokument", produces = [APPLICATION_XML_VALUE])
     fun les(
         @Herid herId: HerId,
         @Parameter(description = "Dokument-id")
@@ -167,16 +141,10 @@ class EDI20Controller(
             } ?: emptyList()
             */
 
-    private fun inlineBestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
+    private fun bestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
             adresse.parter(fra, til, user.navn),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
             vedlegg?.bytes)
-
-    private fun refBestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
-        Innsending(randomUUID(),
-            adresse.parter(fra, til, user.navn),
-            Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),
-            ref = vedlegg?.let { Pair(deft.upload(fra, it), it.contentType!!) })
 
 }
