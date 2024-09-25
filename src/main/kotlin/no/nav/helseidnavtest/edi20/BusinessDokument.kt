@@ -11,7 +11,7 @@ private const val APP_NAVN = "HelseIdNavTest"
 private const val VERSJON = "1.0.0"
 
 data class PostMessageRequest(
-    val businessDokument: String,
+    val businessDocument: String,
     val contentTransferEncoding: String = "base64",
     val contentType: String = APPLICATION_XML_VALUE,
     val systemInfo: SystemInfo = SystemInfo(),
@@ -35,7 +35,7 @@ data class PostMessageRequest(
         val receiverRole: String? = null)
 
     override fun toString(): String {
-        return "PostMessageRequest(businessDokument='${businessDokument.length}', contentTransferEncoding='$contentTransferEncoding', contentType='$contentType', systemInfo=$systemInfo, ebxmlOverrides=$ebxmlOverrides)"
+        return "PostMessageRequest(businessDokument='${businessDocument.length}', contentTransferEncoding='$contentTransferEncoding', contentType='$contentType', systemInfo=$systemInfo, ebxmlOverrides=$ebxmlOverrides)"
     }
 }
 
