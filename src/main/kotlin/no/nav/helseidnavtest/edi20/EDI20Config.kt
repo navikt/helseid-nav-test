@@ -31,7 +31,7 @@ class EDI20Config(baseUri: URI,
             .queryParam(ORDER_BY, params.ordering.value)
             .build()
 
-    fun lesURI(b: UriBuilder, id: UUID) = b.path("${DOK_PATH}/business-dokument").build("$id")
+    fun lesURI(b: UriBuilder, id: UUID) = b.path("${DOK_PATH}/business-document").build("$id")
 
     fun lestURI(b: UriBuilder, id: UUID, herId: HerId) = b.path("$DOK_PATH/read/${herId.verdi}").build("$id")
 
