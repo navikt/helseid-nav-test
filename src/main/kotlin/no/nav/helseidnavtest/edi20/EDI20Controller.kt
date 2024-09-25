@@ -47,7 +47,7 @@ class EDI20Controller(
     private val log = getLogger(javaClass)
 
     @Operation(description = "Sender apprec for melding for gitt mottaker")
-    @PostMapping("${DOK_PATH}/apprec", consumes = [APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE])
+    @PostMapping("${DOK_PATH}/apprec", produces = [APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE])
     fun apprec(
         @Herid @RequestParam herId: HerId,
         @Parameter(description = "Dokument-id")
