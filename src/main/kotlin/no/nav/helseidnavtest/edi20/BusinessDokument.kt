@@ -35,7 +35,7 @@ data class PostMessageRequest(
         val receiverRole: String? = null)
 
     override fun toString(): String {
-        return "PostMessageRequest(businessDokument='${businessDokument.length}', contentTransferEncoding='$contentTransferEncoding', contentType='$contentType', system=$system, ebxmlOverrides=$ebxmlOverrides)"
+        return "PostMessageRequest(businessDokument='${businessDokument.length}', contentTransferEncoding='$contentTransferEncoding', contentType='$contentType', systemInfo=$systemInfo, ebxmlOverrides=$ebxmlOverrides)"
     }
 }
 
