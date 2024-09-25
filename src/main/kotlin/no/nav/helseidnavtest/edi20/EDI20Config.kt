@@ -38,7 +38,7 @@ class EDI20Config(baseUri: URI,
     fun statusURI(b: UriBuilder, id: UUID) = b.path("$DOK_PATH/status").build("$id")
 
     fun apprecURI(b: UriBuilder, id: UUID, sender: HerId) =
-        b.path("$DOK_PATH/apprec/${sender.other().verdi}").build("$id")
+        b.path(APPREC_PATH).build("$id", sender.verdi)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
@@ -60,6 +60,8 @@ class EDI20Config(baseUri: URI,
         private const val DEFAULT_RETRIES = 3
         const val MESSAGES_PATH = "messages"
         const val DOK_PATH = "$MESSAGES_PATH/{id}"
+        const val APPREC_PATH = "$MESSAGES_PATH/{id}/apprec/{senderid}"
+
         const val HERID = "herId"
         const val EDI20 = "edi20"
         const val PLAIN = "${EDI20}plain"

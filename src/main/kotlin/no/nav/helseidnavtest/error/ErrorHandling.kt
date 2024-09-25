@@ -59,7 +59,7 @@ open class IrrecoverableException(status: HttpStatusCode,
                 errors.error,
                 cause,
                 errors.stackTrace,
-                errors.validationErrors)
+                errors.validationErrors ?: emptyList())
 
     class NotFoundException(uri: URI,
                             detail: String? = NOT_FOUND.reasonPhrase,
@@ -88,5 +88,6 @@ private fun problemDetail(status: HttpStatusCode,
     }
 
 data class ErrorResponse(val error: String,
+                         val requestId: String,
                          val validationErrors: List<String>? = emptyList(),
                          val stackTrace: String? = null)
