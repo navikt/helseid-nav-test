@@ -17,6 +17,7 @@ import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.*
 import no.nav.helseidnavtest.oppslag.person.Person.Navn
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.*
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.MediaType.TEXT_XML_VALUE
 import org.springframework.stereotype.Component
@@ -29,6 +30,8 @@ import java.util.*
 @Component
 class EDI20DialogmeldingMapper {
 
+    private val log = getLogger(EDI20DialogmeldingMapper::class.java)
+
     val herIdType = type(NAV_OID, HER, HER_DESC)
 
     fun hodemelding(innsending: Innsending) =
@@ -39,6 +42,8 @@ class EDI20DialogmeldingMapper {
             innsending.ref?.let {
                 document.addAll(listOf(dialogmelding("Dialogmelding"), refDokument(it.first, it.second)))
             }
+        }.also {
+            log.info("Hodemelding er $it")
         }
 
     private fun msgHead(info: XMLMsgInfo) = HMOF.createXMLMsgHead().apply {
