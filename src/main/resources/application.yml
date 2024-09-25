@@ -72,6 +72,9 @@ spring:
     default-property-inclusion: non_null
     deserialization:
       accept-single-value-as-array: true
+    mapper:
+      accept-case-insensitive-enums: true
+      accept-case-insensitive-properties: true
   application:
     name: helseid-nav-test
   datasource:

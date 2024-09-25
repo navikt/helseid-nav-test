@@ -44,7 +44,7 @@ data class Melding(val id: UUID,
                    val senderHerId: HerId?,
                    val businessDocumentId: UUID?,
                    val businessDocumentGenDate: LocalDateTime?,
-                   val isApprec: Boolean)
+                   val isAppRec: Boolean)
 
 data class ApprecErrorDetail(val description: String, val errorCode: String? = null, val details: String? = null)
 enum class ApprecStatus(@JsonValue val result: Int) {
