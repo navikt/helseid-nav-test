@@ -9,7 +9,6 @@ import no.nav.helseidnavtest.error.RecoverableException
 import no.nav.helseidnavtest.oppslag.AbstractRestClientAdapter
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.retry.annotation.Recover
@@ -87,8 +86,7 @@ class EDI20RestClientAdapter(
         recover = "sendRecover",
         retryFor = [RecoverableException::class],
         maxAttempts = 3)
-    fun send(innsending: Innsending) = if (true) {
-        log.info("Invoking send")
+    fun send(innsending: Innsending) =
         restClient
             .post()
             .uri(cf::sendURI)
@@ -99,10 +97,6 @@ class EDI20RestClientAdapter(
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
             .headers.location?.key() ?: throw IllegalStateException("No location header")
-    } else {
-        log.warn("Random failure")
-        throw RecoverableException(BAD_REQUEST, cf.baseUri, "Random failure")
-    }
 
     fun konsumert(herId: HerId, id: UUID) =
         restClient
