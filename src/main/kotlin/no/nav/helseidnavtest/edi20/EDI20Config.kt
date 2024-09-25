@@ -31,14 +31,13 @@ class EDI20Config(baseUri: URI,
             .queryParam(ORDER_BY, params.ordering.value)
             .build()
 
-    fun lesURI(b: UriBuilder, id: UUID) = b.path("${DOK_PATH}/business-document").build("$id")
+    fun lesURI(b: UriBuilder, id: UUID) = b.path(LES_PATH).build("$id")
 
-    fun lestURI(b: UriBuilder, id: UUID, herId: HerId) = b.path("$DOK_PATH/read/${herId.verdi}").build("$id")
+    fun lestURI(b: UriBuilder, id: UUID, herId: HerId) = b.path(LEST_PATH).build("$id", herId.verdi)
 
-    fun statusURI(b: UriBuilder, id: UUID) = b.path("$DOK_PATH/status").build("$id")
+    fun statusURI(b: UriBuilder, id: UUID) = b.path(STATUS_PATH).build("$id")
 
-    fun apprecURI(b: UriBuilder, id: UUID, sender: HerId) =
-        b.path(APPREC_PATH).build("$id", sender.verdi)
+    fun apprecURI(b: UriBuilder, id: UUID, sender: HerId) = b.path(APPREC_PATH).build("$id", sender.verdi)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 
@@ -60,8 +59,6 @@ class EDI20Config(baseUri: URI,
         private const val DEFAULT_RETRIES = 3
         const val MESSAGES_PATH = "messages"
         const val DOK_PATH = "$MESSAGES_PATH/{id}"
-        const val APPREC_PATH = "$MESSAGES_PATH/{id}/apprec/{senderid}"
-
         const val HERID = "herId"
         const val EDI20 = "edi20"
         const val PLAIN = "${EDI20}plain"
@@ -72,6 +69,10 @@ class EDI20Config(baseUri: URI,
         val EDI_1 = HerId(EDI1_ID) to "$EDI20-1"
         val EDI_2 = HerId(EDI2_ID) to "$EDI20-2"
         val LEGE = HprId("565501872")
+        private const val STATUS_PATH = "$DOK_PATH/status"
+        private const val APPREC_PATH = "$DOK_PATH/apprec/{senderid}"
+        private const val LEST_PATH = "$DOK_PATH/read/{senderid}"
+        private const val LES_PATH = "$DOK_PATH/business-document"
         private const val INCLUDE_APPREC = "IncludeAppRec"
         private const val INCLUDE_METADATA = "IncludeMetadata"
         private const val RECEIVER_HER_IDS = "ReceiverHerIds"
