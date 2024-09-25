@@ -10,22 +10,22 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class KafkaRecoverer(private val cfg: InnsendingConfig,
-                     private val kafka: KafkaOperations<UUID, Innsending>) : Recoverer {
+class KafkaRecoverer(private val kafka: KafkaOperations<UUID, Innsending>,
+                     private val cfg: InnsendingConfig) : Recoverer {
 
     private val log = getLogger(KafkaRecoverer::class.java)
 
     override fun recover(innsending: Innsending) =
         with(innsending) {
             log.info("Recovering innsending $id via kafka: $this")
-            // TODO  kafka.send(cfg.topics.main, id, this)
-            "$id"
+            kafka.send(cfg.topics.main, id, this)
+            Unit
         }
 }
 
 interface Recoverer {
 
-    fun recover(innsending: Innsending): String
+    fun recover(innsending: Innsending)
 }
 
 @Component

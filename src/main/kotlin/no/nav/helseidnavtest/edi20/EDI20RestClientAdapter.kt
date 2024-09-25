@@ -76,10 +76,12 @@ class EDI20RestClientAdapter(
             .body<List<Melding>>()
 
     @Recover
-    fun sendRecover(t: Throwable, innsending: Innsending): String {
-        log.warn("Recovering from", t)
-        return recoverer.recover(innsending)
-    }
+    fun sendRecover(t: Throwable, innsending: Innsending) =
+        with(innsending) {
+            log.warn("Recovering from", t)
+            recoverer.recover(innsending)
+            id
+        }
 
     @Retryable(
         listeners = ["loggingRetryListener"],
