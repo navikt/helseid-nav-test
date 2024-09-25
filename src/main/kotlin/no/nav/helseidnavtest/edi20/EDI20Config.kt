@@ -4,7 +4,7 @@ import no.nav.helseidnavtest.dialogmelding.DokumentId
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.HprId
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
-import no.nav.helseidnavtest.edi20.EDI20Config.Ordering.ASC
+import no.nav.helseidnavtest.edi20.EDI20Config.Ordering.DESC
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.web.util.UriBuilder
@@ -51,7 +51,7 @@ class EDI20Config(baseUri: URI,
         val sender: HerId? = null,
         val metadata: Boolean = true,
         val dokumentId: DokumentId? = null,
-        val ordering: Ordering = ASC,
+        val ordering: Ordering = DESC,
         val messages: Int = 10)
 
     companion object {
