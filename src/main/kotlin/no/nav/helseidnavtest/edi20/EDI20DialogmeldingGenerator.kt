@@ -3,6 +3,7 @@ package no.nav.helseidnavtest.edi20
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.hodemelding.XMLMsgHead
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.stereotype.Component
 import java.io.StringWriter
@@ -11,6 +12,8 @@ import java.io.StringWriter
 class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
                                   private val mapper: EDI20DialogmeldingMapper) {
 
+    private val log = getLogger(EDI20DialogmeldingGenerator::class.java)
+
     fun marshal(innsending: Innsending) = marshaller.marshal(innsending)
     fun unmarshal(xml: String) = marshaller.unmarshal(xml)
 
@@ -18,7 +21,7 @@ class EDI20DialogmeldingGenerator(private val marshaller: Jaxb2Marshaller,
         StringWriter().run {
             createMarshaller().marshal(mapper.hodemelding(innsending), this)
             "$this"
-        }
+        }.also { log.info("Marshalled to $it") }
 
     private fun Jaxb2Marshaller.unmarshal(xml: String) = createUnmarshaller().unmarshal(xml.byteInputStream()).let {
         when (it) {
