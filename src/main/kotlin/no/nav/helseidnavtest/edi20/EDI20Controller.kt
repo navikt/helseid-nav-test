@@ -19,8 +19,7 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.User
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
-import org.springframework.http.MediaType.APPLICATION_XML_VALUE
-import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import org.springframework.http.MediaType.*
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.web.bind.annotation.*
@@ -48,7 +47,7 @@ class EDI20Controller(
     private val log = getLogger(javaClass)
 
     @Operation(description = "Sender apprec for melding for gitt mottaker")
-    @PostMapping("${DOK_PATH}/apprec")
+    @PostMapping("${DOK_PATH}/apprec", consumes = [APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE])
     fun apprec(
         @Herid @RequestParam herId: HerId,
         @Parameter(description = "Dokument-id")

@@ -1,7 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.Apprec.Companion.OK
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
 import no.nav.helseidnavtest.error.BodyConsumingErrorHandler
@@ -37,7 +36,7 @@ class EDI20RestClientAdapter(
             .uri { cf.apprecURI(it, id, herId) }
             .headers { it.herId(herId) }
             .accept(APPLICATION_JSON)
-            .body(OK)
+            .body(ApprecRequest())
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .body<String>()

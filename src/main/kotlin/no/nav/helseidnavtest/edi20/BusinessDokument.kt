@@ -2,7 +2,8 @@ package no.nav.helseidnavtest.edi20
 
 import com.fasterxml.jackson.annotation.JsonValue
 import no.nav.helseidnavtest.dialogmelding.HerId
-import no.nav.helseidnavtest.edi20.Apprec.ApprecResult
+import no.nav.helseidnavtest.edi20.ApprecStatus.OK
+import no.nav.helseidnavtest.edi20.PostMessageRequest.SystemInfo
 import org.springframework.http.MediaType.APPLICATION_XML_VALUE
 import java.time.LocalDateTime
 import java.util.*
@@ -45,44 +46,24 @@ data class Melding(val id: UUID,
                    val businessDocumentGenDate: LocalDateTime?,
                    val isApprec: Boolean)
 
-data class Apprec(
-    val result: ApprecResult,
-    val properties: ApprecProperties = ApprecProperties(),
-    val errorList: List<ApprecErrorDetail> = emptyList()) {
-    data class ApprecProperties(val system: ApprecSystem = ApprecSystem()) {
-        data class ApprecSystem(
-            val applicationName: String = APP_NAVN,
-            val applicationVersion: String = VERSJON,
-            val middlewareName: String? = APP_NAVN,
-            val middlewareVersion: String? = VERSJON)
-    }
-
-    data class ApprecErrorDetail(val errorCode: String? = null, val details: String? = null)
-    enum class ApprecResult(@JsonValue val result: Int) {
-        OK(1),
-        ERROR(2),
-        DELFEIL(3)
-    }
-
-    companion object {
-        val OK = Apprec(ApprecResult.OK)
-        val ERROR = Apprec(ApprecResult.ERROR)
-        val DELFEIL = Apprec(ApprecResult.DELFEIL, errorList = listOf(ApprecErrorDetail("42", "Shit happens")))
-    }
+data class ApprecErrorDetail(val description: String, val errorCode: String? = null, val details: String? = null)
+enum class ApprecStatus(@JsonValue val result: Int) {
+    OK(1),
+    ERROR(2),
+    DELFEIL(3)
 }
 
-data class ErrorDetail(
-    val errorCode: String? = null,
-    val description: String? = null,
-    val oid: String? = null,
-    val details: String? = null)
+data class ApprecRequest(
+    val appRecStatus: ApprecStatus = OK,
+    val appRecErrorList: List<ApprecErrorDetail> = emptyList(),
+    val systemInfo: SystemInfo = SystemInfo())
 
 data class Status(
     val herId: HerId,
     val acknowledged: Boolean,
     val appRecReceived: Boolean,
-    val appRecResult: ApprecResult?,
-    val appRecErrorList: List<ErrorDetail> = emptyList())
+    val appRecResult: ApprecStatus?,
+    val appRecErrorList: List<ApprecErrorDetail> = emptyList())
 
 data class DeftStatus(val receiverDownloadStatus: Map<String, Boolean>)
 
