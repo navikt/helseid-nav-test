@@ -10,32 +10,33 @@ import java.util.*
 private const val APP_NAVN = "HelseIdNavTest"
 private const val VERSJON = "1.0.0"
 
-data class BusinessDocument(val businessDocument: String, val properties: Properties = Properties()) {
-    data class Properties(
-        val system: System = System(),
-        val contentTransferEncoding: String = "base64",
-        val contentType: String = APPLICATION_XML_VALUE,
-        val ebxmlOverrides: EbxmlOverrides? = null) {
-        data class EbxmlOverrides(
-            val cpaId: String? = null,
-            val conversationId: String? = null,
-            val service: String? = null,
-            val serviceType: String? = null,
-            val action: String? = null,
-            val senderHerId: Int? = null,
-            val senderRole: String? = null,
-            val receiverHerId: Int? = null,
-            val receiverRole: String? = null)
+data class PostMessageRequest(
+    val businessDokument: String,
+    val contentTransferEncoding: String = "base64",
+    val contentType: String = APPLICATION_XML_VALUE,
+    val systemInfo: SystemInfo = SystemInfo(),
+    val ebxmlOverrides: EbxmlOverrides? = null) {
 
-        data class System(
-            val applicationName: String = APP_NAVN,
-            val applicationVersion: String = VERSJON,
-            val middlewareName: String? = APP_NAVN,
-            val middlewareVersion: String? = VERSJON)
+    data class SystemInfo(
+        val applicationName: String = APP_NAVN,
+        val applicationVersion: String = VERSJON,
+        val middlewareName: String? = APP_NAVN,
+        val middlewareVersion: String? = VERSJON)
+
+    data class EbxmlOverrides(
+        val cpaId: String? = null,
+        val conversationId: String? = null,
+        val service: String? = null,
+        val serviceType: String? = null,
+        val action: String? = null,
+        val senderHerId: Int? = null,
+        val senderRole: String? = null,
+        val receiverHerId: Int? = null,
+        val receiverRole: String? = null)
+
+    override fun toString(): String {
+        return "PostMessageRequest(businessDokument='${businessDokument.length}', contentTransferEncoding='$contentTransferEncoding', contentType='$contentType', system=$system, ebxmlOverrides=$ebxmlOverrides)"
     }
-
-    override fun toString() =
-        "BusinessDocument(businessDocument='${businessDocument.length} bytes', properties=$properties)"
 }
 
 data class Melding(val id: UUID,

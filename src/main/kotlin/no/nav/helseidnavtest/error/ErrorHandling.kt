@@ -27,7 +27,7 @@ class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
         log.info("Handling error response ${res.statusCode} from ${req.uri}")
         throw when (val code = res.statusCode as HttpStatus) {
             BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri, m.readValue<ErrorResponse>(res.body)).also {
-                log.warn("Irrecoverable request due to $code")
+                log.warn("Irrecoverable request $it")
             }
 
             else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
@@ -66,6 +66,8 @@ open class IrrecoverableException(status: HttpStatusCode,
                             cause: Throwable? = null,
                             stackTrace: String? = null) :
         IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace, emptyList())
+
+    override fun toString() = "IrrecoverableException(status=${statusCode}, detail=$body"
 }
 
 open class RecoverableException(status: HttpStatusCode,

@@ -92,7 +92,7 @@ class EDI20RestClientAdapter(
             .uri(cf::sendURI)
             .headers { it.herId(innsending.avsender) }
             .accept(APPLICATION_JSON)
-            .body(BusinessDocument(generator.marshal(innsending).encode()))
+            .body(PostMessageRequest(generator.marshal(innsending).encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()
