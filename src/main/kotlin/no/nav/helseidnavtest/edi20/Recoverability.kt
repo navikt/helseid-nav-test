@@ -30,8 +30,8 @@ data class InnsendingConfig(@NestedConfigurationProperty val topics: InnsendingT
         private const val DEFAULT_BACKOFF = 30000
         private const val DEFAULT_RETRIES = 3
         private const val MAIN_TOPIC = PREFIX + "main"
-        private const val RETRY_TOPIC = PREFIX + "retry"
-        private const val DLT_TOPIC = PREFIX + "dlt"
+        private const val RETRY_TOPIC = "${MAIN_TOPIC}.retry"
+        private const val DLT_TOPIC = "${MAIN_TOPIC}.dlt"
     }
 }
 
