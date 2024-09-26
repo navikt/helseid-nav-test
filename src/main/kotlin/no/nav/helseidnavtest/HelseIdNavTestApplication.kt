@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.jms.annotation.EnableJms
+import org.springframework.kafka.annotation.EnableKafkaRetryTopic
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @EnableCaching
 @EnableJms
 @EnableScheduling
+@EnableKafkaRetryTopic
 class HelseIdNavTestApplication
 
 fun main(args: Array<String>) {
