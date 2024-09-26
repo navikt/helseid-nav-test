@@ -131,14 +131,14 @@ class EDI20Controller(
 
     @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
     @GetMapping("${MESSAGES_PATH}/lesalle")
-    fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
+    fun lesOgAckAlle() = mapOf(EDI_1.first.verdi to lesOgAck(EDI_1.first), EDI_2.first.verdi to lesOgAck(EDI_2.first))
 
     private fun lesOgAck(herId: HerId) =
         edi.poll(PollParameters(herId))
             .flatMap { m ->
                 m.receiverHerId.map {
                     edi.konsumert(it, m.id)
-                    it
+                    m.id
                 }
             }
 
