@@ -48,8 +48,17 @@ spring:
       key-store-password: ${kafka.credstore.password}
     consumer:
       group-id: ${spring.application.name}-${env}
-      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring:
+          deserializer:
+            key:
+              delegate:
+                class: org.springframework.kafka.support.serializer.JsonDeserializer
+            value:
+              delegate:
+                class: org.springframework.kafka.support.serializer.JsonDeserializer
     producer:
       client-id: ${spring.application.name}
       key-serializer: org.springframework.kafka.support.serializer.JsonSerializer

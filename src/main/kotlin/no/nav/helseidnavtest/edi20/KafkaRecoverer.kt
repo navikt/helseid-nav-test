@@ -31,21 +31,8 @@ interface Recoverer {
 @Component
 class LoggingRetryListener : RetryListener {
     private val log = getLogger(RetryListener::class.java)
-    override fun <T : Any, E : Throwable> open(context: RetryContext, cb: RetryCallback<T, E>): Boolean {
-        return super.open(context, cb)
-    }
-
-    override fun <T : Any, E : Throwable> close(ctx: RetryContext, cb: RetryCallback<T, E>, t: Throwable?) {
-        super.close(ctx, cb, t)
-    }
-
-    override fun <T : Any, E : Throwable> onSuccess(ctx: RetryContext, cb: RetryCallback<T, E>, result: T) {
-        log.info("Retry ok")
-        super.onSuccess(ctx, cb, result)
-    }
-
     override fun <T : Any, E : Throwable> onError(ctx: RetryContext, cb: RetryCallback<T, E>, t: Throwable?) {
-        log.info("Retry feilet", t)
+        log.info("Retry metode ${ctx.getAttribute("context.name")} feilet for ${ctx.retryCount}. gang", t)
         super.onError(ctx, cb, t)
     }
 }

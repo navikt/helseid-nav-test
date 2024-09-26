@@ -9,12 +9,14 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty
 import org.springframework.kafka.annotation.DltHandler
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
+import org.springframework.kafka.listener.adapter.ConsumerRecordMetadata
 import org.springframework.kafka.retrytopic.DestinationTopic.Properties
 import org.springframework.kafka.retrytopic.RetryTopicHeaders.DEFAULT_HEADER_ATTEMPTS
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
 import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
 import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
-import org.springframework.kafka.support.KafkaHeaders.*
+import org.springframework.kafka.support.KafkaHeaders.DLT_EXCEPTION_MESSAGE
+import org.springframework.kafka.support.KafkaHeaders.DLT_EXCEPTION_STACKTRACE
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
@@ -88,10 +90,9 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Innsen
         autoStartDltHandler = "true",
         autoCreateTopics = "false")
     fun listen(innsending: Innsending, @Header(DEFAULT_HEADER_ATTEMPTS, required = false) antall: Int?,
-               @Header(RECEIVED_TOPIC) topic: String) =
-        log.info("Mottatt innsending ${innsending.id} på $topic for ${antall?.let { "$it." } ?: "1."} gang.").also {
-            edi.send(innsending)
-        }
+               meta: ConsumerRecordMetadata) =
+        log.info("Mottatt innsending ${innsending.id} på ${meta.topic()} for ${antall?.let { "$it." } ?: "1."} gang.")
+            .also { edi.send(innsending) }
 
     @DltHandler
     fun dlt(innsending: Innsending,
