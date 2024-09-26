@@ -137,7 +137,7 @@ class EDI20Controller(
         edi.poll(PollParameters(herId))
             .flatMap { m ->
                 m.receiverHerId.map {
-                    m.senderHerId?.let { s -> edi.konsumert(s, m.id) }
+                    edi.konsumert(it, m.id)
                     it
                 }
             }
