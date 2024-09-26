@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 @KafkaListener(topics = ["#{@innsendingConfig.topics.main}"], containerFactory = InnsendingConfig.INNSENDING)
 @RetryableTopic(
-    retryTopicSuffix = "retry", dltTopicSuffix = "dlt",
+    retryTopicSuffix = ".retry", dltTopicSuffix = ".dlt",
     attempts = "#{@innsendingConfig.topics.retries}",
     backoff = Backoff(delayExpression = "#{@innsendingConfig.topics.backoff}"),
     exclude = [IrrecoverableException::class], traversingCauses = "true",
