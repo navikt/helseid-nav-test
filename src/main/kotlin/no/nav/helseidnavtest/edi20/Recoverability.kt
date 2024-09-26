@@ -3,10 +3,6 @@ package no.nav.helseidnavtest.edi20
 import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
-import org.springframework.kafka.retrytopic.DestinationTopic.Properties
-import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory
-import org.springframework.kafka.retrytopic.RetryTopicNamesProviderFactory.RetryTopicNamesProvider
-import org.springframework.kafka.retrytopic.SuffixingRetryTopicNamesProviderFactory.SuffixingRetryTopicNamesProvider
 import org.springframework.stereotype.Component
 
 @Component
@@ -44,25 +40,4 @@ abstract class KafkaConfig(val name: String, val isEnabled: Boolean) {
     abstract fun topics(): List<String>
 }
 
-//@Component
-class InnsendingRetryTopicNamingProviderFactory(private val cf: InnsendingConfig) : RetryTopicNamesProviderFactory {
-
-    override fun createRetryTopicNamesProvider(p: Properties): RetryTopicNamesProvider {
-        with(cf.topics) {
-            if (p.isDltTopic) {
-                return object : SuffixingRetryTopicNamesProvider(p) {
-                    override fun getTopicName(topic: String) = dlt
-                }
-            }
-            if (p.isMainEndpoint) {
-                return object : SuffixingRetryTopicNamesProvider(p) {
-                    override fun getTopicName(topic: String) = topic
-                }
-            }
-            return object : SuffixingRetryTopicNamesProvider(p) {
-                override fun getTopicName(topic: String) = retry
-            }
-        }
-    }
-}
 
