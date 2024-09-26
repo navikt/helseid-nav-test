@@ -24,7 +24,7 @@ class EDI20RestClientAdapter(
     @Qualifier(EDI20) restClient: RestClient,
     private val cf: EDI20Config,
     private val recoverer: Recoverer,
-    private val generator: EDI20DialogmeldingGenerator,
+    private val marshaller: EDI20DialogmeldingMarshaller,
     @Qualifier(EDI20) private val handler: BodyConsumingErrorHandler
 ) : AbstractRestClientAdapter(restClient, cf) {
 
@@ -52,7 +52,7 @@ class EDI20RestClientAdapter(
             .body<List<Status>>()
 
     fun les(herId: HerId, id: UUID) =
-        raw(herId, id)?.let(generator::unmarshal)
+        raw(herId, id)?.let(marshaller::unmarshal)
 
     fun raw(herId: HerId, id: UUID) =
         restClient
@@ -72,7 +72,7 @@ class EDI20RestClientAdapter(
             .accept(APPLICATION_JSON)
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
-            .body<List<Melding>>()
+            .body<List<Melding>>() ?: emptyList()
 
     @Recover
     fun sendRecover(t: Throwable, innsending: Innsending) =
@@ -93,7 +93,7 @@ class EDI20RestClientAdapter(
             .uri(cf::sendURI)
             .headers { it.herId(innsending.avsender) }
             .accept(APPLICATION_JSON)
-            .body(PostMessageRequest(generator.marshal(innsending).encode()))
+            .body(PostMessageRequest(marshaller.marshal(innsending).encode()))
             .retrieve()
             .onStatus({ it.isError }) { req, res -> handler.handle(req, res) }
             .toBodilessEntity()

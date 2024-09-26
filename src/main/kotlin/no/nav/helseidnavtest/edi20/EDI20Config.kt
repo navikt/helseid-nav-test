@@ -37,7 +37,7 @@ class EDI20Config(baseUri: URI,
 
     fun statusURI(b: UriBuilder, id: UUID) = b.path(STATUS_PATH).build("$id")
 
-    fun apprecURI(b: UriBuilder, id: UUID, sender: HerId) = b.path(APPREC_PATH).build("$id", sender.verdi)
+    fun apprecURI(b: UriBuilder, id: UUID, herId: HerId) = b.path(APPREC_PATH).build("$id", herId.verdi)
 
     override fun toString() = "$javaClass.simpleName [baseUri=$baseUri, pingEndpoint=$pingEndpoint]"
 

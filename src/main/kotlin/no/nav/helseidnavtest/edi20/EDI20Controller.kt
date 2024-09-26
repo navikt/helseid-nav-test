@@ -7,7 +7,11 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.dialogmelding.Pasient
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DOK_PATH
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI1_ID
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI2_ID
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
+import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.MESSAGES_PATH
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.VALIDATOR
 import no.nav.helseidnavtest.edi20.EDI20Config.PollParameters
@@ -41,7 +45,7 @@ class EDI20Controller(
     private val deft: EDI20DeftService,
     private val pdl: PDLClient,
     private val adresse: AdresseRegisterClient,
-    private val generator: EDI20DialogmeldingGenerator
+    private val generator: EDI20DialogmeldingMarshaller
 ) {
 
     private val log = getLogger(javaClass)
@@ -125,20 +129,18 @@ class EDI20Controller(
         @PathVariable id: UUID) =
         edi.status(herId, id)
 
-    //@Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
-    //@GetMapping("${MESSAGES_PATH}/lesalle")
-    //fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
+    @Operation(description = "Merk alle dokumenter lest for  $EDI1_ID og $EDI2_ID")
+    @GetMapping("${MESSAGES_PATH}/lesalle")
+    fun lesOgAckAlle() = mapOf(EDI_1 to lesOgAck(EDI_1.first), EDI_2 to lesOgAck(EDI_2.first))
 
-    /*
     private fun lesOgAck(herId: HerId) =
         edi.poll(PollParameters(herId))
-            ?.flatMap { m ->
+            .flatMap { m ->
                 m.receiverHerId.map {
-                    konsumert(m.senderHerId, it)
+                    m.senderHerId?.let { s -> edi.konsumert(s, m.id) }
                     it
                 }
-            } ?: emptyList()
-            */
+            }
 
     private fun bestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
