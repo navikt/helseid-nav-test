@@ -3,7 +3,7 @@ kind: Topic
 metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-  name: edi20.main-dlt
+  name: edi20.main.dlt
   namespace: helseopplysninger
   labels:
     team: helseopplysninger

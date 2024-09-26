@@ -3,7 +3,7 @@ kind: Topic
 metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-  name: edi20.main-retry
+  name: edi20.main.retry
   namespace: helseopplysninger
   labels:
     team: helseopplysninger
