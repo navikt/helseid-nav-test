@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         cluster: [ dev-gcp ]
-        topic: [ dlt,retry, main ]
+        topic: [ main,main-dlt,main-retry ]
 
     name: Deploy ${{matrix.topic}} til ${{matrix.cluster}}
     runs-on: ubuntu-latest
