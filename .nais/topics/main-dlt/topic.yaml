@@ -3,19 +3,19 @@ kind: Topic
 metadata:
   annotations:
     kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
-  name: edi20.dlt
+  name: edi20.main-dlt
   namespace: helseopplysninger
   labels:
     team: helseopplysninger
 spec:
   pool: {{pool}}
   config:
-  {{#each config as |value key|}}
-    {{key}}: {{value}}
+  { { #each config as |value key|}}
+    {{key } }: {{value}}
   {{/each}}
   acl:
-  {{#each acl}}
-      - team: {{team}}
-        application: {{application}}
-        access: {{access}}
+  { { #each acl}}
+      - team: {{team } }
+  application: {{application}}
+  access: {{access}}
   {{/each}}
