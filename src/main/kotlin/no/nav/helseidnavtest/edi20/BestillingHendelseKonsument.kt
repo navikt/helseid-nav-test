@@ -16,12 +16,14 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
 @Component
-@KafkaListener(topics = ["#{@innsendingConfig.topics.main}"], containerFactory = InnsendingConfig.INNSENDING)
+@KafkaListener(topics = ["#{@innsendingConfig.recovery.main}"], containerFactory = InnsendingConfig.INNSENDING)
 @RetryableTopic(
-    retryTopicSuffix = ".retry", dltTopicSuffix = ".dlt",
-    attempts = "#{@innsendingConfig.topics.retries}",
-    backoff = Backoff(delayExpression = "#{@innsendingConfig.topics.backoff}"),
-    exclude = [IrrecoverableException::class], traversingCauses = "true",
+    retryTopicSuffix = "#{@innsendingConfig.recovery.retryduffix}",
+    dltTopicSuffix = "#{@innsendingConfig.recovery.retryduffix}",
+    attempts = "#{@innsendingConfig.recovery.retries}",
+    backoff = Backoff(delayExpression = "#{@innsendingConfig.recovery.backoff}"),
+    exclude = [IrrecoverableException::class],
+    traversingCauses = "true",
     autoStartDltHandler = "true",
     autoCreateTopics = "false",
 )
