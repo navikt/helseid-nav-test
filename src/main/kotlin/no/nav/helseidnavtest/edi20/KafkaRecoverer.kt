@@ -18,7 +18,7 @@ class KafkaRecoverer(private val kafka: KafkaOperations<UUID, Innsending>,
     override fun recover(innsending: Innsending) =
         with(innsending) {
             log.info("Recovering innsending $id via kafka: $this")
-            kafka.send(cfg.topics.main, id, this)
+            kafka.send(cfg.recovery.main, id, this)
             Unit
         }
 }

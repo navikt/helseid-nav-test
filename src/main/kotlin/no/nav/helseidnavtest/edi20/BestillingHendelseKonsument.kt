@@ -40,5 +40,5 @@ class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: Innsen
     fun dlt(innsending: Innsending,
             @Header(DLT_EXCEPTION_MESSAGE) msg: String,
             @Header(DLT_EXCEPTION_STACKTRACE) trace: String) =
-        log.error("$msg ${innsending.id}  ${cfg.topics.retries} forsøk ($trace)")
+        log.error("$msg ${innsending.id}  ${cfg.recovery.retries} forsøk ($trace)")
 }

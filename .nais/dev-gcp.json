@@ -18,5 +18,10 @@
     "reply": "QA.Q1_HELSEID.IU03_UTSENDING_REPLY"
   },
   "ereg": "ereg-services-q1.dev-fss-pub.nais.io",
-  "aareg": "aareg-services-q1.dev-fss-pub.nais.io"
+  "aareg": "aareg-services-q1.dev-fss-pub.nais.io",
+  "recovery": {
+    "main": "edi20.main",
+    "dlt": "edi20.dlt",
+    "retry": "edi20.dlq"
+  }
 }

@@ -192,4 +192,8 @@ springdoc:
   swagger-ui:
     csrf:
       enabled: true
-
+innsending:
+  topics:
+    main: edi20.main
+    retry: ${innsending.topics.main}.retry
+    dlt: ${innsending.topics.main}.dlt
