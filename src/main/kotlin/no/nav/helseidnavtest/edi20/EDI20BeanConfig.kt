@@ -7,7 +7,6 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
-import no.nav.helseidnavtest.edi20.EDI20DeftConfig.Companion.EDI20DEFT
 import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
@@ -32,14 +31,9 @@ import org.springframework.web.client.RestClient.Builder
 import java.util.*
 
 @Configuration(proxyBeanMethods = true)
-class EDI20BeanConfig/*(private val namingProviderFactory: InnsendingRetryTopicNamingProviderFactory) :
-    RetryTopicConfigurationSupport()*/ {
+class EDI20BeanConfig {
 
     val log = getLogger(EDI20BeanConfig::class.java)
-
-    // override fun createComponentFactory() = object : RetryTopicComponentFactory() {
-    //     override fun retryTopicNamesProviderFactory() = namingProviderFactory
-    // }
 
     @Bean(INNSENDING)
     fun bestillingListenerContainerFactory(p: KafkaProperties) =
@@ -61,12 +55,6 @@ class EDI20BeanConfig/*(private val namingProviderFactory: InnsendingRetryTopicN
     @Bean
     @Qualifier(EDI20)
     fun edi20RestClient(b: Builder, cfg: EDI20Config, @Qualifier(EDI20) interceptor: ClientHttpRequestInterceptor) =
-        restClient(b, cfg, interceptor)
-
-    @Bean
-    @Qualifier(EDI20DEFT)
-    fun ediDeft20RestClient(b: Builder, cfg: EDI20DeftConfig,
-                            @Qualifier(EDI20) interceptor: ClientHttpRequestInterceptor) =
         restClient(b, cfg, interceptor)
 
     @Bean
