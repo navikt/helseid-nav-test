@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component
 @Component
 @KafkaListener(topics = ["#{@innsendingConfig.recovery.main}"], containerFactory = InnsendingConfig.INNSENDING)
 @RetryableTopic(
-    retryTopicSuffix = "#{@innsendingConfig.recovery.retryduffix}",
-    dltTopicSuffix = "#{@innsendingConfig.recovery.retryduffix}",
+    retryTopicSuffix = "#{@innsendingConfig.recovery.retrysuffix}",
+    dltTopicSuffix = "#{@innsendingConfig.recovery.retrysuffix}",
     attempts = "#{@innsendingConfig.recovery.retries}",
     backoff = Backoff(delayExpression = "#{@innsendingConfig.recovery.backoff}"),
     exclude = [IrrecoverableException::class],
