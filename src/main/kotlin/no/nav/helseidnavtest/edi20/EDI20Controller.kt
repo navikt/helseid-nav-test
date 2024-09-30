@@ -42,7 +42,6 @@ private const val NO_TOKEN = "Mangler OIDC-token"
         url = "https://utviklerportal.nhn.no/informasjonstjenester/meldingstjener/edi-20/edi-20-ekstern-docs/openapi/meldingstjener-api/"))
 class EDI20Controller(
     private val edi: EDI20Service,
-    private val deft: EDI20DeftService,
     private val pdl: PDLClient,
     private val adresse: AdresseRegisterClient,
     private val generator: EDI20DialogmeldingMarshaller
@@ -67,7 +66,7 @@ class EDI20Controller(
         edi.poll(PollParameters(herId, apprec))
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
-    @PostMapping("$MESSAGES_PATH/inline", consumes = [MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("$MESSAGES_PATH/send", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun send(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
@@ -79,8 +78,8 @@ class EDI20Controller(
             edi.send(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
-    @Operation(description = "Laster opp et vedlegg og inkluderer denne inline i hodemeldingen for den gitte avsenderen")
-    @PostMapping("$MESSAGES_PATH/inlinevalidering", consumes = [MULTIPART_FORM_DATA_VALUE])
+    @Operation(description = "Laster opp et vedlegg og inkluderer denne i hodemeldingen for den gitte avsenderen")
+    @PostMapping("$MESSAGES_PATH/alider", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun valider(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
@@ -94,7 +93,7 @@ class EDI20Controller(
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
-    @PostMapping("$MESSAGES_PATH/inline/show", consumes = [MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("$MESSAGES_PATH/show", consumes = [MULTIPART_FORM_DATA_VALUE])
     fun show(
         @AuthenticationPrincipal helsePersonell: OidcUser?,
         @Herid @RequestParam fra: HerId,
