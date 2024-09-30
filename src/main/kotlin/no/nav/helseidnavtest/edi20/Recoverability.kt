@@ -7,15 +7,15 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConfigurationProperties(INNSENDING)
-data class InnsendingConfig(@NestedConfigurationProperty val recovery: InnsendingTopics = InnsendingTopics(),
+data class InnsendingConfig(@NestedConfigurationProperty val recovery: InnsendingTopics,
                             val enabled: Boolean = true) : KafkaConfig(INNSENDING, enabled) {
 
     override fun topics() = recovery.all
 
     data class InnsendingTopics(
         val main: String = MAIN_TOPIC,
-        val retrysuffix: String = RETRY_SUFFIX,
-        val dltsuffix: String = DLT_SUFFIX,
+        val retrysuffix: String,
+        val dltsuffix: String,
         val backoff: Int = DEFAULT_BACKOFF,
         val retries: Int = DEFAULT_RETRIES
     ) {
@@ -30,8 +30,6 @@ data class InnsendingConfig(@NestedConfigurationProperty val recovery: Innsendin
         private const val DEFAULT_BACKOFF = 30000
         private const val DEFAULT_RETRIES = 3
         private const val MAIN_TOPIC = PREFIX + "main"
-        private const val RETRY_SUFFIX = ".retry"
-        private const val DLT_SUFFIX = ".dlt"
     }
 }
 

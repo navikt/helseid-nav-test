@@ -70,6 +70,14 @@ spec:
   env:
     - name: recovery_main
       value: {{recovery.main}}
+    - name: recovery_retrysuffix
+      value: {{recovery.retrysuffix}}
+    - name: recovery_dltsuffix
+      value: {{recovery.dltsuffix}}
+    - name: recovery_retry
+      value: {{recovery.main}}{{recovery.retrysuffix}}
+    - name: recovery_dlt
+      value: {{recovery.main}}{{recovery.dltsuffix}}
     - name: stshost
       value: {{stshost}}
     - name: edihost

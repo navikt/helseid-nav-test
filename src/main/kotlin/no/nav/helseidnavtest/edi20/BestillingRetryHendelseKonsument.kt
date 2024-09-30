@@ -1,5 +1,6 @@
 package no.nav.helseidnavtest.edi20
 
+import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.slf4j.LoggerFactory
@@ -16,10 +17,10 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
 @Component
-@KafkaListener(topics = ["#{@innsendingConfig.recovery.main}"], containerFactory = InnsendingConfig.INNSENDING)
+@KafkaListener(topics = ["#{@innsendingConfig.recovery.main}"], containerFactory = INNSENDING)
 @RetryableTopic(
     retryTopicSuffix = "#{@innsendingConfig.recovery.retrysuffix}",
-    dltTopicSuffix = "#{@innsendingConfig.recovery.retrysuffix}",
+    dltTopicSuffix = "#{@innsendingConfig.recovery.dltsuffix}",
     attempts = "#{@innsendingConfig.recovery.retries}",
     backoff = Backoff(delayExpression = "#{@innsendingConfig.recovery.backoff}"),
     exclude = [IrrecoverableException::class],
