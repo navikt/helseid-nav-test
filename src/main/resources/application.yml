@@ -192,7 +192,8 @@ springdoc:
   swagger-ui:
     csrf:
       enabled: true
-recovery:
-  retrysuffix: .retry
-  dltsuffix: .dlt
-  main: edi20.main
+innsending:
+  recovery:
+    retrysuffix: .retry
+    dltsuffix: .dlt
+    main: edi20.main
