@@ -3,9 +3,7 @@ package no.nav.helseidnavtest.edi20
 import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
-import org.springframework.stereotype.Component
 
-@Component
 @ConfigurationProperties(INNSENDING)
 data class InnsendingConfig(@NestedConfigurationProperty val recovery: Recovery,
                             val enabled: Boolean = true) : KafkaConfig(INNSENDING, enabled) {
