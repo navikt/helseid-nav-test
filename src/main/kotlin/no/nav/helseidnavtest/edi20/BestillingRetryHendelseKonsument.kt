@@ -16,7 +16,7 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
 @Component
-@KafkaListener(topics = ["\${@innsending.recovery.main}"], containerFactory = "innsending")
+@KafkaListener(topics = ["\${innsending.recovery.main}"], containerFactory = "innsending")
 @RetryableTopic(
     retryTopicSuffix = "\${innsending.recovery.retrysuffix}",
     dltTopicSuffix = "\${innsending.recovery.dltsuffix}",
