@@ -27,15 +27,13 @@ import org.springframework.stereotype.Component
     autoStartDltHandler = "true",
     autoCreateTopics = "false",
 )
-class BestillingHendelseKonsument(private val edi: EDI20Service, val cfg: InnsendingConfig) {
+class BestillingRetryHendelseKonsument(private val edi: EDI20Service, val cfg: InnsendingConfig) {
 
-    private val log = LoggerFactory.getLogger(BestillingHendelseKonsument::class.java)
+    private val log = LoggerFactory.getLogger(BestillingRetryHendelseKonsument::class.java)
 
     @KafkaHandler
-    fun listen(innsending: Innsending,
-               accessor: KafkaMessageHeaderAccessor,
-               meta: ConsumerRecordMetadata) =
-        log.info("Mottatt innsending ${innsending.id} på ${meta.topic()} for ${accessor.nonBlockingRetryDeliveryAttempt.let { "$it." }} gang.")
+    fun listen(innsending: Innsending, accessor: KafkaMessageHeaderAccessor, meta: ConsumerRecordMetadata) =
+        log.info("Mottatt innsending ${innsending.id} på ${meta.topic()} for ${accessor.nonBlockingRetryDeliveryAttempt} gang.")
             .also { edi.send(innsending) }
 
     @DltHandler
