@@ -1,6 +1,5 @@
 package no.nav.helseidnavtest.edi20
 
-import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.error.IrrecoverableException
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.slf4j.LoggerFactory
@@ -17,18 +16,18 @@ import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
 @Component
-@KafkaListener(topics = ["#{@innsendingConfig.recovery.main}"], containerFactory = INNSENDING)
+@KafkaListener(topics = ["\${@innsending.recovery.main}"], containerFactory = "innsending")
 @RetryableTopic(
-    retryTopicSuffix = "#{@innsendingConfig.recovery.retrysuffix}",
-    dltTopicSuffix = "#{@innsendingConfig.recovery.dltsuffix}",
-    attempts = "#{@innsendingConfig.recovery.retries}",
-    backoff = Backoff(delayExpression = "#{@innsendingConfig.recovery.backoff}"),
+    retryTopicSuffix = "\${innsending.recovery.retrysuffix}",
+    dltTopicSuffix = "\${innsending.recovery.dltsuffix}",
+    attempts = "\${innsending.recovery.retries}",
+    backoff = Backoff(delayExpression = "\${innsending.recovery.backoff}"),
     exclude = [IrrecoverableException::class],
     traversingCauses = "true",
     autoStartDltHandler = "true",
     autoCreateTopics = "false",
 )
-class BestillingRetryHendelseKonsument(private val edi: EDI20Service, val cfg: InnsendingConfig) {
+class BestillingRetryHendelseKonsument(private val edi: EDI20Service) {
 
     private val log = LoggerFactory.getLogger(BestillingRetryHendelseKonsument::class.java)
 
@@ -41,5 +40,5 @@ class BestillingRetryHendelseKonsument(private val edi: EDI20Service, val cfg: I
     fun dlt(innsending: Innsending,
             @Header(DLT_EXCEPTION_MESSAGE) msg: String,
             @Header(DLT_EXCEPTION_STACKTRACE) trace: String) =
-        log.error("$msg ${innsending.id}  ${cfg.recovery.retries} forsøk ($trace)")
+        log.error("$msg ${innsending.id} feilet ($trace)")
 }

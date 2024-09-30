@@ -194,6 +194,8 @@ springdoc:
       enabled: true
 innsending:
   recovery:
+    retries: 3
+    backoff: 10000
     retrysuffix: .retry
     dltsuffix: .dlt
     main: edi20.main
