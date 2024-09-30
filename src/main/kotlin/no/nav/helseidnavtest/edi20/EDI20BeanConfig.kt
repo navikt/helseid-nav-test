@@ -7,7 +7,6 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator
 import com.nimbusds.oauth2.sdk.token.AccessTokenType.DPOP
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI20
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.PLAIN
-import no.nav.helseidnavtest.edi20.InnsendingConfig.Companion.INNSENDING
 import no.nav.helseidnavtest.oppslag.AbstractRestConfig
 import no.nav.helseidnavtest.oppslag.TokenExchangingRequestInterceptor
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
@@ -35,7 +34,7 @@ class EDI20BeanConfig {
 
     val log = getLogger(EDI20BeanConfig::class.java)
 
-    @Bean(INNSENDING)
+    @Bean("innsending")
     fun bestillingListenerContainerFactory(p: KafkaProperties) =
         ConcurrentKafkaListenerContainerFactory<UUID, Innsending>().apply {
             containerProperties.isObservationEnabled = true
