@@ -198,4 +198,4 @@ innsending:
     backoff: 10000
     retrysuffix: .retry
     dltsuffix: .dlt
-    main: edi20.main
+    main: helseopplysninger.edi20.main
