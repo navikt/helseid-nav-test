@@ -194,5 +194,5 @@ springdoc:
       enabled: true
 recovery:
   retrysuffix: .retry
-  dlfsuffix: .dlt
+  dltsuffix: .dlt
   main: edi20.main
