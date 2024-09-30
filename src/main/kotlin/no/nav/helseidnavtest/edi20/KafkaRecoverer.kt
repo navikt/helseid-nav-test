@@ -2,6 +2,7 @@ package no.nav.helseidnavtest.edi20
 
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaOperations
 import org.springframework.retry.RetryCallback
 import org.springframework.retry.RetryContext
@@ -11,14 +12,14 @@ import java.util.*
 
 @Component
 class KafkaRecoverer(private val kafka: KafkaOperations<UUID, Innsending>,
-                     private val cfg: InnsendingConfig) : Recoverer {
+                     @Value("\${innsending.recovery.main}") private val topic: String) : Recoverer {
 
     private val log = getLogger(KafkaRecoverer::class.java)
 
     override fun recover(innsending: Innsending) =
         with(innsending) {
             log.info("Recovering innsending $id via kafka: $this")
-            kafka.send(cfg.recovery.main, id, this)
+            kafka.send(topic, id, this)
             Unit
         }
 }
