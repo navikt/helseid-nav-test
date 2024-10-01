@@ -32,8 +32,8 @@ class BestillingRetryHendelseKonsument(private val edi: EDI20Service) {
     private val log = LoggerFactory.getLogger(BestillingRetryHendelseKonsument::class.java)
 
     @KafkaHandler
-    fun listen(innsending: Innsending, accessor: KafkaMessageHeaderAccessor, meta: ConsumerRecordMetadata) =
-        log.info("Mottatt innsending ${innsending.id} på ${meta.topic()} for ${accessor.nonBlockingRetryDeliveryAttempt} gang.")
+    fun listen(innsending: Innsending, a: KafkaMessageHeaderAccessor, meta: ConsumerRecordMetadata) =
+        log.info("Mottatt innsending ${innsending.id} på ${meta.topic()} for ${a.nonBlockingRetryDeliveryAttempt} gang.")
             .also { edi.send(innsending) }
 
     @DltHandler

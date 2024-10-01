@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.client.ClientHttpResponse
@@ -54,18 +53,13 @@ open class IrrecoverableException(status: HttpStatusCode,
                                   validationErrors: List<String>? = emptyList()) :
     ErrorResponseException(status, problemDetail(status, detail, uri, stackTrace, validationErrors), cause) {
     constructor(status: HttpStatusCode, uri: URI, errors: ErrorResponse, cause: Throwable? = null) :
-            this(status,
-                uri,
-                errors.error,
-                cause,
-                errors.stackTrace,
-                errors.validationErrors ?: emptyList())
+            this(status, uri, errors.error, cause, errors.stackTrace, errors.validationErrors)
 
     class NotFoundException(uri: URI,
                             detail: String? = NOT_FOUND.reasonPhrase,
                             cause: Throwable? = null,
                             stackTrace: String? = null) :
-        IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace, emptyList())
+        IrrecoverableException(NOT_FOUND, uri, detail, cause, stackTrace)
 
     override fun toString() = "IrrecoverableException(status=${statusCode}, detail=$body"
 }
@@ -82,7 +76,8 @@ private fun problemDetail(status: HttpStatusCode,
                           stackTrace: String? = null,
                           validationErrors: List<String>? = emptyList()) =
     forStatusAndDetail(status, detail).apply {
-        title = HttpStatus.resolve(status.value())?.reasonPhrase ?: status.toString()
+        title = resolve(status.value())?.reasonPhrase ?: "$status"
+        setProperty("uri", uri)
         validationErrors?.isNotEmpty().let { setProperty("validationErrors", validationErrors) }
         stackTrace?.let { setProperty("stackTrace", it) }
     }
