@@ -29,7 +29,7 @@ class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
                 log.warn("Irrecoverable request $it")
             }
 
-            else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
+            else -> RecoverableException(res.statusCode, req.uri)
         }
     }
 }
@@ -38,9 +38,9 @@ class BodyConsumingErrorHandler(private val m: ObjectMapper) : ErrorHandler {
 @Primary
 class DefaultErrorHandler : ErrorHandler {
     override fun handle(req: HttpRequest, res: ClientHttpResponse) {
-        throw when (val code = res.statusCode as HttpStatus) {
+        throw when (val code = res.statusCode) {
             BAD_REQUEST, NOT_FOUND -> IrrecoverableException(code, req.uri)
-            else -> RecoverableException(res.statusCode as HttpStatus, req.uri)
+            else -> RecoverableException(code, req.uri)
         }
     }
 }
