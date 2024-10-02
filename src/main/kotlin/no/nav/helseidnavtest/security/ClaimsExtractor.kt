@@ -12,24 +12,24 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser
 class ClaimsExtractor(private val claims: Map<String, Any>) {
     constructor(user: OidcUser) : this(user.claims)
 
-    data class User(val profession: List<String>,
-                    val hprNumber: HprId,
-                    val securityLevel: String,
-                    val navn: Navn,
-                    val assuranceLevel: String,
-                    val fnr: Fødselsnummer)
+    data class HelsePersonell(val profession: List<String>,
+                              val hprNumber: HprId,
+                              val securityLevel: String,
+                              val navn: Navn,
+                              val assuranceLevel: String,
+                              val fnr: Fødselsnummer)
 
     val professions = claims[HPR_DETAILS]?.let { hprDetails(it as Map<*, *>).professions } ?: emptyList()
     val securityLevel = claim(SECURITY_LEVEL)
 
-    val user = User(professions, HprId(claim(HPR_NUMBER)),
+    val helsePersonell = HelsePersonell(professions, HprId(claim(HPR_NUMBER)),
         securityLevel,
         Navn(claim(GIVEN_NAME_CLAIM_NAME), claim(MIDDLE_NAME_CLAIM_NAME), claim(FAMILY_NAME_CLAIM_NAME)),
         claim(ASSURANCE_LEVEL),
         Fødselsnummer(claim(PID)))
 
     private fun claim(claim: String) = claims[claim] as? String
-        ?: throw IllegalStateException() //IrrecoverableException(INTERNAL_SERVER_ERROR, "Mangler claim $claim", claim)
+        ?: throw IllegalStateException()
 
     private fun hprDetails(respons: Map<*, *>) =
         HPRDetails(with((respons)) {

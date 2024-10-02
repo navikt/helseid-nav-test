@@ -10,76 +10,62 @@ import no.nhn.register.communicationparty.CommunicationParty
 import no.nhn.register.communicationparty.Organization
 import no.nhn.register.communicationparty.OrganizationPerson
 import no.nhn.register.communicationparty.Service
-import java.net.URI
 import java.util.*
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart as Sender
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart as Avsender
+import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Virksomhet as FastlegeKontor
 
-abstract class KommunikasjonsPart(val aktiv: Boolean = true,
-                                  visningsNavn: String?,
-                                  val herId: HerId,
-                                  val navn: String) {
+abstract class KommunikasjonsPart(val herId: HerId, val navn: String, aktiv: Boolean = true) {
 
     enum class Type { Organization, Person, Service }
-
-    val orgNavn = visningsNavn ?: navn
 
     init {
         require(aktiv) { "Kommunikasjonspart ${herId.verdi} (${navn} er ikke aktiv" }
     }
 
-    class Virksomhet(aktiv: Boolean,
-                     visningsNavn: String?,
-                     herId: HerId,
-                     navn: String) :
-        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+    class Virksomhet(herId: HerId, navn: String, aktiv: Boolean = true) :
+        KommunikasjonsPart(herId, navn, aktiv) {
         constructor(virksomhet: Organization) :
-                this(virksomhet.isActive,
-                    virksomhet.displayName.value,
-                    virksomhet.herId(),
-                    virksomhet.name.value)
+                this(virksomhet.herId(),
+                    virksomhet.name.value,
+                    virksomhet.isActive)
     }
 
-    class VirksomhetPerson(aktiv: Boolean,
-                           visningsNavn: String?,
-                           herId: HerId,
-                           navn: String,
-                           val virksomhet: Virksomhet) :
-        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+    class Fastlege(
+        herId: HerId, val name: Navn, val fastlegeKontor: FastlegeKontor, aktiv: Boolean = true,
+    ) :
+        Tjeneste(herId, name.visningsNavn, fastlegeKontor, aktiv) {
         constructor(person: OrganizationPerson, virksomhet: Organization) :
-                this(person.isActive,
-                    person.displayName.value,
-                    person.herId(),
-                    person.name.value,
-                    Virksomhet(virksomhet))
+                this(person.herId(),
+                    person.navn(),
+                    Virksomhet(virksomhet),
+                    person.isActive)
     }
 
-    class Tjeneste(aktiv: Boolean,
-                   visningsNavn: String?,
-                   herId: HerId,
-                   navn: String,
-                   val virksomhet: Virksomhet) :
-        KommunikasjonsPart(aktiv, visningsNavn, herId, navn) {
+    open class Tjeneste(herId: HerId, navn: String, val virksomhet: Virksomhet, aktiv: Boolean) :
+        KommunikasjonsPart(herId, navn, aktiv) {
         constructor(tjeneste: Service, virksomhet: Organization) :
-                this(tjeneste.isActive,
-                    tjeneste.displayName.value,
-                    tjeneste.herId(),
+                this(tjeneste.herId(),
                     tjeneste.name.value,
-                    Virksomhet(virksomhet))
+                    Virksomhet(virksomhet),
+                    tjeneste.isActive)
     }
 
     data class Mottaker(val part: KommunikasjonsPart, val navn: Navn)
 }
 
+private fun OrganizationPerson.navn() = with(person.value) {
+    Navn(firstName.value, middleName.value, lastName.value)
+}
+
 data class Innsending(val id: UUID,
                       val parter: Parter,
                       val pasient: Pasient,
-                      val vedlegg: ByteArray? = null,
-                      val ref: Pair<URI, String>? = null) {
+                      val vedlegg: ByteArray? = null) {
 
     @JsonIgnore
     val avsender = parter.avsender.herId
 
-    data class Parter(val avsender: Sender, val mottaker: Mottaker)
+    data class Parter(val avsender: Avsender, val mottaker: Mottaker)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -92,7 +78,7 @@ data class Innsending(val id: UUID,
 
     override fun hashCode() = id.hashCode()
     override fun toString() =
-        javaClass.simpleName + "(id=$id, parter=$parter, pasient=$pasient, vedlegg=${vedlegg?.size}, ref=$ref)"
+        javaClass.simpleName + "(id=$id, parter=$parter, pasient=$pasient, vedlegg=${vedlegg?.size})"
 }
 
 private fun CommunicationParty.herId() = HerId(herId)

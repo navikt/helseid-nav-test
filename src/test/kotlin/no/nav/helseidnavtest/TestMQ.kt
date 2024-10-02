@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest
+package no.nav.helseidnavtest
 
 import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.fastlege.FastlegeClient
@@ -8,33 +8,20 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.AuthorityUtils
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.core.oidc.OidcIdToken
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import org.springframework.security.test.context.support.WithSecurityContext
 import org.springframework.security.test.context.support.WithSecurityContextFactory
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import kotlin.annotation.AnnotationRetention.RUNTIME
-
 
 //@SpringBootTest
 @ExtendWith(MockitoExtension::class)
 @ExtendWith(SpringExtension::class)
 
- class IBMMQTest {
-
+class IBMMQTest {
 
     @Retention(RUNTIME)
-   // @WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
+    // @WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
     annotation class WithMockCustomUser(val username: String = "rob", val name: String = "Rob Winch")
 
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
@@ -44,26 +31,28 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
 
     @Mock
     lateinit var adresse: AdresseRegisterClient
+
     @Mock
     lateinit var pdl: PDLClient
+
     @Mock
     lateinit var fastlege: FastlegeClient
 
     @Test
     fun testMQConnection() {
     }
+
     class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
         override fun createSecurityContext(customUser: WithMockCustomUser): SecurityContext {
             val context = SecurityContextHolder.createEmptyContext()
-          //  val principal = OAuth2User(customUser.name, customUser.username)
-           // val auth: Authentication =
-         //       OAuth2AuthenticationToken(principal, listOf(SimpleGrantedAuthority("LE_4")), "1")
-          //  context.authentication = auth
+            //  val principal = OAuth2User(customUser.name, customUser.username)
+            // val auth: Authentication =
+            //       OAuth2AuthenticationToken(principal, listOf(SimpleGrantedAuthority("LE_4")), "1")
+            //  context.authentication = auth
             return context
         }
     }
 }
-
 
 /*
 @TestConfiguration

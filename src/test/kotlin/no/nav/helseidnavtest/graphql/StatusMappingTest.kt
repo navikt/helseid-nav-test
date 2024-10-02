@@ -1,12 +1,12 @@
-package no.nav.helse.helseidnavtest.graphql
+package no.nav.helseidnavtest.graphql
 
 import no.nav.helseidnavtest.oppslag.graphql.GraphQLErrorHandler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import java.net.URI
 
-class StatusMappingTest  {
+class StatusMappingTest {
 
     @Test
     fun mapStatus() {

@@ -29,7 +29,6 @@ object PDLMapper {
             }
         }
 
-
     private fun navnFra(navn: PDLNavn) =
         with(navn) {
             Person.Navn(fornavn, mellomnavn, etternavn).also {
@@ -55,7 +54,10 @@ data class Person(
     val adresse: Adresse? = null,
     val fødseldato: LocalDate? = null
 ) {
-    data class Navn(val fornavn: String, val mellomnavn: String?, val etternavn: String)
+    data class Navn(val fornavn: String, val mellomnavn: String?, val etternavn: String) {
+        val visningsNavn = listOf(fornavn, mellomnavn, etternavn).joinToString(separator = " ")
+    }
+
     data class Adresse(
         val adressenavn: String?,
         val husbokstav: String?,

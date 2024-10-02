@@ -1,4 +1,4 @@
-package no.nav.helse.helseidnavtest
+package no.nav.helseidnavtest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -15,11 +15,10 @@ class HelseIdNavTestApplicationTests {
     fun contextLoads() {
         val m1 = jacksonObjectMapper()
         val m = m1.writerWithDefaultPrettyPrinter()
-        val t = Tjeneste(true,
-            "visningsnavn",
-            EDI_1.first,
+        val t = Tjeneste(EDI_1.first,
             "navn",
-            Virksomhet(true, "visningsnavn", NAV, "NAV"))
+            Virksomhet(NAV, "NAV", true),
+            true)
         val s = m.writeValueAsString(t)
         val t1 = m1.readValue<Tjeneste>(s)
         println(t1)

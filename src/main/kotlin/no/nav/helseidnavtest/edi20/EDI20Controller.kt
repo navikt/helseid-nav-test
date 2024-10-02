@@ -20,7 +20,7 @@ import no.nav.helseidnavtest.oppslag.adresse.AdresseRegisterClient
 import no.nav.helseidnavtest.oppslag.adresse.Innsending
 import no.nav.helseidnavtest.oppslag.person.PDLClient
 import no.nav.helseidnavtest.security.ClaimsExtractor
-import no.nav.helseidnavtest.security.ClaimsExtractor.User
+import no.nav.helseidnavtest.security.ClaimsExtractor.HelsePersonell
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.*
@@ -75,7 +75,7 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
+            edi.send(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).helsePersonell, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Laster opp et vedlegg og inkluderer denne i hodemeldingen for den gitte avsenderen")
@@ -89,7 +89,7 @@ class EDI20Controller(
         @Parameter(description = "Valgfritt vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile?) =
         helsePersonell?.let {
-            edi.send(bestilling(fra, til, pasient, ClaimsExtractor(it).user, vedlegg))
+            edi.send(bestilling(fra, til, pasient, ClaimsExtractor(it).helsePersonell, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Laster opp et vedlegg og viser hodemeldingen slik den ville ha blitt sendt inline for den gitte avsenderen")
@@ -102,7 +102,7 @@ class EDI20Controller(
         @Parameter(description = "Vedlegg")
         @RequestPart("file", required = false) vedlegg: MultipartFile) =
         helsePersonell?.let {
-            generator.marshal(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).user, vedlegg))
+            generator.marshal(bestilling(fra, fra.other(), pasient, ClaimsExtractor(it).helsePersonell, vedlegg))
         } ?: throw IrrecoverableException(UNAUTHORIZED, edi.uri, NO_TOKEN)
 
     @Operation(description = "Marker et dokument som konsumert av en gitt herId")
@@ -141,7 +141,7 @@ class EDI20Controller(
                 }
             }
 
-    private fun bestilling(fra: HerId, til: HerId, pasient: String, user: User, vedlegg: MultipartFile?) =
+    private fun bestilling(fra: HerId, til: HerId, pasient: String, user: HelsePersonell, vedlegg: MultipartFile?) =
         Innsending(randomUUID(),
             adresse.parter(fra, til, user.navn),
             Pasient(Fnr(pasient), pdl.navn(Fnr(pasient))),

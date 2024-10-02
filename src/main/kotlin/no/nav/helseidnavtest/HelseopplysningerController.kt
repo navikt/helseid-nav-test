@@ -22,7 +22,7 @@ class MainController {
         model.addAttribute("results", searchResults)
         return "index"
     }
-    
+
     @PostMapping("/clicked")
     fun clicked(model: Model): String {
         val user = SecurityContextHolder.getContext().authentication
@@ -41,7 +41,7 @@ class HelseopplysningerController {
     fun hello(authentication: Authentication) = dump(authentication.oidcUser())
 
     private fun dump(oidcUser: OidcUser): String {
-        val user = ClaimsExtractor(oidcUser).user
+        val user = ClaimsExtractor(oidcUser).helsePersonell
         val scopes = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
         }

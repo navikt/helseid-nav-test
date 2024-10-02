@@ -115,7 +115,7 @@ class ClaimsExtractorTest {
             "middle_name" to "mellom",
             "family_name" to "Nordmann"
         )
-        val e = ClaimsExtractor(claims).user
+        val e = ClaimsExtractor(claims).helsePersonell
         assertThat(e.hprNumber).isEqualTo(HprId(123456))
         println(e.profession)
         println(e.securityLevel)

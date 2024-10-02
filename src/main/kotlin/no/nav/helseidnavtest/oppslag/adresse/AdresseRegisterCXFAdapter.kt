@@ -38,7 +38,7 @@ private class KommunikasjonsPartMapper(private val client: ICommunicationPartySe
     fun map(it: CommunicationParty, herId: HerId) =
         when (it) {
             is KommunikasjonsPartVirksomhet -> Virksomhet(it)
-            is KommunikasjonsPartPerson -> VirksomhetPerson(it, client.getOrganizationDetails(it.parentHerId))
+            is KommunikasjonsPartPerson -> Fastlege(it, client.getOrganizationDetails(it.parentHerId))
             is KommunikasjonsPartTjeneste -> Tjeneste(it, client.getOrganizationDetails(it.parentHerId))
             else -> throw IllegalStateException("Ukjent type kommunikasjonspart for herId $herId ${it.javaClass.simpleName}")
         }
