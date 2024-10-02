@@ -14,7 +14,7 @@ import java.util.*
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart as Avsender
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Virksomhet as FastlegeKontor
 
-abstract class KommunikasjonsPart(val herId: HerId, val navn: String, aktiv: Boolean = true) {
+abstract class KommunikasjonsPart(val herId: HerId, val navn: String, val aktiv: Boolean = true) {
 
     enum class Type { Organization, Person, Service }
 
