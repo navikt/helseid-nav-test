@@ -33,7 +33,7 @@ class EDI20DialogmeldingMapperTest {
     fun hodemelding() {
         val legekontor = FastlegeKontor(HerId("123"), "Legekontoret")
         val lege = Fastlege(HerId("456"), Person.Navn("Ola", null, "Nordmann"), legekontor)
-        val m = mapper.mottaker(Mottaker(lege, Person.Navn("Ola", null, "Nordmann")))
+        val m = mapper.mottaker(Mottaker(lege, 2  Navn("Ola", null, "Nordmann")))
         jaxb2Marshaller.marshal(m, System.out)
     }
 }
