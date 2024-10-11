@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
 
     val log = LoggerFactory.getLogger(HelseIdNavTestApplication::class.java)
 
-    ApplicationModules.of(HelseIdNavTestApplication::class.java).forEach { log.info(it.toString()) }
+    ApplicationModules.of(HelseIdNavTestApplication::class.java).verify().forEach { log.info(it.toString()) }
     runApplication<HelseIdNavTestApplication>(*args) {
         setAdditionalProfiles(*profiler())
     }
