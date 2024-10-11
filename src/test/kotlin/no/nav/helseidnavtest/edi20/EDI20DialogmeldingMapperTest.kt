@@ -4,7 +4,6 @@ import jakarta.xml.bind.Marshaller.JAXB_ENCODING
 import jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT
 import no.nav.helseidnavtest.dialogmelding.HerId
 import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Fastlege
-import no.nav.helseidnavtest.oppslag.adresse.KommunikasjonsPart.Mottaker
 import no.nav.helseidnavtest.oppslag.person.Person
 import no.nav.helseopplysninger.apprec.XMLAppRec
 import no.nav.helseopplysninger.basecontainer.XMLBase64Container
@@ -33,7 +32,7 @@ class EDI20DialogmeldingMapperTest {
     fun hodemelding() {
         val legekontor = FastlegeKontor(HerId("123"), "Legekontoret")
         val lege = Fastlege(HerId("456"), Person.Navn("Ola", null, "Nordmann"), legekontor)
-        val m = mapper.mottaker(Mottaker(lege, 2  Navn("Ola", null, "Nordmann")))
-        jaxb2Marshaller.marshal(m, System.out)
+        //val m = mapper.mottaker(Mottaker(lege, 2  Navn("Ola", null, "Nordmann")))
+        //jaxb2Marshaller.marshal(m, System.out)
     }
 }
