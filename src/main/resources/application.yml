@@ -147,7 +147,7 @@ spring:
             provider: helse-id
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
-            client-id: ${clientid}
+            client-id: ${clientid1}
             client-name: NAV Helseopplysninger
             scope:
               - profile

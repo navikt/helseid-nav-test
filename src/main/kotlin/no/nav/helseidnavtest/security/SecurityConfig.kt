@@ -46,7 +46,9 @@ class SecurityConfig(
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val helseidjwk = JWK.parse(assertion)
-    private val helseidjwk1 = JWK.parse(helseid1)
+    private val helseidjwk1 = JWK.parse(helseid1).also {
+        log.info("HelseID1: $it")
+    }
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
 
