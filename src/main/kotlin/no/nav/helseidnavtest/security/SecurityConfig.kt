@@ -48,7 +48,9 @@ class SecurityConfig(
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val helseidjwk = JWK.parse(assertion)
-    private val helseidjwk1 = JWK.parse(helseid1)
+    private val helseidjwk1 = kotlin.runCatching {
+        JWK.parse(helseid1)
+    }.getOrElse { throw IllegalArgumentException("Kunne ikke parse jwk1", it) }
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
 
@@ -82,7 +84,7 @@ class SecurityConfig(
             log.info("Klient: ${it.registrationId}")
             when (it.registrationId) {
                 "helse-id" -> helseidjwk
-                "helse-id1" -> helseidjwk1
+                //  "helse-id1" -> helseidjwk1
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
