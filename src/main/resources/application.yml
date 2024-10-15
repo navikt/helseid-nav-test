@@ -157,7 +157,6 @@ spring:
               - helseid://scopes/identity/pid
               - helseid://scopes/identity/security_level
               - helseid://scopes/hpr/hpr_number
-              - nhn:flr-public/read
         provider:
           aad:
             issuer-uri: ${azure.openid.config.issuer}
