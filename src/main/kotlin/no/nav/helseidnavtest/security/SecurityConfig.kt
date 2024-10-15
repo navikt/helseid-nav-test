@@ -76,8 +76,10 @@ class SecurityConfig(
 
     private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
+            log.info("Klient: ${it.registrationId}")
             when (it.registrationId) {
                 "helse-id" -> jwk
+                "helse-id1" -> jwk
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
