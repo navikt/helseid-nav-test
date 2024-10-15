@@ -129,6 +129,7 @@ spring:
             scope:
               - api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default
           helse-id:
+            provider: helse-id
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
             client-id: ${clientid}
@@ -143,6 +144,7 @@ spring:
               - helseid://scopes/hpr/hpr_number
               - nhn:flr-public/read
           helse-id1:
+            provider: helse-id
             client-authentication-method: private_key_jwt
             authorization-grant-type: authorization_code
             client-id: ${clientid}
