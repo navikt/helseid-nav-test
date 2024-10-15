@@ -106,6 +106,8 @@ spec:
       value: {{env}}
     - name: clientid
       value: {{clientid}}
+    - name: clientid1
+      value: {{clientid1}}
     - name: clientid-test1
       value: {{clientid-test1}}
     - name: clientid-test2

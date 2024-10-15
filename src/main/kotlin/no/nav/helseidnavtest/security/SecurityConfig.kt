@@ -39,13 +39,16 @@ import java.time.Instant.now
 @EnableWebSecurity(debug = true)
 class SecurityConfig(
     @Value("\${helse-id.jwk}") private val assertion: String,
+    @Value("\${helse-id1.jwk}") private val helseid1: String,
+
     @Value("\${helse-id.test1.jwk}") private val jwk1: String,
     @Value("\${helse-id.test2.jwk}") private val jwk2: String
 ) {
 
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
-    private val jwk = JWK.parse(assertion)
+    private val helseidjwk = JWK.parse(assertion)
+    private val helseidjwk1 = JWK.parse(helseid1)
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
 
@@ -78,8 +81,8 @@ class SecurityConfig(
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             log.info("Klient: ${it.registrationId}")
             when (it.registrationId) {
-                "helse-id" -> jwk
-                "helse-id1" -> jwk
+                "helse-id" -> helseidjwk
+                "helse-id1" -> helseidjwk1
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
