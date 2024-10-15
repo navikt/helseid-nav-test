@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2A
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.endpoint.*
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
@@ -48,9 +47,7 @@ class SecurityConfig(
     private val authorizationEndpoint: String = "/oauth2/authorization"
 
     private val helseidjwk = JWK.parse(assertion)
-    private val helseidjwk1 = kotlin.runCatching {
-        JWK.parse(helseid1)
-    }.getOrElse { throw IllegalArgumentException("Kunne ikke parse jwk1", it) }
+    private val helseidjwk1 = JWK.parse(helseid1)
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
 
@@ -73,12 +70,12 @@ class SecurityConfig(
         }
     }
 
-    @Bean
+    /*@Bean
     fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
         OidcClientInitiatedLogoutSuccessHandler(repo).apply {
             setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
         }
-
+*/
     private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             log.info("Klient: ${it.registrationId}")
