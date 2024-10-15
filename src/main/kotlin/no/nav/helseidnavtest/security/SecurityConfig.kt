@@ -84,7 +84,7 @@ class SecurityConfig(
             log.info("Klient: ${it.registrationId}")
             when (it.registrationId) {
                 "helse-id" -> helseidjwk
-                //  "helse-id1" -> helseidjwk1
+                "helse-id1" -> helseidjwk1
                 else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
             }
         })
