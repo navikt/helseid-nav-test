@@ -29,7 +29,6 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVA
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.util.LinkedMultiValueMap
 import java.time.Instant.now
 
@@ -95,8 +94,7 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        repo: ClientRegistrationRepository,
-        successHandler: LogoutSuccessHandler
+        repo: ClientRegistrationRepository
     ): SecurityFilterChain {
         http {
             csrf { disable() }
@@ -112,9 +110,6 @@ class SecurityConfig(
                 jwt {}
             }
             oauth2Client {
-            }
-            logout {
-                logoutSuccessHandler = successHandler
             }
             authorizeRequests {
                 authorize("/hello1", authenticated)
