@@ -18,12 +18,17 @@ Test av HelseID pålogging til beskyttet REST endepunkt i NAV
 | Teknologi   | Minimum versjon |
 |-------------|-----------------|
 | JDK         | 21              |
-| Kotlin      | 1.9.22          |
-| Spring Boot | 3.2.2           |
+
+Du kan sjekke hvilken versjon du har installert, ved å bruke denne kommandoen:
+``` shell
+java -version
+```
 
 ## Installasjon
+``` shell
+./mvnw clean install
+```
 
-`$ ./mvnw clean install`
 
 ### Kjør lokalt
 
@@ -31,7 +36,7 @@ Det anbefales å bruke Spring Boot konfigurasjon via IntelliJ Run Configurations
 
 #### JWK oppsett
 
-Kopier [application-dev-gcp.yml](./src/main/resources/application-dev-gcp.yml) og endre navnet på filen til
+Kopier [application.yml](./src/main/resources/application.yml) og endre navnet på filen til
 application-local.yml
 
 Gi filen følgende felter:
@@ -57,44 +62,15 @@ Du kan opprette din egen klient i HelseID selvbetjening hvis du ønsker. Dette g
     1. Sørg for at konfigurasjonen opprettes på klienten du lagde i steg 3
 5. Last ned konfigurasjonsfilen og legg til de nødvendige verdiene i `application-local.yml`
 
-#### Maven oppsett
-
-Du trenger tilgang til å hente NAV spesifikk verktøy på GitHub. Dette gjør du ved å legge til innstillinger i
-din `~/.m2/settings.xml`:
-
-Følg [denne guiden på GitHub](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry)
-for å generere Personal Access Token (PAT) med riktig scope.
-Maven innstillingene skal til slutt inneholde disse verdiene:
-
-```xml
-
-<repository>
-    <id>helse</id>
-    <name>GitHub felles Apache Maven Packages</name>
-    <url>https://maven.pkg.github.com/navikt/helseid-nav-test</url>
-</repository>
-
-<servers>
-<server>
-    <id>github</id>
-    <username>[ditt github brukernavn]</username>
-    <password>[din personal access token]</password>
-</server>
-</servers>
-```
-
-Husk at du må autorisere PATen på NAV IKT og NAIS. Dette gjør du i menyen på PATen.
-
-Dersom du bruker IntelliJ bør du huke av for at din lokale `settings.xml` overskriver default Maven settings i
-innstillingene.
-Dette finner du i **Build, Execution, Deployment > Build Tools > Maven**. Huk av *User settings file override*
-
 ### Docker
 
 Vi bruker lokal JIB Maven for automatisk oppsett av Docker image. For å opprette et image, kjør
-
-`$ ./mvnw compile com.google.cloud.tools:jib-maven-plugin:3.3.2:dockerBuild`
+``` shell
+./mvnw compile dockerBuild`
+```
 
 ## Support
+Spørsmål knyttet til koden eller prosjektet kan stilles som issues her på GitHub.
 
-NAV ansatte kan kontakte teamet på [#team-helseopplysninger](https://app.slack.com/client/T5LNAMWNA/C01AQTAU3CH),
+### For NAV-ansatte
+Interne henvendelser kan sendes via Slack i kanalen ![#team-helseopplysninger](https://app.slack.com/client/T5LNAMWNA/C01AQTAU3CH),
