@@ -118,6 +118,7 @@ spec:
       value: {{ereg}}
   envFrom:
     - secret: helseid
+    - secret: helseid1
     - secret: helseid2
     - secret: fastlege
     - secret: dialogmelding
