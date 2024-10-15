@@ -142,7 +142,6 @@ spring:
               - helseid://scopes/identity/pid
               - helseid://scopes/identity/security_level
               - helseid://scopes/hpr/hpr_number
-              - nhn:flr-public/read
           helse-id1:
             provider: helse-id
             client-authentication-method: private_key_jwt
