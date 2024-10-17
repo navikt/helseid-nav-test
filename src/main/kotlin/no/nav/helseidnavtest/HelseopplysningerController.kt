@@ -45,7 +45,9 @@ class HelseopplysningerController {
         val authorities = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
         }
-        val claims = oidcUser.idToken.claims
+        val idtokenClaims = oidcUser.idToken.claims.map {
+            "<li>${it.key}: ${it.value}</li>"
+        }.joinToString("")
         val userClaims = oidcUser.userInfo.claims.map {
             "<li>${it.key}: ${it.value}</li>"
         }.joinToString("")
@@ -63,7 +65,7 @@ class HelseopplysningerController {
             <ul>$userClaims</ul>
              <br>
          <p>ID-Token claims</p>
-            <ul>$claims</ul>     
+            <ul>$idtokenClaims</ul>     
             <br>
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
