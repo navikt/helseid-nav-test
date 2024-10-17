@@ -67,7 +67,7 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
 
         return """
             <h1>/hello1</h1>
-            <p>Hello from <b>${user.navn}</b></p>
+            <p>Hello from <b>${user.navn} ${client.accessToken.tokenValue}</b></p>
             <p>HPR-nummer: <b>${user.hprNumber}</b></p>
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
             <br>
