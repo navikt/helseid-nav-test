@@ -4,7 +4,9 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.core.oidc.user.OidcUser
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,18 +34,24 @@ class MainController {
 }
 
 @RestController
-class HelseopplysningerController {
+class HelseopplysningerController(private val authorizedClientService: OAuth2AuthorizedClientService) {
 
     @GetMapping("/hello1")
-    fun hello1(oidcUser: OidcUser) =
-        dump(oidcUser)
+    fun hello1(authentication: Authentication) =
+        dump(authentication as OAuth2AuthenticationToken)
 
     @GetMapping("/hello")
     fun hello(authentication: Authentication) =
-        dump(authentication.oidcUser())
+        dump(authentication as OAuth2AuthenticationToken)
 
-    private fun dump(oidcUser: OidcUser, scopes: Set<String> = emptySet()): String {
-        val accessTokenScopes = scopes.joinToString("") {
+    private fun dump(token: OAuth2AuthenticationToken, scopes: Set<String> = emptySet()): String {
+        val oidcUser = token.oidcUser()
+
+        val client =
+            authorizedClientService.loadAuthorizedClient<OAuth2AuthorizedClient>(token.authorizedClientRegistrationId,
+                token.name)
+
+        val accessTokenScopes = client.accessToken?.scopes?.joinToString("") {
             "<li>$it</li>"
         }
         val user = ClaimsExtractor(oidcUser).helsePersonell
