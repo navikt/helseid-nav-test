@@ -42,10 +42,11 @@ class HelseopplysningerController {
 
     private fun dump(oidcUser: OidcUser): String {
         val user = ClaimsExtractor(oidcUser).helsePersonell
-        val scopes = oidcUser.authorities.joinToString("") {
+        val authorities = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
         }
-        val claims = oidcUser.claims.map {
+        val claims = oidcUser.idToken.claims
+        val userClaims = oidcUser.userInfo.claims.map {
             "<li>${it.key}: ${it.value}</li>"
         }.joinToString("")
 
@@ -56,10 +57,13 @@ class HelseopplysningerController {
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
             <br>
             <p>Requested authorities</p>
-            <ul>$scopes</ul>
+            <ul>$authorities</ul>
             <br>
-            <p>Token claims</p>
-            <ul>$claims</ul>
+            <p>Userinfo claims</p>
+            <ul>$userClaims</ul>
+             <br>
+         <p>ID-Token claims</p>
+            <ul>$claims</ul>     
             <br>
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
