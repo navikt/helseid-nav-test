@@ -4,6 +4,8 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -35,12 +37,18 @@ class MainController {
 class HelseopplysningerController {
 
     @GetMapping("/hello1")
-    fun hello1(authentication: Authentication) = dump(authentication.oidcUser())
+    fun hello1(oidcUser: OidcUser, @RegisteredOAuth2AuthorizedClient("helse-id") client: OAuth2AuthorizedClient) =
+        dump(oidcUser, client.accessToken.scopes)
 
     @GetMapping("/hello")
-    fun hello(authentication: Authentication) = dump(authentication.oidcUser())
+    fun hello(authentication: Authentication,
+              @RegisteredOAuth2AuthorizedClient("helse-id") client: OAuth2AuthorizedClient) =
+        dump(authentication.oidcUser(), client.accessToken.scopes)
 
-    private fun dump(oidcUser: OidcUser): String {
+    private fun dump(oidcUser: OidcUser, scopes: Set<String> = emptySet()): String {
+        val accessTokenScopes = scopes.joinToString("") {
+            "<li>$it</li>"
+        }
         val user = ClaimsExtractor(oidcUser).helsePersonell
         val authorities = oidcUser.authorities.joinToString("") {
             "<li>${it.authority.replace("SCOPE_", "")}</li>"
@@ -58,6 +66,8 @@ class HelseopplysningerController {
             <p>HPR-nummer: <b>${user.hprNumber}</b></p>
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
             <br>
+            <p>Access token scopes</p>
+            <ul>$accessTokenScopes</ul>
             <p>Requested authorities</p>
             <ul>$authorities</ul>
             <br>
