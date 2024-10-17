@@ -44,7 +44,7 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
     fun hello(authentication: Authentication) =
         dump(authentication as OAuth2AuthenticationToken)
 
-    private fun dump(token: OAuth2AuthenticationToken, scopes: Set<String> = emptySet()): String {
+    private fun dump(token: OAuth2AuthenticationToken): String {
         val oidcUser = token.oidcUser()
 
         val client =
@@ -54,9 +54,9 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
         val accessTokenScopes = client.accessToken?.scopes?.joinToString("") {
             "<li>$it</li>"
         }
-        val user = ClaimsExtractor(oidcUser).helsePersonell
+        val user = ClaimsExtractor(oidcUser.claims).helsePersonell
         val authorities = oidcUser.authorities.joinToString("") {
-            "<li>${it.authority.replace("SCOPE_", "")}</li>"
+            "<li>${it.authority}</li>"
         }
         val idtokenClaims = oidcUser.idToken.claims.map {
             "<li>${it.key}: ${it.value}</li>"
