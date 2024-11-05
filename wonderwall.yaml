@@ -51,7 +51,7 @@ spec:
     - name: WONDERWALL_UPSTREAM_HOST
       value: echo
     - name: WONDERWALL_BIND_ADDRESS
-      value: 0.0.0.0:8080
+      value: $(BIND_ADDRESS)
     - name: WONDERWALL_INGRESS
       value: https://wonderwall-helse.ekstern.dev.nav.no
     - name: WONDERWALL_OPENID_WELL_KNOWN_URL
