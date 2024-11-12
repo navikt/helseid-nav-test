@@ -1,6 +1,10 @@
 package no.nav.helseidnavtest.security
 
+import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier
+import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DELEGATING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
@@ -26,6 +30,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
 import java.time.Instant.now
@@ -42,6 +48,16 @@ class SecurityConfig(
     private val edi20_2_jwk = JWK.parse(jwk2)
 
     private val log = getLogger(SecurityConfig::class.java)
+
+    @Bean
+    fun jwtDecoder(): JwtDecoder { // jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier (new JOSEObjectType ("at+jwt")))
+        return NimbusJwtDecoder.withJwkSetUri("https://helseid-sts.test.nhn.no/.well-known/openid-configuration/jwks")
+            .jwtProcessorCustomizer { customizer: ConfigurableJWTProcessor<SecurityContext?> ->
+                customizer.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(
+                    JOSEObjectType("at+jwt")))
+            }
+            .build()
+    }
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
@@ -68,7 +84,8 @@ class SecurityConfig(
         http {
             csrf { disable() }
             oauth2ResourceServer {
-                jwt {}
+                jwt {
+                }
             }
             oauth2Client {
             }
