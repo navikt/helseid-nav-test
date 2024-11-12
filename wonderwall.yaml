@@ -4,7 +4,7 @@ metadata:
   annotations:
     nais.io/read-only-file-system: "false"
     nais.io/run-as-user: "1001"
-  name: wonderwall
+  name: helseid-wonderwall
   namespace: helseopplysninger
   labels:
     team: helseopplysninger
@@ -17,7 +17,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-       -  application: helseid-nav-test
+       -  application: helseid-nav
       external:
         - host: helseid-sts.test.nhn.no
   image:   ghcr.io/nais/wonderwall:latest
@@ -34,7 +34,7 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   ingresses:
-    - https://helseid-nav-test.ekstern.dev.nav.no
+    - https://helseid-wonderwall.ekstern.dev.nav.no
   resources:
     limits:
       memory: 8192Mi
@@ -53,7 +53,7 @@ spec:
     - name: WONDERWALL_BIND_ADDRESS
       value: $(BIND_ADDRESS)
     - name: WONDERWALL_INGRESS
-      value: https://helseid-nav-test.ekstern.dev.nav.no
+      value: https://helseid-wonderwall.ekstern.dev.nav.no
     - name: WONDERWALL_OPENID_WELL_KNOWN_URL
       value: https://helseid-sts.test.nhn.no/.well-known/openid-configuration
     - name: WONDERWALL_AUTO_LOGIN
