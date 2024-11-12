@@ -49,7 +49,7 @@ class SecurityConfig(
 
     private val log = getLogger(SecurityConfig::class.java)
 
-    @Bean
+    //@Bean
     fun jwtDecoder(): JwtDecoder { // jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier (new JOSEObjectType ("at+jwt")))
         return NimbusJwtDecoder.withJwkSetUri("https://helseid-sts.test.nhn.no/.well-known/openid-configuration/jwks")
             .jwtProcessorCustomizer { customizer: ConfigurableJWTProcessor<SecurityContext?> ->
