@@ -128,34 +128,6 @@ spring:
             provider: aad
             scope:
               - api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default
-          helse-id:
-            provider: helse-id
-            client-authentication-method: private_key_jwt
-            authorization-grant-type: authorization_code
-            client-id: ${clientid}
-            client-name: NAV Helseopplysninger
-            scope:
-              - profile
-              - openid
-              - offline_access
-              - helseid://scopes/identity/assurance_level
-              - helseid://scopes/identity/pid
-              - helseid://scopes/identity/security_level
-              - helseid://scopes/hpr/hpr_number
-          helse-id1:
-            provider: helse-id
-            client-authentication-method: private_key_jwt
-            authorization-grant-type: authorization_code
-            client-id: ${clientid1}
-            client-name: NAV Helseopplysninger
-            scope:
-              - profile
-              - openid
-              - offline_access
-              - helseid://scopes/identity/assurance_level
-              - helseid://scopes/identity/pid
-              - helseid://scopes/identity/security_level
-              - helseid://scopes/hpr/hpr_number
         provider:
           aad:
             issuer-uri: ${azure.openid.config.issuer}
