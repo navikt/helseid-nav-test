@@ -98,6 +98,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${helse-id.issuer}
+          jwk-set-uri: ${helse-id.issuer}/.well-known/openid-configuration/jwks
       client:
         registration:
           edi20-1:
