@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -30,7 +31,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
-import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
@@ -50,14 +50,13 @@ class SecurityConfig(
     private val log = getLogger(SecurityConfig::class.java)
 
     @Bean
-    fun jwtDecoder(): JwtDecoder { // jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier (new JOSEObjectType ("at+jwt")))
-        return NimbusJwtDecoder.withJwkSetUri("https://helseid-sts.test.nhn.no/.well-known/openid-configuration/jwks")
+    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties) =
+        NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
             .jwtProcessorCustomizer { customizer: ConfigurableJWTProcessor<SecurityContext?> ->
                 customizer.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(
                     JOSEObjectType("at+jwt")))
             }
             .build()
-    }
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
