@@ -23,8 +23,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.endpoint.*
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers.withPkce
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
@@ -36,15 +34,10 @@ import java.time.Instant.now
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity(debug = true)
 class SecurityConfig(
-    @Value("\${helse-id.jwk}") private val assertion: String,
-    @Value("\${helse-id1.jwk}") private val helseid1: String,
-
     @Value("\${helse-id.test1.jwk}") private val jwk1: String,
     @Value("\${helse-id.test2.jwk}") private val jwk2: String
 ) {
-    
-    private val helseidjwk = JWK.parse(assertion)
-    private val helseidjwk1 = JWK.parse(helseid1)
+
     private val edi20_1_jwk = JWK.parse(jwk1)
     private val edi20_2_jwk = JWK.parse(jwk2)
 
@@ -66,22 +59,6 @@ class SecurityConfig(
             }
         }
     }
-
-    private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
-        addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
-            log.info("Klient: ${it.registrationId}")
-            when (it.registrationId) {
-                "helse-id" -> helseidjwk
-                "helse-id1" -> helseidjwk1
-                else -> throw IllegalArgumentException("Ukjent klient: ${it.registrationId}")
-            }
-        })
-    }
-
-    private fun authCodeResponseClient(converter: OAuth2AuthorizationCodeGrantRequestEntityConverter) =
-        DefaultAuthorizationCodeTokenResponseClient().apply {
-            setRequestEntityConverter(converter)
-        }
 
     @Bean
     fun securityFilterChain(

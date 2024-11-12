@@ -34,7 +34,7 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   ingresses:
-    - https:helseid-nav-test.ekstern.dev.nav.no
+    - https://helseid-nav-test.ekstern.dev.nav.no
   resources:
     limits:
       memory: 8192Mi
@@ -53,7 +53,7 @@ spec:
     - name: WONDERWALL_BIND_ADDRESS
       value: $(BIND_ADDRESS)
     - name: WONDERWALL_INGRESS
-      value: https://wonderwall-helse.ekstern.dev.nav.no
+      value: https://helseid-nav-test.ekstern.dev.nav.no
     - name: WONDERWALL_OPENID_WELL_KNOWN_URL
       value: https://helseid-sts.test.nhn.no/.well-known/openid-configuration
     - name: WONDERWALL_AUTO_LOGIN
