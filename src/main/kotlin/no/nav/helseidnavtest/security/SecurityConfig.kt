@@ -42,9 +42,7 @@ class SecurityConfig(
     @Value("\${helse-id.test1.jwk}") private val jwk1: String,
     @Value("\${helse-id.test2.jwk}") private val jwk2: String
 ) {
-
-    private val authorizationEndpoint: String = "/oauth2/authorization"
-
+    
     private val helseidjwk = JWK.parse(assertion)
     private val helseidjwk1 = JWK.parse(helseid1)
     private val edi20_1_jwk = JWK.parse(jwk1)
@@ -69,12 +67,6 @@ class SecurityConfig(
         }
     }
 
-    /*@Bean
-    fun oidcLogoutSuccessHandler(repo: ClientRegistrationRepository) =
-        OidcClientInitiatedLogoutSuccessHandler(repo).apply {
-            setPostLogoutRedirectUri("{baseUrl}/oauth2/authorization/helse-id")
-        }
-*/
     private fun converter() = OAuth2AuthorizationCodeGrantRequestEntityConverter().apply {
         addParametersConverter(NimbusJwtClientAuthenticationParametersConverter {
             log.info("Klient: ${it.registrationId}")
@@ -98,14 +90,6 @@ class SecurityConfig(
     ): SecurityFilterChain {
         http {
             csrf { disable() }
-            oauth2Login {
-                authorizationEndpoint {
-                    authorizationRequestResolver = pkceAddingResolver(repo)
-                }
-                tokenEndpoint {
-                    accessTokenResponseClient = authCodeResponseClient(converter())
-                }
-            }
             oauth2ResourceServer {
                 jwt {}
             }
@@ -119,11 +103,6 @@ class SecurityConfig(
         }
         return http.build()
     }
-
-    private fun pkceAddingResolver(repo: ClientRegistrationRepository) =
-        DefaultOAuth2AuthorizationRequestResolver(repo, authorizationEndpoint).apply {
-            setAuthorizationRequestCustomizer(withPkce())
-        }
 
     @Bean
     @Qualifier(PLAIN)
