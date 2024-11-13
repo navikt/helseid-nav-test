@@ -66,10 +66,11 @@ class SecurityConfig(
     @ConditionalOnProperty(name = ["spring.security.oauth2.resourceserver.jwt.jwk-set-uri"])
     @Bean
     fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
-        log.info("DECODING")
         val jwkSetUri = oAuth2ResourceServerProperties.jwt.jwkSetUri
         val jwtDecoder = withJwkSetUri(jwkSetUri).build()
         jwtDecoder.setJwtValidator {
+            log.info("DECODING " + it.headers)
+
             // Accept tokens with typ `at+jwt`
             if (it.headers["typ"] == "at+jwt") {
                 OAuth2TokenValidatorResult.success()
