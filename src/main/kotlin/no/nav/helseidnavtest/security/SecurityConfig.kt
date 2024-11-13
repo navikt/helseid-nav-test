@@ -3,8 +3,6 @@ package no.nav.helseidnavtest.security
 import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier
-import com.nimbusds.jose.proc.SecurityContext
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.DELEGATING
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_1
 import no.nav.helseidnavtest.edi20.EDI20Config.Companion.EDI_2
@@ -13,6 +11,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,10 +28,12 @@ import org.springframework.security.oauth2.client.endpoint.*
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
+import org.springframework.security.oauth2.core.OAuth2Error
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder.withJwkSetUri
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
 import java.time.Instant.now
@@ -51,16 +52,72 @@ class SecurityConfig(
     private val log = getLogger(SecurityConfig::class.java)
 
     //@Bean
-    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
-        log.info("URI " + oAuth2ResourceServerProperties.jwt.issuerUri)
-        return NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
-            .jwtProcessorCustomizer { customizer: ConfigurableJWTProcessor<SecurityContext?> ->
-                customizer.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(
+    @ConditionalOnProperty(name = ["spring.security.oauth2.resourceserver.jwt.jwk-set-uri"])
+    fun jwtDecoder1(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
+        log.info("URI " + oAuth2ResourceServerProperties.jwt.jwkSetUri)
+        return withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
+            .jwtProcessorCustomizer {
+                it.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(
                     JOSEObjectType("at+jwt")))
             }
             .build()
     }
 
+    @ConditionalOnProperty(name = ["spring.security.oauth2.resourceserver.jwt.jwk-set-uri"])
+    @Bean
+    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
+        log.info("DECODING")
+        val jwkSetUri = oAuth2ResourceServerProperties.jwt.jwkSetUri
+        val jwtDecoder = withJwkSetUri(jwkSetUri).build()
+        jwtDecoder.setJwtValidator {
+            // Accept tokens with typ `at+jwt`
+            if (it.headers["typ"] == "at+jwt") {
+                OAuth2TokenValidatorResult.success()
+            } else {
+                OAuth2TokenValidatorResult.failure(
+                    OAuth2Error("invalid_token", "Invalid token type", null)
+                )
+            }
+        }
+
+        return jwtDecoder
+    }
+
+    /*
+    @Bean
+    fun jwtDecoderByJwkKeySetUri(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties,
+                                 oAuth2ClientDetailProperties: OAuth2ClientResourceDetailProperties): JwtDecoder {
+        val jwtProperties = oAuth2ResourceServerProperties.jwt
+
+        val nimbusJwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwtProperties.jwkSetUri)
+            .jwsAlgorithm(SignatureAlgorithm.from(jwtProperties.jwsAlgorithms[0]))
+            .jwtProcessorCustomizer { processor: ConfigurableJWTProcessor<SecurityContext?> ->
+                processor.setJWSTypeVerifier(
+                    DefaultJOSEObjectTypeVerifier(
+                        JOSEObjectType("JWT"), JOSEObjectType("at+jwt")))
+            }
+            .build()
+
+        val validators: MutableList<OAuth2TokenValidator<Jwt>> = ArrayList<OAuth2TokenValidator<Jwt>>()
+
+        validators.add(JwtTimestampValidator())
+
+        if (jwtProperties.issuerUri != null) {
+            validators.add(JwtIssuerValidator(jwtProperties.issuerUri))
+        }
+
+        if (oAuth2ClientDetailProperties.getAudience() != null) {
+            validators.add(JwtAudienceValidator(oAuth2ClientDetailProperties.getAudience()))
+        }
+
+        if (oAuth2ClientDetailProperties.getScope() != null) {
+            validators.add(JwtScopeValidator(oAuth2ClientDetailProperties.getScope()))
+        }
+
+        nimbusJwtDecoder.setJwtValidator(DelegatingOAuth2TokenValidator<Any?>(validators))
+        return nimbusJwtDecoder
+    }
+*/
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
         authorities + authorities.flatMapTo(mutableSetOf()) { authority ->
