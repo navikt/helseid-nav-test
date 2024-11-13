@@ -52,7 +52,7 @@ class SecurityConfig(
         NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
             .jwtProcessorCustomizer { processor ->
                 log.info("Customizing JWT processor")
-                processor.setJWETypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
+                processor.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
             }
             .build()
 
