@@ -14,7 +14,6 @@ import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeReposi
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -30,7 +29,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
-import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
@@ -49,17 +47,14 @@ class SecurityConfig(
 
     private val log = getLogger(SecurityConfig::class.java)
 
-    @Primary
     @Bean
-    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
-        log.info("URI " + oAuth2ResourceServerProperties.jwt.jwkSetUri)
-        return NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
+    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties) =
+        NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
             .jwtProcessorCustomizer { processor ->
-                log.info("CUSTOMIZING")
+                log.info("Customizing JWT processor")
                 processor.setJWETypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
             }
             .build()
-    }
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
