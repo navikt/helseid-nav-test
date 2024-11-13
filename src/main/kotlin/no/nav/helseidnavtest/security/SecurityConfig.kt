@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -65,12 +66,14 @@ class SecurityConfig(
 
     @ConditionalOnProperty(name = ["spring.security.oauth2.resourceserver.jwt.jwk-set-uri"])
     @Bean
+    @Primary
     fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
+
+        log.info("DECODING " + oAuth2ResourceServerProperties.jwt.jwkSetUri)
         val jwkSetUri = oAuth2ResourceServerProperties.jwt.jwkSetUri
         val jwtDecoder = withJwkSetUri(jwkSetUri).build()
         jwtDecoder.setJwtValidator {
             log.info("DECODING " + it.headers)
-
             // Accept tokens with typ `at+jwt`
             if (it.headers["typ"] == "at+jwt") {
                 OAuth2TokenValidatorResult.success()
