@@ -50,7 +50,7 @@ class SecurityConfig(
 
     private val log = getLogger(SecurityConfig::class.java)
 
-    @Bean
+    //@Bean
     fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties): JwtDecoder {
         log.info("URI " + oAuth2ResourceServerProperties.jwt.issuerUri)
         return NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
