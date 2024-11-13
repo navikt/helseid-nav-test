@@ -48,11 +48,10 @@ class SecurityConfig(
     private val log = getLogger(SecurityConfig::class.java)
 
     @Bean
-    fun jwtDecoder(oAuth2ResourceServerProperties: OAuth2ResourceServerProperties) =
-        NimbusJwtDecoder.withJwkSetUri(oAuth2ResourceServerProperties.jwt.jwkSetUri)
-            .jwtProcessorCustomizer { processor ->
-                log.info("Customizing JWT processor")
-                processor.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
+    fun jwtDecoder(props: OAuth2ResourceServerProperties) =
+        NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
+            .jwtProcessorCustomizer {
+                it.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
             }
             .build()
 
