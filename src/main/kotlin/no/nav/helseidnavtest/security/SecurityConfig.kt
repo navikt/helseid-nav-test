@@ -55,6 +55,7 @@ class SecurityConfig(
             .jwtProcessorCustomizer {
                 it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
             }.build().apply {
+                log.info("Issuer: ${props.jwt.issuerUri}")
                 val issuerValidator = JwtIssuerValidator(props.jwt.issuerUri)
                 setJwtValidator(JwtValidators.createDefaultWithValidators(issuerValidator))
             }
