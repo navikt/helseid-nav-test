@@ -4,7 +4,6 @@ import no.nav.helseidnavtest.security.ClaimsExtractor
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.oidcUser
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Controller
@@ -47,24 +46,22 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
     private fun dump(token: Authentication): String {
         val oidcUser = (token as JwtAuthenticationToken)
 
-        val client =
-            authorizedClientService.loadAuthorizedClient<OAuth2AuthorizedClient>(token.authorizedClientRegistrationId,
-                token.name)
-
+        /*
         val accessTokenScopes = client.accessToken?.scopes?.joinToString("") {
             "<li>$it</li>"
-        }
+        }*/
         val user = ClaimsExtractor(token.tokenAttributes).helsePersonell
         val authorities = oidcUser.authorities.joinToString("") {
             "<li>${it.authority}</li>"
         }
+        /*
         val idtokenClaims = oidcUser.idToken.claims.map {
             "<li>${it.key}: ${it.value}</li>"
         }.joinToString("")
         val userClaims = oidcUser.userInfo.claims.map {
             "<li>${it.key}: ${it.value}</li>"
         }.joinToString("")
-
+*/
         return """
             <h1>/hello1</h1>
             <p>Hello from <b>${user.navn}</b></p>
@@ -72,15 +69,12 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
             <p>Nivå: <b>${user.assuranceLevel}</b> - <b>${user.securityLevel}</b></p>
             <br>
             <p>Access token scopes</p>
-            <ul>$accessTokenScopes</ul>
             <p>Requested authorities</p>
             <ul>$authorities</ul>
             <br>
             <p>Userinfo claims</p>
-            <ul>$userClaims</ul>
              <br>
          <p>ID-Token claims</p>
-            <ul>$idtokenClaims</ul>     
             <br>
             <a href="/logout"><button>Logg ut</button></a>
         """.trimIndent()
