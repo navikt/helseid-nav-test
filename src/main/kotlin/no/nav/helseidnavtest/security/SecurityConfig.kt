@@ -52,6 +52,7 @@ class SecurityConfig(
     fun jwtDecoder(props: OAuth2ResourceServerProperties) =
         NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
             .jwtProcessorCustomizer {
+                log.info("Issuer0: ${props.jwt.issuerUri}")
                 it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
             }.build().apply {
                 log.info("Issuer: ${props.jwt.issuerUri}")
