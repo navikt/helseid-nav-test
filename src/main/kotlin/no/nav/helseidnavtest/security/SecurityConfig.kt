@@ -27,8 +27,11 @@ import org.springframework.security.oauth2.client.endpoint.*
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator
+import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
@@ -48,12 +51,17 @@ class SecurityConfig(
     private val log = getLogger(SecurityConfig::class.java)
 
     @Bean
-    fun jwtDecoder(props: OAuth2ResourceServerProperties) =
-        NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
+    fun jwtDecoder(props: OAuth2ResourceServerProperties): NimbusJwtDecoder? {
+        val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
             .jwtProcessorCustomizer {
-                it.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
-            }
-            .build()
+                it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
+            }.build()
+        val issuerValidator = JwtIssuerValidator("https://expected-issuer.com")
+        val combinedValidator =
+            DelegatingOAuth2TokenValidator(JwtValidators.createDefault(), issuerValidator)
+        jwtDecoder.setJwtValidator(combinedValidator)
+        return jwtDecoder
+    }
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->

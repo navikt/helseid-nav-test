@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -38,14 +38,14 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
 
     @GetMapping("/hello1")
     fun hello1(authentication: Authentication) =
-        dump(authentication as OAuth2AuthenticationToken)
+        dump(authentication)
 
     @GetMapping("/hello")
     fun hello(authentication: Authentication) =
-        dump(authentication as OAuth2AuthenticationToken)
+        dump(authentication)
 
-    private fun dump(token: OAuth2AuthenticationToken): String {
-        val oidcUser = token.oidcUser()
+    private fun dump(token: Authentication): String {
+        val oidcUser = (token as JwtAuthenticationToken)
 
         val client =
             authorizedClientService.loadAuthorizedClient<OAuth2AuthorizedClient>(token.authorizedClientRegistrationId,
@@ -54,7 +54,7 @@ class HelseopplysningerController(private val authorizedClientService: OAuth2Aut
         val accessTokenScopes = client.accessToken?.scopes?.joinToString("") {
             "<li>$it</li>"
         }
-        val user = ClaimsExtractor(oidcUser.claims).helsePersonell
+        val user = ClaimsExtractor(token.tokenAttributes).helsePersonell
         val authorities = oidcUser.authorities.joinToString("") {
             "<li>${it.authority}</li>"
         }

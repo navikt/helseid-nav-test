@@ -4,7 +4,7 @@ import com.nimbusds.jose.JWSAlgorithm.ES256
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.ECDSASigner
 import com.nimbusds.jose.jwk.ECKey
-import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.JWTClaimsSet.Builder
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.oauth2.sdk.dpop.DPoPProofFactory.TYPE
 import com.nimbusds.openid.connect.sdk.Nonce
@@ -28,7 +28,7 @@ class DPoPProofGenerator(private val keyPair: ECKey) {
         }.serialize()
 
     private fun claims(method: HttpMethod, uri: URI, token: OAuth2AccessToken?, nonce: Nonce?) =
-        JWTClaimsSet.Builder()
+        Builder()
             .jwtID("${UUID.randomUUID()}")
             .issueTime(from(now()))
             .nonce(nonce)
@@ -56,16 +56,16 @@ class DPoPProofGenerator(private val keyPair: ECKey) {
         private fun URI.stripQuery() =
             "${URI(scheme, getAuthority(), getPath(), null, getFragment())}"
 
-        private fun JWTClaimsSet.Builder.htm(method: HttpMethod) =
+        private fun Builder.htm(method: HttpMethod) =
             claim(HTM_CLAIM_NAME, method.name())
 
-        private fun JWTClaimsSet.Builder.htu(uri: URI) =
+        private fun Builder.htu(uri: URI) =
             claim(HTU_CLAIM_NAME, uri.stripQuery())
 
-        private fun JWTClaimsSet.Builder.nonce(nonce: Nonce?) =
+        private fun Builder.nonce(nonce: Nonce?) =
             apply { nonce?.let { claim(NONCE_CLAIM_NAME, it.value) } }
 
-        private fun JWTClaimsSet.Builder.ath(token: OAuth2AccessToken?) =
+        private fun Builder.ath(token: OAuth2AccessToken?) =
             apply { token?.let { claim(ATH_CLAIM_NAME, it.hash()) } }
     }
 }
