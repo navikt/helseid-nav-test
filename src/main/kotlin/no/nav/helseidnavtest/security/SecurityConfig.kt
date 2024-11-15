@@ -27,7 +27,6 @@ import org.springframework.security.oauth2.client.endpoint.*
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.jwt.JwtIssuerValidator
@@ -56,10 +55,8 @@ class SecurityConfig(
             .jwtProcessorCustomizer {
                 it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
             }.build().apply {
-
                 val issuerValidator = JwtIssuerValidator(props.jwt.issuerUri)
-                setJwtValidator(DelegatingOAuth2TokenValidator(JwtValidators.createDefaultWithValidators(),
-                    issuerValidator))
+                setJwtValidator(JwtValidators.createDefaultWithValidators(issuerValidator))
             }
 
     @Bean
