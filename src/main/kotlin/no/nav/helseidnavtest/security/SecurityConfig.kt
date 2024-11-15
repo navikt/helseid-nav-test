@@ -29,7 +29,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVATE_KEY_JWT
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
@@ -52,13 +51,12 @@ class SecurityConfig(
     fun jwtDecoder(props: OAuth2ResourceServerProperties) =
         NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
             .jwtProcessorCustomizer {
-                log.info("Issuer0: ${props.jwt.issuerUri}")
                 it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
-            }.build().apply {
+            }.build()/*.apply {
                 log.info("Issuer: ${props.jwt.issuerUri}")
                 val issuerValidator = JwtIssuerValidator(props.jwt.issuerUri)
                 //   setJwtValidator(JwtValidators.createDefaultWithValidators(issuerValidator))
-            }
+            }*/
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
