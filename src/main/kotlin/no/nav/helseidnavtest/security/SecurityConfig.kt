@@ -30,7 +30,6 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod.PRIVA
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority
 import org.springframework.security.oauth2.jwt.JwtIssuerValidator
-import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.util.LinkedMultiValueMap
@@ -57,7 +56,7 @@ class SecurityConfig(
             }.build().apply {
                 log.info("Issuer: ${props.jwt.issuerUri}")
                 val issuerValidator = JwtIssuerValidator(props.jwt.issuerUri)
-                setJwtValidator(JwtValidators.createDefaultWithValidators(issuerValidator))
+                //   setJwtValidator(JwtValidators.createDefaultWithValidators(issuerValidator))
             }
 
     @Bean
