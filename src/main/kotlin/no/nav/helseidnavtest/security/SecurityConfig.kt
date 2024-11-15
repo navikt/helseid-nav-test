@@ -51,17 +51,14 @@ class SecurityConfig(
     private val log = getLogger(SecurityConfig::class.java)
 
     @Bean
-    fun jwtDecoder(props: OAuth2ResourceServerProperties): NimbusJwtDecoder? {
-        val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
+    fun jwtDecoder(props: OAuth2ResourceServerProperties) =
+        NimbusJwtDecoder.withJwkSetUri(props.jwt.jwkSetUri)
             .jwtProcessorCustomizer {
                 it.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt"))
-            }.build()
-        val issuerValidator = JwtIssuerValidator("https://expected-issuer.com")
-        val combinedValidator =
-            DelegatingOAuth2TokenValidator(JwtValidators.createDefault(), issuerValidator)
-        jwtDecoder.setJwtValidator(combinedValidator)
-        return jwtDecoder
-    }
+            }.build().apply {
+                val issuerValidator = JwtIssuerValidator(props.jwt.issuerUri)
+                setJwtValidator(DelegatingOAuth2TokenValidator(JwtValidators.createDefault(), issuerValidator))
+            }
 
     @Bean
     fun userAuthoritiesMapper() = GrantedAuthoritiesMapper { authorities ->
