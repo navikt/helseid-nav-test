@@ -1,11 +1,9 @@
 package no.nav.helseidnavtest.security
 
-import com.nimbusds.jose.JWSAlgorithm
-import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.JWSObject
-import com.nimbusds.jose.Payload
+import com.nimbusds.jose.*
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.JWK
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.oauth2.sdk.AuthorizationRequest
 import com.nimbusds.oauth2.sdk.ResponseType
@@ -26,6 +24,9 @@ import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.SPECIALITIES
 import no.nav.helseidnavtest.security.ClaimsExtractor.Companion.VALUE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator
+import org.springframework.security.oauth2.jwt.JwtValidators.createDefaultWithValidators
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import java.net.URI
 
 class ClaimsExtractorTest {
@@ -43,6 +44,18 @@ class ClaimsExtractorTest {
           "qi": "bzgB4cM8Y0rQF6GoHgkEGAEfIGY8wkByKLlMDrJ1VOK0HVp2M0I8tYsKcMIxdWkRDywvx2Qu_ClXNSpcRRkB6mlglj2gULWkxLw4plXlAZg5gpRzUyKk-zyE1K7u2VuzahwHQoZTEFRji9pe_DbS8c9QXAEFsvI2IF9ILohlBZER-7Z9Bp3WRkxSGqWOr6vjoKugZP2T5NJojH9vTf7f7vbAnUJWARJB52cvUAoGHJ5H14QTAa-uPzQP9xj32jlT3g16spNNLxQFLZeyKFoA8jYhgEKPRJQBdTSkVa7JxSeI35quebBY1eGx_mzhQvGrMBRF3rbh-kGgrnEOB3_KWg"
         }
     """.trimIndent()
+
+    @Test
+    fun nimbus() {
+        val nimbus = NimbusJwtDecoder.withJwkSetUri("https://helseid-sts.test.nhn.no/.well-known/openid-configuration")
+            .jwtProcessorCustomizer {
+                it.setJWSTypeVerifier(DefaultJOSEObjectTypeVerifier(JOSEObjectType("at+jwt")))
+            }
+            .build().apply {
+                setJwtValidator(createDefaultWithValidators(JwtIssuerValidator("https://helseid-sts.test.nhn.no")))
+            }
+        println(nimbus)
+    }
 
     // @Test
     fun xxx() {
