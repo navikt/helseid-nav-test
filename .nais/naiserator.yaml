@@ -67,7 +67,7 @@ spec:
       memory: 8192Mi
     requests:
       cpu: 250m
-      memory: 4096Mi
+      memory: 256Mi
   env:
     - name: recovery_main
       value: {{recovery.main}}
